@@ -5,7 +5,7 @@
 
 // Параметры подключения к WiFi
 // Имя WiFi точки доступа
-const char* ssid = "WIFI SSID";
+const char* ssid = "WIFI_SSID";
 
 // Пароль к точке доступа
 const char* password = "WIFI PASSWORD";
