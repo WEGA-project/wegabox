@@ -31,7 +31,7 @@ float AirTemp, AirHum, RootTemp, CO2, tVOC;
 #define I2C_SDA 21         // SDA
 #define I2C_SCL 22         // SCL
  
-#define DS18B20 0 
+#define DS18B20 1 
 #define c_AHT10 1
 #define c_AM2320 0
 #define c_CCS811 1
@@ -105,6 +105,38 @@ void setup() {
 
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
+}
+
+// Функция Task1code: мигает светодиодом каждые 1000 мс:
+
+void Task1code( void * pvParameters ){
+for(;;){
+  //#if DS18B20 == 1
+  // sens18b20.requestTemperatures();
+  // RootTemp=sens18b20.getTempCByIndex(0);
+  // server.handleClient();
+  // ArduinoOTA.handle();
+  //RootTemp=12;
+  //#endif
+}
+}
+
+
+// Функция Task2code: мигает светодиодом каждые 700 мс:
+
+void Task2code( void * pvParameters ){
+  Serial.print("Task2 running on core ");
+           //  "Задача Task2 выполняется на ядре "
+  Serial.println(xPortGetCoreID());
+
+  for(;;){
+    digitalWrite(led2, HIGH);
+    delay(700);
+    digitalWrite(led2, LOW);
+    delay(700);
+  }
+
+
 
   // Создаем задачу с кодом из функции Task1code(),
   // с приоритетом 1 и выполняемую на ядре 0:
@@ -137,15 +169,16 @@ void setup() {
 }
 
 
+
 void loop() {
   server.handleClient();
   ArduinoOTA.handle();
 
-  // #if DS18B20 == 1
-  // sens18b20.requestTemperatures();
-  // RootTemp=sens18b20.getTempCByIndex(0);
-  // #endif
-
+  #if DS18B20 == 1
+  sens18b20.requestTemperatures();
+  RootTemp=sens18b20.getTempCByIndex(0);
+  #endif
+ 
   #if c_AHT10 == 1
   AirTemp=myAHT10.readTemperature();
   AirHum=myAHT10.readHumidity();
