@@ -61,11 +61,27 @@ void handleRoot() {
   server.send(200, "text/html",  httpstr);
   }
 
+void TaskOTA(void * parameters){
+  for(;;){
+    server.handleClient();
+    ArduinoOTA.handle();
+  }
+}
 
 void Task1(void * parameters){
   for(;;){
-    seta=13;
-    vTaskDelay(1000/ portTICK_PERIOD_MS);
+    //seta=13;
+      #if DS18B20 == 1
+      float ds0;
+      //while (ds0 != -127 )
+      //{
+      sens18b20.requestTemperatures();
+      ds0=sens18b20.getTempCByIndex(0);
+      //}
+      RootTemp=ds0;
+      #endif
+    //vTaskDelay(1000/ portTICK_PERIOD_MS);
+  
   }
 }
 
@@ -86,8 +102,8 @@ void setup() {
   server.begin();
 
   #if DS18B20 == 1
-  sens18b20.begin();
-  sens18b20.setResolution(12);
+      sens18b20.begin();
+      sens18b20.setResolution(12);
   #endif
 
   #if c_AHT10 == 1
@@ -103,21 +119,18 @@ void setup() {
   #endif
 
 
-  xTaskCreate(Task1,"Task1",1000,NULL,0,NULL);
-
+  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
+  xTaskCreate(Task1,"Task1",20000,NULL,2,NULL);
   server.handleClient();
   ArduinoOTA.handle();
 
 }
 
 void loop() {
-  server.handleClient();
-  ArduinoOTA.handle();
+  // server.handleClient();
+  // ArduinoOTA.handle();
 
-  #if DS18B20 == 1
-  sens18b20.requestTemperatures();
-  RootTemp=sens18b20.getTempCByIndex(0);
-  #endif
+
  
   #if c_AHT10 == 1
   AirTemp=myAHT10.readTemperature();

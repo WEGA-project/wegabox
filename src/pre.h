@@ -5,10 +5,10 @@
 
 // Параметры подключения к WiFi
 // Имя WiFi точки доступа
-const char* ssid = "WIFI SSID";
+const char* ssid = "dd-wrt";
 
 // Пароль к точке доступа
-const char* password = "WIFI PASSWORD";
+const char* password = "HruBse1447209";
 
 // Параметры подключения к WEGA-API
 // Адрес wega-api где ADDRESS адрес установленного сервера WEGA-API https://github.com/WEGA-project/WEGA/wiki/install
