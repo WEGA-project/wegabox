@@ -10,16 +10,7 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include <pre.h>
 
-// Контакты для светодиодов:
-const int led1 = 2;
-const int led2 = 4;
-
 #include <func>
-
-//TaskHandle_t Task1;
-
-
-
 
 // Переменные
 float AirTemp, AirHum, RootTemp, CO2, tVOC,seta;
