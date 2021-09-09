@@ -16,13 +16,13 @@ const int led2 = 4;
 
 #include <func>
 
-TaskHandle_t Task1;
-TaskHandle_t Task2;
+//TaskHandle_t Task1;
+
 
 
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,seta;
 
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -64,11 +64,19 @@ void handleRoot() {
        if(AirHum)   { httpstr +=  "AirHum=" +   fFTS(AirHum,3) + "<br>"; }
        if(CO2)   { httpstr +=  "CO2=" +   fFTS(CO2,3) + "<br>"; }
        if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,3) + "<br>"; }
-              
+        httpstr +=  "seta=" +   fFTS(seta,3) + "<br>";      
        
 
   server.send(200, "text/html",  httpstr);
   }
+
+
+void Task1(void * parameters){
+  for(;;){
+    seta=13;
+    vTaskDelay(1000/ portTICK_PERIOD_MS);
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -103,72 +111,13 @@ void setup() {
   ccs811.start(CCS811_MODE_1SEC);
   #endif
 
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-}
 
-// Функция Task1code: мигает светодиодом каждые 1000 мс:
+  xTaskCreate(Task1,"Task1",1000,NULL,0,NULL);
 
-void Task1code( void * pvParameters ){
-for(;;){
-  //#if DS18B20 == 1
-  // sens18b20.requestTemperatures();
-  // RootTemp=sens18b20.getTempCByIndex(0);
-  // server.handleClient();
-  // ArduinoOTA.handle();
-  //RootTemp=12;
-  //#endif
-}
-}
-
-
-// Функция Task2code: мигает светодиодом каждые 700 мс:
-
-void Task2code( void * pvParameters ){
-  Serial.print("Task2 running on core ");
-           //  "Задача Task2 выполняется на ядре "
-  Serial.println(xPortGetCoreID());
-
-  for(;;){
-    digitalWrite(led2, HIGH);
-    delay(700);
-    digitalWrite(led2, LOW);
-    delay(700);
-  }
-
-
-
-  // Создаем задачу с кодом из функции Task1code(),
-  // с приоритетом 1 и выполняемую на ядре 0:
-  xTaskCreatePinnedToCore(
-                    Task1code,   /* Функция задачи */
-                    "Task1",     /* Название задачи */
-                    10000,       /* Размер стека задачи */
-                    NULL,        /* Параметр задачи */
-                    1,           /* Приоритет задачи */
-                    &Task1,      /* Идентификатор задачи,
-                                    чтобы ее можно было отслеживать */
-                    0);          /* Ядро для выполнения задачи (0) */                  
-  delay(500); 
-
-
-  // Создаем задачу с кодом из функции Task2code(),
-  // с приоритетом 1 и выполняемую на ядре 1:
-  xTaskCreatePinnedToCore(
-                    Task2code,   /* Функция задачи */
-                    "Task2",     /* Название задачи */
-                    10000,       /* Размер стека задачи */
-                    NULL,        /* Параметр задачи */
-                    1,           /* Приоритет задачи */
-                    &Task2,      /* Идентификатор задачи,
-                                    чтобы ее можно было отслеживать */
-                    1);          /* Ядро для выполнения задачи (1) */
-
-    delay(500); 
+  server.handleClient();
+  ArduinoOTA.handle();
 
 }
-
-
 
 void loop() {
   server.handleClient();
@@ -195,6 +144,9 @@ void loop() {
       tVOC=etvoc;
     } 
   #endif
+
+
+
 
 }
 
