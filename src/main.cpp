@@ -1,4 +1,4 @@
-
+//  git update-index --assume-unchanged **/pre.h
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
@@ -62,12 +62,14 @@ void handleRoot() {
   }
 
 
-void Task1(void * parameters){
+void WebOTA(void * parameters){
   for(;;){
-    seta=13;
-    vTaskDelay(1000/ portTICK_PERIOD_MS);
+  server.handleClient();
+  ArduinoOTA.handle();
   }
 }
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -103,10 +105,8 @@ void setup() {
   #endif
 
 
-  xTaskCreate(Task1,"Task1",1000,NULL,0,NULL);
+  xTaskCreate(WebOTA,"WebOTA",10000,NULL,2,NULL);
 
-  server.handleClient();
-  ArduinoOTA.handle();
 
 }
 
