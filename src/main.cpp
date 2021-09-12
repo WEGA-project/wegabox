@@ -13,7 +13,7 @@ WebServer server(80);
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,seta;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,seta,hall;
 
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -26,6 +26,7 @@ float AirTemp, AirHum, RootTemp, CO2, tVOC,seta;
 #define c_AHT10 1
 #define c_AM2320 0
 #define c_CCS811 1
+#define c_hall 1
 
 
 #if DS18B20 == 1
@@ -55,7 +56,7 @@ void handleRoot() {
        if(AirHum)   { httpstr +=  "AirHum=" +   fFTS(AirHum,3) + "<br>"; }
        if(CO2)   { httpstr +=  "CO2=" +   fFTS(CO2,3) + "<br>"; }
        if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,3) + "<br>"; }
-        httpstr +=  "seta=" +   fFTS(seta,3) + "<br>";      
+       if(hall)   { httpstr +=  "hall=" +   fFTS(hall,3) + "<br>"; }     
        
 
   server.send(200, "text/html",  httpstr);
@@ -68,18 +69,19 @@ void TaskOTA(void * parameters){
   }
 }
 
+void HallInternalSensor(void * parameters){
+  for(;;){
+
+    delay(1000);
+  }
+}
+
+
+
 void Task1(void * parameters){
   for(;;){
     //seta=13;
-      #if DS18B20 == 1
-      float ds0;
-      //while (ds0 != -127 )
-      //{
-      sens18b20.requestTemperatures();
-      ds0=sens18b20.getTempCByIndex(0);
-      //}
-      RootTemp=ds0;
-      #endif
+
     //vTaskDelay(1000/ portTICK_PERIOD_MS);
   
   }
@@ -120,21 +122,26 @@ void setup() {
 
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
-  xTaskCreate(Task1,"Task1",20000,NULL,2,NULL);
+  //xTaskCreate(Task1,"Task1",20000,NULL,2,NULL);
+  //xTaskCreate(HallInternalSensor,"HallInternalSensor",20000,NULL,1,NULL);
+  //xTaskCreate(AHT10Sensor,"AHT10Sensor",20000,NULL,1,NULL);
+
   server.handleClient();
   ArduinoOTA.handle();
 
 }
 
 void loop() {
-  // server.handleClient();
-  // ArduinoOTA.handle();
 
 
- 
-  #if c_AHT10 == 1
-  AirTemp=myAHT10.readTemperature();
-  AirHum=myAHT10.readHumidity();
+  #if DS18B20 == 1
+  float ds0;
+  //while (ds0 != -127 )
+  //{
+  sens18b20.requestTemperatures();
+  ds0=sens18b20.getTempCByIndex(0);
+  //}
+  RootTemp=ds0;
   #endif
 
   #if c_CCS811 == 1
@@ -150,6 +157,21 @@ void loop() {
   #endif
 
 
+  #if c_AHT10 == 1
+    AirTemp=myAHT10.readTemperature();
+    delay(1000);
+    AirHum=myAHT10.readHumidity();
+  #endif
+
+  #if c_hall == 1
+      long n=0;
+      double sensorValue=0;
+      while ( n< 10){
+       n++;
+       sensorValue = hallRead()+sensorValue;
+       }
+    hall=sensorValue/n;
+  #endif
 
 
 }
