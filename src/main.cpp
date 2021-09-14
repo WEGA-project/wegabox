@@ -78,9 +78,26 @@ void TaskOTA(void * parameters){
   for(;;){
     server.handleClient();
     ArduinoOTA.handle();
+   // vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
+void TaskAHT10(void * parameters){
+  portMUX_TYPE myAhtMytex = portMUX_INITIALIZER_UNLOCKED;
+  for(;;){
+    portENTER_CRITICAL(&myAhtMytex);
+    AirTemp=myAHT10.readTemperature();
+    portEXIT_CRITICAL(&myAhtMytex);
+    
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+    
+    portENTER_CRITICAL(&myAhtMytex);
+    AirHum=myAHT10.readHumidity();
+    portEXIT_CRITICAL(&myAhtMytex);
+    
+    vTaskDelay(2 * 1000 / portTICK_PERIOD_MS);
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -139,6 +156,7 @@ void setup() {
   ArduinoOTA.handle();
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
+  xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
 
 }
 
@@ -165,11 +183,10 @@ void loop() {
   #endif
 
 
-  #if c_AHT10 == 1
-    AirTemp=myAHT10.readTemperature();
-    delay(1000);
-    AirHum=myAHT10.readHumidity();
-  #endif
+  // #if c_AHT10 == 1
+  //   AirTemp=myAHT10.readTemperature();
+  //   AirHum=myAHT10.readHumidity();
+  // #endif
 
   #if c_hall == 1
       long n=0;
