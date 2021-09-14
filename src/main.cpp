@@ -13,8 +13,8 @@ WebServer server(80);
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,seta,hall,pHmV;
-
+float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV;
+TaskHandle_t TaskAHT10Handler;
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
@@ -82,22 +82,66 @@ void TaskOTA(void * parameters){
   }
 }
 
-void TaskAHT10(void * parameters){
-  portMUX_TYPE myAhtMytex = portMUX_INITIALIZER_UNLOCKED;
+void TaskWegaApi(void * parameters){
   for(;;){
-    portENTER_CRITICAL(&myAhtMytex);
+
+// Sending to WEGA-API 
+WiFiClient client;
+HTTPClient http;
+
+String httpstr=wegaapi;
+httpstr +=  "?db=" + wegadb;
+httpstr +=  "&auth=" + wegaauth;
+httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
+if(RootTemp) httpstr +=  "&RootTemp=" + fFTS(RootTemp,3);
+if(AirTemp) httpstr +=  "&AirTemp=" +fFTS(AirTemp, 3);
+if(AirHum) httpstr +=  "&AirHum=" +fFTS(AirHum, 3);
+if(hall) httpstr +=  "&hall=" +fFTS(hall, 3);
+if(pHmV) httpstr +=  "&pHmV=" +fFTS(pHmV, 4);
+if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
+if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
+
+http.begin(client, httpstr);
+http.GET();
+http.end();
+
+
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.disconnect(true);
+    WiFi.begin(ssid, password);  }
+delay (10000);
+  }
+  
+}
+
+
+void TaskAHT10(void * parameters){
+  for(;;){
     AirTemp=myAHT10.readTemperature();
-    portEXIT_CRITICAL(&myAhtMytex);
-    
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-    
-    portENTER_CRITICAL(&myAhtMytex);
+    vTaskDelay(50);
     AirHum=myAHT10.readHumidity();
-    portEXIT_CRITICAL(&myAhtMytex);
-    
-    vTaskDelay(2 * 1000 / portTICK_PERIOD_MS);
+    vTaskDelay(50);
   }
 }
+
+
+
+// void TaskAHT10(void * parameters){
+//   portMUX_TYPE myAhtMytex = portMUX_INITIALIZER_UNLOCKED;
+//   for(;;){
+//     portENTER_CRITICAL(&myAhtMytex);
+//     AirTemp=myAHT10.readTemperature();
+//     portEXIT_CRITICAL(&myAhtMytex);
+    
+//     vTaskDelay(200 / portTICK_PERIOD_MS);
+    
+//     portENTER_CRITICAL(&myAhtMytex);
+//     AirHum=myAHT10.readHumidity();
+//     portEXIT_CRITICAL(&myAhtMytex);
+    
+//     vTaskDelay(2 * 1000 / portTICK_PERIOD_MS);
+//   }
+// }
 
 void setup() {
   Serial.begin(9600);
@@ -156,8 +200,16 @@ void setup() {
   ArduinoOTA.handle();
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
-  xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
+  xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
+// xTaskCreatePinnedToCore(
+//       TaskAHT10, // Function to implement the task
+//       "TaskAHT10",   // Name of the task
+//       10000,         // Stack size in words
+//       NULL,          // Task input parameter
+//       0,             // Priority of the task
+//       &TaskAHT10Handler,    // Task handle.
+//       0);
 }
 
 void loop() {
@@ -183,10 +235,10 @@ void loop() {
   #endif
 
 
-  // #if c_AHT10 == 1
-  //   AirTemp=myAHT10.readTemperature();
-  //   AirHum=myAHT10.readHumidity();
-  // #endif
+  #if c_AHT10 == 1
+    AirTemp=myAHT10.readTemperature();
+    AirHum=myAHT10.readHumidity();
+  #endif
 
   #if c_hall == 1
       long n=0;
@@ -217,9 +269,15 @@ void loop() {
 
   }
 
-
-
   #endif
+
+
+
+
+
+
+
+
 
 }
 
