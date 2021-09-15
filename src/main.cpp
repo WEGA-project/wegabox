@@ -8,12 +8,16 @@ WebServer server(80);
 
 #include <WiFiClient.h>
 #include <HTTPClient.h>
+#include "GyverFilters.h"
+//GMedian<50, int> PhFilter;    
+GKalman PhFilter(40, 40, 0.005);
+
 #include <pre.h>
 
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw;
 TaskHandle_t TaskAHT10Handler;
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -21,16 +25,25 @@ TaskHandle_t TaskAHT10Handler;
 #include <Wire.h>          // Шина I2C
 #define I2C_SDA 21         // SDA
 #define I2C_SCL 22         // SCL
- 
-#define DS18B20 1 
+
+
+// Подключенные устройства
+#define c_DS18B20 1 
 #define c_AHT10 1
 #define c_AM2320 0
 #define c_CCS811 1
 #define c_hall 1
 #define c_MCP3421 1
+#define c_ADS1115 0
 
 
-#if DS18B20 == 1
+
+
+
+
+
+
+#if c_DS18B20 == 1
   #include <OneWire.h>
   #include <DallasTemperature.h>
   OneWire oneWire(ONE_WIRE_BUS);
@@ -53,9 +66,16 @@ TaskHandle_t TaskAHT10Handler;
 // 0x68 is the default address for all MCP342x devices
   uint8_t address = 0x68;
   MCP342x adc = MCP342x(address);
-  MCP342x::Config config(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain1);
+  //MCP342x::Config config(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain1);
+  MCP342x::Config config(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18,MCP342x::gain4);
   MCP342x::Config status;
   bool startConversion = false;
+#endif
+
+#if c_ADS1115 == 1
+  #include<ADS1115_WE.h> 
+  #define I2C_ADDRESS 0x48
+  ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
 #endif
 
 
@@ -84,64 +104,35 @@ void TaskOTA(void * parameters){
 
 void TaskWegaApi(void * parameters){
   for(;;){
+    // Sending to WEGA-API 
+    WiFiClient client;
+    HTTPClient http;
 
-// Sending to WEGA-API 
-WiFiClient client;
-HTTPClient http;
+    String httpstr=wegaapi;
+    httpstr +=  "?db=" + wegadb;
+    httpstr +=  "&auth=" + wegaauth;
+    httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
+    if(RootTemp) httpstr +=  "&RootTemp=" + fFTS(RootTemp,3);
+    if(AirTemp) httpstr +=  "&AirTemp=" +fFTS(AirTemp, 3);
+    if(AirHum) httpstr +=  "&AirHum=" +fFTS(AirHum, 3);
+    if(hall) httpstr +=  "&hall=" +fFTS(hall, 3);
+    if(pHmV) httpstr +=  "&pHmV=" +fFTS(pHmV, 4);
+    if(pHraw) httpstr +=  "&pHraw=" +fFTS(pHraw, 4);
+    if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
+    if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
 
-String httpstr=wegaapi;
-httpstr +=  "?db=" + wegadb;
-httpstr +=  "&auth=" + wegaauth;
-httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
-if(RootTemp) httpstr +=  "&RootTemp=" + fFTS(RootTemp,3);
-if(AirTemp) httpstr +=  "&AirTemp=" +fFTS(AirTemp, 3);
-if(AirHum) httpstr +=  "&AirHum=" +fFTS(AirHum, 3);
-if(hall) httpstr +=  "&hall=" +fFTS(hall, 3);
-if(pHmV) httpstr +=  "&pHmV=" +fFTS(pHmV, 4);
-if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
-if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
+    http.begin(client, httpstr);
+    http.GET();
+    http.end();
 
-http.begin(client, httpstr);
-http.GET();
-http.end();
-
-
-  if (WiFi.status() != WL_CONNECTED) {
-    WiFi.disconnect(true);
-    WiFi.begin(ssid, password);  }
-delay (10000);
+      if (WiFi.status() != WL_CONNECTED) {
+        WiFi.disconnect(true);
+        WiFi.begin(ssid, password);  }
+    delay (10000);
   }
   
 }
 
-
-void TaskAHT10(void * parameters){
-  for(;;){
-    AirTemp=myAHT10.readTemperature();
-    vTaskDelay(50);
-    AirHum=myAHT10.readHumidity();
-    vTaskDelay(50);
-  }
-}
-
-
-
-// void TaskAHT10(void * parameters){
-//   portMUX_TYPE myAhtMytex = portMUX_INITIALIZER_UNLOCKED;
-//   for(;;){
-//     portENTER_CRITICAL(&myAhtMytex);
-//     AirTemp=myAHT10.readTemperature();
-//     portEXIT_CRITICAL(&myAhtMytex);
-    
-//     vTaskDelay(200 / portTICK_PERIOD_MS);
-    
-//     portENTER_CRITICAL(&myAhtMytex);
-//     AirHum=myAHT10.readHumidity();
-//     portEXIT_CRITICAL(&myAhtMytex);
-    
-//     vTaskDelay(2 * 1000 / portTICK_PERIOD_MS);
-//   }
-// }
 
 void setup() {
   Serial.begin(9600);
@@ -159,14 +150,13 @@ void setup() {
   server.on("/",handleRoot);
   server.begin();
 
-  #if DS18B20 == 1
+  #if c_DS18B20 == 1
       sens18b20.begin();
       sens18b20.setResolution(12);
   #endif
 
   #if c_AHT10 == 1
   Wire.begin(I2C_SDA, I2C_SCL);
-  myAHT10.begin();
   #endif
 
   #if c_CCS811 == 1
@@ -185,14 +175,16 @@ void setup() {
       Serial.print("No device found at address ");
       Serial.println(address, HEX);
       while (1);
-  }
+   }
+    adc.configure(config);
+    startConversion = true;
+  #endif
 
-  // Configure the device with the desired settings. If there are
-  // multiple devices you must do this for each one.
-  adc.configure(config);
-  
-  // First time loop() is called start a conversion
-  startConversion = true;
+  #if c_ADS1115 == 1
+    if(!adc.init()) Serial.println("ADS1115 not connected!");
+    adc.setVoltageRange_mV(ADS1115_RANGE_2048);
+    adc.setConvRate(ADS1115_128_SPS);
+    adc.setMeasureMode(ADS1115_SINGLE);
   #endif
 
 
@@ -201,21 +193,12 @@ void setup() {
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
-
-// xTaskCreatePinnedToCore(
-//       TaskAHT10, // Function to implement the task
-//       "TaskAHT10",   // Name of the task
-//       10000,         // Stack size in words
-//       NULL,          // Task input parameter
-//       0,             // Priority of the task
-//       &TaskAHT10Handler,    // Task handle.
-//       0);
 }
 
 void loop() {
 
 
-  #if DS18B20 == 1
+  #if c_DS18B20 == 1
     sens18b20.requestTemperatures();
     float ds0=sens18b20.getTempCByIndex(0);
     if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
@@ -236,8 +219,17 @@ void loop() {
 
 
   #if c_AHT10 == 1
-    AirTemp=myAHT10.readTemperature();
-    AirHum=myAHT10.readHumidity();
+    myAHT10.begin();
+    
+    float AirTemp0=myAHT10.readTemperature();
+    if(AirTemp0 != 255) AirTemp=AirTemp0;
+    delay(50);
+    
+    float AirHum0=myAHT10.readHumidity();
+    if(AirHum0 != 255) AirHum=AirHum0;
+    delay(50);
+    
+    
   #endif
 
   #if c_hall == 1
@@ -251,28 +243,25 @@ void loop() {
   #endif
 
   #if c_MCP3421 == 1
+    long value = 0;
+    uint8_t err;
+    if (startConversion) {
+      MCP342x::generalCallConversion();
+      startConversion = false;
+    }
 
-      long value = 0;
-  uint8_t err;
-
-  if (startConversion) {
-    MCP342x::generalCallConversion();
-    startConversion = false;
-  }
-  
-  err = adc.read(value, status);
-  if (!err && status.isReady()) { 
-
-    startConversion = true;
-    
-    pHmV=4096/pow(2,18)*value;
-
-  }
-
+    err = adc.read(value, status);
+    if (!err && status.isReady()) { 
+      startConversion = true;
+      pHraw=value;
+      if(pHraw !=-26) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
+    }
   #endif
 
-
-
+  #if c_ADS1115 == 1
+    adc.setCompareChannels(ADS1115_COMP_1_3);
+    pHmV=adc.getResult_mV();
+  #endif
 
 
 
