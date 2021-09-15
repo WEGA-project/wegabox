@@ -17,7 +17,7 @@ GKalman PhFilter(40, 40, 0.005);
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An;
 TaskHandle_t TaskAHT10Handler;
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -35,9 +35,8 @@ TaskHandle_t TaskAHT10Handler;
 #define c_hall 1
 #define c_MCP3421 1
 #define c_ADS1115 0
-
-
-
+#define c_NTC 1
+#define c_EC 1
 
 
 
@@ -78,6 +77,18 @@ TaskHandle_t TaskAHT10Handler;
   ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
 #endif
 
+#if c_NTC == 1
+ #define NTC_port 32
+ #define NTC_MiddleCount 10000
+#endif
+
+#if c_EC == 1
+  #define EC_DigitalPort1 18
+  #define EC_DigitalPort2 19
+  #define EC_AnalogPort 33
+  #define EC_MiddleCount 10000
+#endif
+
 
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";
@@ -90,6 +101,9 @@ void handleRoot() {
        if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,3) + "<br>"; }
        if(hall)   { httpstr +=  "hall=" +   fFTS(hall,3) + "<br>"; }     
        if(pHmV)   { httpstr +=  "pHmV=" +   fFTS(pHmV,3) + "<br>"; }
+       if(NTC)   { httpstr +=  "NTC=" +   fFTS(NTC,3) + "<br>"; }
+       if(Ap)   { httpstr +=  "Ap=" +   fFTS(Ap,3) + "<br>"; }
+       if(An)   { httpstr +=  "An=" +   fFTS(An,3) + "<br>"; }
 
   server.send(200, "text/html",  httpstr);
   }
@@ -120,6 +134,9 @@ void TaskWegaApi(void * parameters){
     if(pHraw) httpstr +=  "&pHraw=" +fFTS(pHraw, 4);
     if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
     if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
+    if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 0);
+    if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 0);
+    if(An) httpstr +=  "&An=" +fFTS(An, 0);
 
     http.begin(client, httpstr);
     http.GET();
@@ -228,8 +245,6 @@ void loop() {
     float AirHum0=myAHT10.readHumidity();
     if(AirHum0 != 255) AirHum=AirHum0;
     delay(50);
-    
-    
   #endif
 
   #if c_hall == 1
@@ -254,7 +269,8 @@ void loop() {
     if (!err && status.isReady()) { 
       startConversion = true;
       pHraw=value;
-      if(pHraw !=-26) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
+      //PhFilter.setParameters(1,1);
+      if(pHraw !=-26 and pHraw != 129) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
     }
   #endif
 
@@ -263,9 +279,46 @@ void loop() {
     pHmV=adc.getResult_mV();
   #endif
 
+  #if c_NTC == 1
+    long count=0;
+    float NTC0=0;
+    pinMode(NTC_port, INPUT);
+    while (count < NTC_MiddleCount){
+      count++;
+      NTC0=analogRead(NTC_port)+NTC0;
+    }
+    NTC=NTC0/count;
+  #endif
 
+  #if c_EC == 1
+    float Ap0 = 0;
+    float An0 = 0;
+    double eccount = 0;
 
+    pinMode(EC_AnalogPort, INPUT);
+    pinMode(EC_DigitalPort1, OUTPUT);
+    pinMode(EC_DigitalPort2, OUTPUT);
 
+    while (eccount < EC_MiddleCount){
+      eccount++;
+      digitalWrite(EC_DigitalPort1, HIGH);
+      delayMicroseconds(1);
+      Ap0 = analogRead(EC_AnalogPort) + Ap0;
+      digitalWrite(EC_DigitalPort1, LOW);
+
+      digitalWrite(EC_DigitalPort2, HIGH);
+      delayMicroseconds(1);
+      An0 = analogRead(EC_AnalogPort) + An0;
+      digitalWrite(EC_DigitalPort2, LOW);
+    }
+
+    pinMode(EC_DigitalPort1, INPUT);
+    pinMode(EC_DigitalPort2, INPUT);
+    pinMode(EC_AnalogPort, INPUT);
+
+    Ap = Ap0 / eccount;
+    An = An0 / eccount;
+  #endif
 
 
 }
