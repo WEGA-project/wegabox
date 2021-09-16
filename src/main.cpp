@@ -33,8 +33,8 @@ TaskHandle_t TaskAHT10Handler;
 #define c_AM2320 0
 #define c_CCS811 1
 #define c_hall 1
-#define c_MCP3421 1
-#define c_ADS1115 0
+#define c_MCP3421 0
+#define c_ADS1115 1
 #define c_NTC 1
 #define c_EC 1
 
@@ -86,7 +86,7 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 50000
+  #define EC_MiddleCount 10000
 #endif
 
 
@@ -255,10 +255,10 @@ void setup() {
   #endif
 
   #if c_ADS1115 == 1
-    if(!adc.init()) Serial.println("ADS1115 not connected!");
-    adc.setVoltageRange_mV(ADS1115_RANGE_2048);
-    adc.setConvRate(ADS1115_128_SPS);
-    adc.setMeasureMode(ADS1115_SINGLE);
+   adc.init();
+   adc.setConvRate(ADS1115_128_SPS);
+   adc.setVoltageRange_mV(ADS1115_RANGE_0256);
+   adc.setMeasureMode(ADS1115_CONTINUOUS);
   #endif
 
 
@@ -336,8 +336,8 @@ void loop() {
   #endif
 
   #if c_ADS1115 == 1
-    adc.setCompareChannels(ADS1115_COMP_1_3);
-    pHmV=adc.getResult_mV();
+    adc.setCompareChannels(ADS1115_COMP_0_3);
+    pHmV=PhFilter.filtered(adc.getResult_mV());
   #endif
 
 
