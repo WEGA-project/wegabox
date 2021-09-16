@@ -86,7 +86,7 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 1000
+  #define EC_MiddleCount 50000
 #endif
 
 
@@ -97,8 +97,8 @@ void handleRoot() {
        if(RootTemp) { httpstr +=  "RootTemp=" + fFTS(RootTemp,3) + "<br>"; }
        if(AirTemp)  { httpstr +=  "AirTemp=" +  fFTS(AirTemp,3) + "<br>"; }
        if(AirHum)   { httpstr +=  "AirHum=" +   fFTS(AirHum,3) + "<br>"; }
-       if(CO2)   { httpstr +=  "CO2=" +   fFTS(CO2,3) + "<br>"; }
-       if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,3) + "<br>"; }
+       if(CO2)   { httpstr +=  "CO2=" +   fFTS(CO2,0) + "<br>"; }
+       if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,0) + "<br>"; }
        if(hall)   { httpstr +=  "hall=" +   fFTS(hall,3) + "<br>"; }     
        if(pHmV)   { httpstr +=  "pHmV=" +   fFTS(pHmV,3) + "<br>"; }
        if(NTC)   { httpstr +=  "NTC=" +   fFTS(NTC,3) + "<br>"; }
@@ -134,9 +134,9 @@ void TaskWegaApi(void * parameters){
     if(pHraw) httpstr +=  "&pHraw=" +fFTS(pHraw, 4);
     if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
     if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
-    if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 0);
-    if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 0);
-    if(An) httpstr +=  "&An=" +fFTS(An, 0);
+    if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 3);
+    if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 3);
+    if(An) httpstr +=  "&An=" +fFTS(An, 3);
 
     http.begin(client, httpstr);
     http.GET();
@@ -151,20 +151,6 @@ void TaskWegaApi(void * parameters){
 }
 
 
-void TaskNTC(void * parameters){
-  for(;;){
-    // long count=0;
-    // float NTC0=0;
-    // pinMode(NTC_port, INPUT);
-    // while (count < NTC_MiddleCount){
-    //   count++;
-    //   NTC0=analogRead(NTC_port)+NTC0;
-    //   ArduinoOTA.handle();
-    // }
-    // NTC=NTC0/count;
-    delay (1000);
-  }
-}
 
 
 
@@ -176,24 +162,32 @@ void TaskEC(void * parameters){
     float An0 = 0;
     double eccount = 0;
 
+    #if c_NTC == 1
+      float NTC0=0;
+    #endif // c_NTC 
+
     pinMode(EC_AnalogPort, INPUT);
+    pinMode(NTC_port, INPUT);
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
 
     while (eccount < EC_MiddleCount){
       eccount++;
       digitalWrite(EC_DigitalPort1, HIGH);
-      //delayMicroseconds(1);
       Ap0 = analogRead(EC_AnalogPort) + Ap0;
       digitalWrite(EC_DigitalPort1, LOW);
-
+      
       digitalWrite(EC_DigitalPort2, HIGH);
-      //delayMicroseconds(1);
       An0 = analogRead(EC_AnalogPort) + An0;
       digitalWrite(EC_DigitalPort2, LOW);
 
     ArduinoOTA.handle();
-    vTaskDelay(1 / portTICK_PERIOD_MS);   
+    vTaskDelay(1 / portTICK_PERIOD_MS); 
+
+    #if c_NTC == 1
+      NTC0=analogRead(NTC_port)+NTC0;
+    #endif // c_NTC 
+
     }
     
     pinMode(EC_DigitalPort1, INPUT);
@@ -203,24 +197,13 @@ void TaskEC(void * parameters){
     Ap = Ap0 / eccount;
     An = An0 / eccount;
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    #if c_NTC == 1
+      NTC = NTC0 / eccount;
+    #endif // c_NTC
+
+    vTaskDelay(200 / portTICK_PERIOD_MS);
     server.handleClient();
   #endif // c_EC
-
-  #if c_NTC == 1
-    long count=0;
-    float NTC0=0;
-    pinMode(NTC_port, INPUT);
-    while (count < NTC_MiddleCount){
-      count++;
-      NTC0=analogRead(NTC_port)+NTC0;
-      ArduinoOTA.handle();
-      vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-    NTC=NTC0/count;
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    server.handleClient();
-  #endif // c_NTC
   }
 
 }
@@ -285,7 +268,7 @@ void setup() {
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
   xTaskCreate(TaskEC,"TaskEC",10000,NULL,4,NULL);
- // xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,4,NULL);
+
   
 }
 
@@ -348,7 +331,7 @@ void loop() {
       startConversion = true;
       pHraw=value;
       //PhFilter.setParameters(1,1);
-      if(pHraw !=-26 and pHraw != 129) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
+      if(pHraw !=-26 and pHraw != 129 and pHraw != 126 and pHraw != 26) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
     }
   #endif
 
