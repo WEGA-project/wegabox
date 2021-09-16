@@ -10,7 +10,7 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include "GyverFilters.h"
 //GMedian<50, int> PhFilter;    
-GKalman PhFilter(40, 40, 0.005);
+GKalman PhFilter(150, 0.05);
 
 #include <pre.h>
 
@@ -86,7 +86,7 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 10000
+  #define EC_MiddleCount 1000
 #endif
 
 
@@ -112,7 +112,7 @@ void TaskOTA(void * parameters){
   for(;;){
     server.handleClient();
     ArduinoOTA.handle();
-   // vTaskDelay(200 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
@@ -150,6 +150,80 @@ void TaskWegaApi(void * parameters){
   
 }
 
+
+void TaskNTC(void * parameters){
+  for(;;){
+    // long count=0;
+    // float NTC0=0;
+    // pinMode(NTC_port, INPUT);
+    // while (count < NTC_MiddleCount){
+    //   count++;
+    //   NTC0=analogRead(NTC_port)+NTC0;
+    //   ArduinoOTA.handle();
+    // }
+    // NTC=NTC0/count;
+    delay (1000);
+  }
+}
+
+
+
+void TaskEC(void * parameters){
+  for(;;){
+  
+  #if c_EC == 1
+    float Ap0 = 0;
+    float An0 = 0;
+    double eccount = 0;
+
+    pinMode(EC_AnalogPort, INPUT);
+    pinMode(EC_DigitalPort1, OUTPUT);
+    pinMode(EC_DigitalPort2, OUTPUT);
+
+    while (eccount < EC_MiddleCount){
+      eccount++;
+      digitalWrite(EC_DigitalPort1, HIGH);
+      //delayMicroseconds(1);
+      Ap0 = analogRead(EC_AnalogPort) + Ap0;
+      digitalWrite(EC_DigitalPort1, LOW);
+
+      digitalWrite(EC_DigitalPort2, HIGH);
+      //delayMicroseconds(1);
+      An0 = analogRead(EC_AnalogPort) + An0;
+      digitalWrite(EC_DigitalPort2, LOW);
+
+    ArduinoOTA.handle();
+    vTaskDelay(1 / portTICK_PERIOD_MS);   
+    }
+    
+    pinMode(EC_DigitalPort1, INPUT);
+    pinMode(EC_DigitalPort2, INPUT);
+    pinMode(EC_AnalogPort, INPUT);
+
+    Ap = Ap0 / eccount;
+    An = An0 / eccount;
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    server.handleClient();
+  #endif // c_EC
+
+  #if c_NTC == 1
+    long count=0;
+    float NTC0=0;
+    pinMode(NTC_port, INPUT);
+    while (count < NTC_MiddleCount){
+      count++;
+      NTC0=analogRead(NTC_port)+NTC0;
+      ArduinoOTA.handle();
+      vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+    NTC=NTC0/count;
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    server.handleClient();
+  #endif // c_NTC
+  }
+
+}
 
 void setup() {
   Serial.begin(9600);
@@ -210,12 +284,16 @@ void setup() {
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
+  xTaskCreate(TaskEC,"TaskEC",10000,NULL,4,NULL);
+ // xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,4,NULL);
+  
 }
 
 void loop() {
 
 
   #if c_DS18B20 == 1
+    sens18b20.begin();
     sens18b20.requestTemperatures();
     float ds0=sens18b20.getTempCByIndex(0);
     if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
@@ -277,47 +355,6 @@ void loop() {
   #if c_ADS1115 == 1
     adc.setCompareChannels(ADS1115_COMP_1_3);
     pHmV=adc.getResult_mV();
-  #endif
-
-  #if c_NTC == 1
-    long count=0;
-    float NTC0=0;
-    pinMode(NTC_port, INPUT);
-    while (count < NTC_MiddleCount){
-      count++;
-      NTC0=analogRead(NTC_port)+NTC0;
-    }
-    NTC=NTC0/count;
-  #endif
-
-  #if c_EC == 1
-    float Ap0 = 0;
-    float An0 = 0;
-    double eccount = 0;
-
-    pinMode(EC_AnalogPort, INPUT);
-    pinMode(EC_DigitalPort1, OUTPUT);
-    pinMode(EC_DigitalPort2, OUTPUT);
-
-    while (eccount < EC_MiddleCount){
-      eccount++;
-      digitalWrite(EC_DigitalPort1, HIGH);
-      delayMicroseconds(1);
-      Ap0 = analogRead(EC_AnalogPort) + Ap0;
-      digitalWrite(EC_DigitalPort1, LOW);
-
-      digitalWrite(EC_DigitalPort2, HIGH);
-      delayMicroseconds(1);
-      An0 = analogRead(EC_AnalogPort) + An0;
-      digitalWrite(EC_DigitalPort2, LOW);
-    }
-
-    pinMode(EC_DigitalPort1, INPUT);
-    pinMode(EC_DigitalPort2, INPUT);
-    pinMode(EC_AnalogPort, INPUT);
-
-    Ap = Ap0 / eccount;
-    An = An0 / eccount;
   #endif
 
 
