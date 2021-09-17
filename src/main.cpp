@@ -10,7 +10,7 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include "GyverFilters.h"
 GMedian<7, int> PhMediana;    
-GABfilter PhGAB(0.001, 200, 1);
+GABfilter PhGAB(0.001, 150, 1);
 
 
 #include <pre.h>
@@ -63,13 +63,8 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_MCP3421 == 1
   #include <MCP342x.h>
-// 0x68 is the default address for all MCP342x devices
   uint8_t address = 0x68;
   MCP342x adc = MCP342x(address);
-  //MCP342x::Config config(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain1);
-  // MCP342x::Config config(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18,MCP342x::gain4);
-  // MCP342x::Config status;
-  // bool startConversion = false;
 #endif
 
 #if c_ADS1115 == 1
@@ -87,7 +82,7 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 10000
+  #define EC_MiddleCount 50000
 #endif
 
 
@@ -147,7 +142,7 @@ void TaskWegaApi(void * parameters){
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
     ArduinoOTA.handle();   
-    delay (10000); // Периодичность отправки данных в базу (в мс)
+    delay (60000); // Периодичность отправки данных в базу (в мс)
   }
   
 }
@@ -254,14 +249,7 @@ void setup() {
     // startConversion = true;
   #endif
 
-  #if c_ADS1115 == 1
-   adc.init();
-   adc.setConvRate(ADS1115_128_SPS);
-   adc.setVoltageRange_mV(ADS1115_RANGE_0256);
-   adc.setMeasureMode(ADS1115_CONTINUOUS);
-  #endif
-
-
+ 
   server.handleClient();
   ArduinoOTA.handle();
 
@@ -349,7 +337,7 @@ void loop() {
       pHmV=pHraw;
     }else{
       PhGAB.setParameters(0.001, 200, 1);
-      pHmV=PhGAB.filtered(pHraw;
+      pHmV=PhGAB.filtered(pHraw);
     }
   #endif // c_ADS1115
 
