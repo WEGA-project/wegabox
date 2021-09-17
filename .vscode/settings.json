@@ -1,5 +1,13 @@
 {
     "files.associations": {
-        "func": "cpp"
+        "func": "cpp",
+        "*.tcc": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "regex": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     }
 }

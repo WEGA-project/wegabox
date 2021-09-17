@@ -9,8 +9,9 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include "GyverFilters.h"
-//GMedian<50, int> PhFilter;    
-GKalman PhFilter(150, 0.05);
+GMedian<7, int> PhMediana;    
+GABfilter PhGAB(0.001, 200, 1);
+
 
 #include <pre.h>
 
@@ -33,8 +34,8 @@ TaskHandle_t TaskAHT10Handler;
 #define c_AM2320 0
 #define c_CCS811 1
 #define c_hall 1
-#define c_MCP3421 0
-#define c_ADS1115 1
+#define c_MCP3421 1
+#define c_ADS1115 0
 #define c_NTC 1
 #define c_EC 1
 
@@ -66,9 +67,9 @@ TaskHandle_t TaskAHT10Handler;
   uint8_t address = 0x68;
   MCP342x adc = MCP342x(address);
   //MCP342x::Config config(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain1);
-  MCP342x::Config config(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18,MCP342x::gain4);
-  MCP342x::Config status;
-  bool startConversion = false;
+  // MCP342x::Config config(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18,MCP342x::gain4);
+  // MCP342x::Config status;
+  // bool startConversion = false;
 #endif
 
 #if c_ADS1115 == 1
@@ -145,12 +146,11 @@ void TaskWegaApi(void * parameters){
       if (WiFi.status() != WL_CONNECTED) {
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
-    delay (10000);
+    ArduinoOTA.handle();   
+    delay (10000); // Периодичность отправки данных в базу (в мс)
   }
   
 }
-
-
 
 
 
@@ -250,8 +250,8 @@ void setup() {
       Serial.println(address, HEX);
       while (1);
    }
-    adc.configure(config);
-    startConversion = true;
+    // adc.configure(config);
+    // startConversion = true;
   #endif
 
   #if c_ADS1115 == 1
@@ -320,28 +320,41 @@ void loop() {
 
   #if c_MCP3421 == 1
     long value = 0;
-    uint8_t err;
-    if (startConversion) {
-      MCP342x::generalCallConversion();
-      startConversion = false;
+    MCP342x::Config status;
+    // Initiate a conversion; convertAndRead() will wait until it can be read
+    uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
+    if (err) {
+      Serial.print("Convert error: ");
+      Serial.println(err);
     }
-
-    err = adc.read(value, status);
-    if (!err && status.isReady()) { 
-      startConversion = true;
-      pHraw=value;
-      //PhFilter.setParameters(1,1);
-      if(pHraw !=-26 and pHraw != 129 and pHraw != 126 and pHraw != 26) pHmV=4096/pow(2,18)*PhFilter.filtered(pHraw)/4;
+    else {
+      pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
+      if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
+        PhGAB.setParameters(1,1,1);
+        PhGAB.filtered(pHraw);
+        pHmV=4096/pow(2,18)*pHraw/1;
+      }else{
+        PhGAB.setParameters(0.001, 200, 1);
+        pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
+      }
     }
-  #endif
+  #endif // c_MCP3421
 
   #if c_ADS1115 == 1
     adc.setCompareChannels(ADS1115_COMP_0_3);
-    pHmV=PhFilter.filtered(adc.getResult_mV());
-  #endif
+    pHraw=PhMediana.filtered(adc.getResult_mV());
+    if (millis() < 60000){
+      PhGAB.setParameters(1,1,1);
+      PhGAB.filtered(pHraw);
+      pHmV=pHraw;
+    }else{
+      PhGAB.setParameters(0.001, 200, 1);
+      pHmV=PhGAB.filtered(pHraw;
+    }
+  #endif // c_ADS1115
 
 
-}
+} // loop
 
 
 
