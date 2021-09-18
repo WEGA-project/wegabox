@@ -5,48 +5,5 @@ String fFTS(float x, byte precision) {
   return String(tmp);
 }
 
-// Функция прямого опроса ультразвукового датчика возврат в микросекундах эха
-float us(int trg, int ech, float temp, long cnt) {
-   long count=0;
- long microssum=0;
- while (count < cnt) {
-  count++;
-    ArduinoOTA.handle();
-       
-    pinMode(trg, OUTPUT );
-    pinMode(ech, INPUT);
-
-    digitalWrite(trg,1);
-    delayMicroseconds(10);
-    digitalWrite(trg,0);
 
 
-    long n=0;
-    long limit=10000;
-    
-    long startmic,endmicros;
-    while (n<limit){
-      n++;
-    if(digitalRead(ech) == 1)  
-      {
-      startmic=micros();
-      long z=0;
-      while (digitalRead(ech) == 1 and z<20000) {
-        z++;
-        endmicros=micros();
-        }
-        n=limit;
-        delay(200);
-      } 
-
-    }
-
-  microssum=microssum+(endmicros-startmic);
-      
- }
- 
- float vSound=20.046796*sqrt(273.15+temp);
- float DistCm = (vSound/10000)*((float(microssum)/count)/2);
- if (DistCm > 0 and DistCm < 200 ) return DistCm; // В сантиметрах
- //return (float(microssum)/count);  // В миллисекундах
-}

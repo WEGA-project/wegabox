@@ -24,3 +24,16 @@ String wegaauth = "adab637320e5c47624cdd15169276981";
 // Имя базы данных - уникальное имя для устройства. База будет создана автоматически.
 // каждому устройству должна быть назначена своя отдельная база!             
 String wegadb   = "wegabox";
+
+// Подключенные устройства
+#define c_DS18B20 1 
+#define c_AHT10 1
+#define c_AM2320 0
+#define c_CCS811 1
+#define c_hall 1
+#define c_MCP3421 1
+#define c_ADS1115 0
+#define c_NTC 1
+#define c_EC 1
+#define c_US025 1
+#define c_MCP23017 0

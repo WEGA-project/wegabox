@@ -28,19 +28,6 @@ TaskHandle_t TaskAHT10Handler;
 #define I2C_SCL 22         // SCL
 
 
-// Подключенные устройства
-#define c_DS18B20 1 
-#define c_AHT10 1
-#define c_AM2320 0
-#define c_CCS811 1
-#define c_hall 1
-#define c_MCP3421 1
-#define c_ADS1115 0
-#define c_NTC 1
-#define c_EC 1
-#define c_US025 1
-
-
 #if c_DS18B20 == 1
   #include <OneWire.h>
   #include <DallasTemperature.h>
@@ -88,9 +75,13 @@ TaskHandle_t TaskAHT10Handler;
 //dst=us(13,14,25,60);
   #define US_ECHO 13
   #define US_TRIG 14
+  #define US_MiddleCount 50
 #endif // c_US025
 
-
+#if c_MCP23017 == 1
+  #include <Adafruit_MCP23X17.h>
+  Adafruit_MCP23X17 mcp;
+#endif // c_MCP23017
 
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";
@@ -150,7 +141,7 @@ void TaskWegaApi(void * parameters){
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
     ArduinoOTA.handle();   
-    delay (60000); // Периодичность отправки данных в базу (в мс)
+    delay (20000); // Периодичность отправки данных в базу (в мс)
   }
   
 }
@@ -209,6 +200,56 @@ void TaskEC(void * parameters){
 
 }
 
+#if c_US025 == 1
+void TaskDist(void * parameters){
+  for(;;){
+    server.handleClient();
+    ArduinoOTA.handle();
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+
+    float temp=25;
+    long cnt=US_MiddleCount;  
+    long count=0;
+    long microssum=0;
+    long startmic;
+    long endmicros;
+    while (count < cnt) {
+      count++;
+      ArduinoOTA.handle();
+      pinMode(US_TRIG, OUTPUT );
+      pinMode(US_ECHO, INPUT);
+      digitalWrite(US_TRIG,1);
+      delayMicroseconds(10);
+      digitalWrite(US_TRIG,0);
+      long n=0;
+      long limit=10000;
+
+      while (n<limit){
+        n++;
+        if(digitalRead(US_ECHO) == 1)  
+        {
+          startmic=micros();
+          long z=0;
+          while (digitalRead(US_ECHO) == 1 and z<20000) {
+            z++;
+            endmicros=micros();
+          }
+          n = limit;
+          //delay(200);
+          vTaskDelay(200 / portTICK_PERIOD_MS);
+        } 
+      }
+      microssum=microssum+(endmicros-startmic);
+    }
+
+    float vSound=20.046796*sqrt(273.15+temp);
+    float DistCm = (vSound/10000)*((float(microssum)/count)/2);
+    if (DistCm > 0 and DistCm < 200 ) Dist=DistCm; // В сантиметрах слать только реальные значения от 0 до 2 метров
+    
+  }
+} // TaskDist
+#endif // c_US025
+
 void setup() {
   Serial.begin(9600);
   WiFi.mode(WIFI_STA);
@@ -255,15 +296,33 @@ void setup() {
     // startConversion = true;
   #endif
 
+  #if c_ADS1115 == 1
+   adc.init();
+   adc.setConvRate(ADS1115_128_SPS);
+   adc.setVoltageRange_mV(ADS1115_RANGE_0256);
+   adc.setMeasureMode(ADS1115_CONTINUOUS);
+  #endif // c_ADS1115
+
+  #if c_MCP23017 == 1
+    if (!mcp.begin_I2C()) {
+      Serial.println("Error.");
+      while (1);
+    }
+  #endif // c_MCP23017
  
   server.handleClient();
   ArduinoOTA.handle();
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
-  xTaskCreate(TaskEC,"TaskEC",10000,NULL,4,NULL);
 
-  
+  #if c_EC == 1
+  xTaskCreate(TaskEC,"TaskEC",10000,NULL,4,NULL);
+  #endif
+
+  #if c_US025 == 1
+  xTaskCreate(TaskDist,"TaskDist",10000,NULL,1,NULL);
+  #endif
 }
 
 void loop() {
@@ -324,7 +383,7 @@ void loop() {
     else {
       pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
       if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
-        PhGAB.setParameters(1,1,1);
+        PhGAB.setParameters(10,10,10);
         PhGAB.filtered(pHraw);
         pHmV=4096/pow(2,18)*pHraw/1;
       }else{
@@ -347,10 +406,21 @@ void loop() {
     }
   #endif // c_ADS1115
 
-  #if c_US025 == 1
-    Dist=us(US_ECHO,US_TRIG,25,60);
-  #endif // c_US025
+  // #if c_US025 == 1
+  //   Dist=us(US_ECHO,US_TRIG,25,60);
+  // #endif // c_US025
 
+  #if c_MCP23017 == 1
+  
+    mcp.pinMode(0,OUTPUT);
+    mcp.pinMode(1,OUTPUT);
+    
+    mcp.digitalWrite(0,HIGH);
+    mcp.digitalWrite(1,LOW);
+    delay (2000);
+    mcp.digitalWrite(0,LOW);
+
+  #endif // c_MCP23017
 
 } // loop
 
