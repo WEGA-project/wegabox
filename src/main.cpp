@@ -18,7 +18,7 @@ GABfilter PhGAB(0.001, 150, 1);
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist;
 TaskHandle_t TaskAHT10Handler;
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -38,9 +38,7 @@ TaskHandle_t TaskAHT10Handler;
 #define c_ADS1115 0
 #define c_NTC 1
 #define c_EC 1
-
-
-
+#define c_US025 1
 
 
 #if c_DS18B20 == 1
@@ -85,6 +83,14 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_MiddleCount 50000
 #endif
 
+#if c_US025 == 1
+// Level ultrasound (echo, trig, temp, averaging counter) > cm 
+//dst=us(13,14,25,60);
+  #define US_ECHO 13
+  #define US_TRIG 14
+#endif // c_US025
+
+
 
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";
@@ -100,6 +106,7 @@ void handleRoot() {
        if(NTC)   { httpstr +=  "NTC=" +   fFTS(NTC,3) + "<br>"; }
        if(Ap)   { httpstr +=  "Ap=" +   fFTS(Ap,3) + "<br>"; }
        if(An)   { httpstr +=  "An=" +   fFTS(An,3) + "<br>"; }
+       if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
 
   server.send(200, "text/html",  httpstr);
   }
@@ -133,6 +140,7 @@ void TaskWegaApi(void * parameters){
     if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 3);
     if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 3);
     if(An) httpstr +=  "&An=" +fFTS(An, 3);
+    if(Dist) httpstr +=  "&Dist=" +fFTS(Dist, 3);
 
     http.begin(client, httpstr);
     http.GET();
@@ -146,8 +154,6 @@ void TaskWegaApi(void * parameters){
   }
   
 }
-
-
 
 void TaskEC(void * parameters){
   for(;;){
@@ -285,15 +291,15 @@ void loop() {
 
 
   #if c_AHT10 == 1
+    myAHT10.softReset();
+    delay(100);
     myAHT10.begin();
-    
+
     float AirTemp0=myAHT10.readTemperature();
     if(AirTemp0 != 255) AirTemp=AirTemp0;
-    delay(50);
     
     float AirHum0=myAHT10.readHumidity();
     if(AirHum0 != 255) AirHum=AirHum0;
-    delay(50);
   #endif
 
   #if c_hall == 1
@@ -340,6 +346,10 @@ void loop() {
       pHmV=PhGAB.filtered(pHraw);
     }
   #endif // c_ADS1115
+
+  #if c_US025 == 1
+    Dist=us(US_ECHO,US_TRIG,25,60);
+  #endif // c_US025
 
 
 } // loop
