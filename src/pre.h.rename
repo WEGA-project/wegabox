@@ -37,3 +37,4 @@ String wegadb   = "wegabox";
 #define c_EC 1
 #define c_US025 1
 #define c_MCP23017 0
+#define c_PR 1

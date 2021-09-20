@@ -9,16 +9,16 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include "GyverFilters.h"
-GMedian<7, int> PhMediana;    
+GMedian<7, int> PhMediana; 
+GMedian<7, int> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
-
+GABfilter DstGAB(0.01, 150, 1);
 
 #include <pre.h>
-
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist;
+float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
 TaskHandle_t TaskAHT10Handler;
 
 #define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
@@ -75,13 +75,25 @@ TaskHandle_t TaskAHT10Handler;
 //dst=us(13,14,25,60);
   #define US_ECHO 13
   #define US_TRIG 14
-  #define US_MiddleCount 50
+  #define US_MiddleCount 1
+
+  #include <HCSR04.h>
+  UltraSonicDistanceSensor distanceSensor(13, 14);  // Initialize sensor that uses digital pins 13 and 12.
+
+
 #endif // c_US025
 
 #if c_MCP23017 == 1
   #include <Adafruit_MCP23X17.h>
   Adafruit_MCP23X17 mcp;
 #endif // c_MCP23017
+
+#if c_PR == 1
+ #define PR_AnalogPort 35
+ #define PR_MiddleCount 100
+#endif // c_PR
+
+#include <tasks.h>
 
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";
@@ -98,157 +110,12 @@ void handleRoot() {
        if(Ap)   { httpstr +=  "Ap=" +   fFTS(Ap,3) + "<br>"; }
        if(An)   { httpstr +=  "An=" +   fFTS(An,3) + "<br>"; }
        if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
+       if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
 
   server.send(200, "text/html",  httpstr);
   }
 
-void TaskOTA(void * parameters){
-  for(;;){
-    server.handleClient();
-    ArduinoOTA.handle();
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-  }
-}
 
-void TaskWegaApi(void * parameters){
-  for(;;){
-    // Sending to WEGA-API 
-    WiFiClient client;
-    HTTPClient http;
-
-    String httpstr=wegaapi;
-    httpstr +=  "?db=" + wegadb;
-    httpstr +=  "&auth=" + wegaauth;
-    httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
-    if(RootTemp) httpstr +=  "&RootTemp=" + fFTS(RootTemp,3);
-    if(AirTemp) httpstr +=  "&AirTemp=" +fFTS(AirTemp, 3);
-    if(AirHum) httpstr +=  "&AirHum=" +fFTS(AirHum, 3);
-    if(hall) httpstr +=  "&hall=" +fFTS(hall, 3);
-    if(pHmV) httpstr +=  "&pHmV=" +fFTS(pHmV, 4);
-    if(pHraw) httpstr +=  "&pHraw=" +fFTS(pHraw, 4);
-    if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
-    if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
-    if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 3);
-    if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 3);
-    if(An) httpstr +=  "&An=" +fFTS(An, 3);
-    if(Dist) httpstr +=  "&Dist=" +fFTS(Dist, 3);
-
-    http.begin(client, httpstr);
-    http.GET();
-    http.end();
-
-      if (WiFi.status() != WL_CONNECTED) {
-        WiFi.disconnect(true);
-        WiFi.begin(ssid, password);  }
-    ArduinoOTA.handle();   
-    delay (20000); // Периодичность отправки данных в базу (в мс)
-  }
-  
-}
-
-void TaskEC(void * parameters){
-  for(;;){
-  
-  #if c_EC == 1
-    float Ap0 = 0;
-    float An0 = 0;
-    double eccount = 0;
-
-    #if c_NTC == 1
-      float NTC0=0;
-    #endif // c_NTC 
-
-    pinMode(EC_AnalogPort, INPUT);
-    pinMode(NTC_port, INPUT);
-    pinMode(EC_DigitalPort1, OUTPUT);
-    pinMode(EC_DigitalPort2, OUTPUT);
-
-    while (eccount < EC_MiddleCount){
-      eccount++;
-      digitalWrite(EC_DigitalPort1, HIGH);
-      Ap0 = analogRead(EC_AnalogPort) + Ap0;
-      digitalWrite(EC_DigitalPort1, LOW);
-      
-      digitalWrite(EC_DigitalPort2, HIGH);
-      An0 = analogRead(EC_AnalogPort) + An0;
-      digitalWrite(EC_DigitalPort2, LOW);
-
-    ArduinoOTA.handle();
-    vTaskDelay(1 / portTICK_PERIOD_MS); 
-
-    #if c_NTC == 1
-      NTC0=analogRead(NTC_port)+NTC0;
-    #endif // c_NTC 
-
-    }
-    
-    pinMode(EC_DigitalPort1, INPUT);
-    pinMode(EC_DigitalPort2, INPUT);
-    pinMode(EC_AnalogPort, INPUT);
-
-    Ap = Ap0 / eccount;
-    An = An0 / eccount;
-
-    #if c_NTC == 1
-      NTC = NTC0 / eccount;
-    #endif // c_NTC
-
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-    server.handleClient();
-  #endif // c_EC
-  }
-
-}
-
-#if c_US025 == 1
-void TaskDist(void * parameters){
-  for(;;){
-    server.handleClient();
-    ArduinoOTA.handle();
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-
-    float temp=25;
-    long cnt=US_MiddleCount;  
-    long count=0;
-    long microssum=0;
-    long startmic;
-    long endmicros;
-    while (count < cnt) {
-      count++;
-      ArduinoOTA.handle();
-      pinMode(US_TRIG, OUTPUT );
-      pinMode(US_ECHO, INPUT);
-      digitalWrite(US_TRIG,1);
-      delayMicroseconds(10);
-      digitalWrite(US_TRIG,0);
-      long n=0;
-      long limit=10000;
-
-      while (n<limit){
-        n++;
-        if(digitalRead(US_ECHO) == 1)  
-        {
-          startmic=micros();
-          long z=0;
-          while (digitalRead(US_ECHO) == 1 and z<20000) {
-            z++;
-            endmicros=micros();
-          }
-          n = limit;
-          //delay(200);
-          vTaskDelay(200 / portTICK_PERIOD_MS);
-        } 
-      }
-      microssum=microssum+(endmicros-startmic);
-    }
-
-    float vSound=20.046796*sqrt(273.15+temp);
-    float DistCm = (vSound/10000)*((float(microssum)/count)/2);
-    if (DistCm > 0 and DistCm < 200 ) Dist=DistCm; // В сантиметрах слать только реальные значения от 0 до 2 метров
-    
-  }
-} // TaskDist
-#endif // c_US025
 
 void setup() {
   Serial.begin(9600);
@@ -321,8 +188,12 @@ void setup() {
   #endif
 
   #if c_US025 == 1
-  xTaskCreate(TaskDist,"TaskDist",10000,NULL,1,NULL);
+  //xTaskCreate(TaskDist,"TaskDist",10000,NULL,1,NULL);
   #endif
+
+  #if c_PR == 1
+  xTaskCreate(TaskPR,"TaskPR",10000,NULL,1,NULL);
+  #endif // c_PR
 }
 
 void loop() {
@@ -385,7 +256,7 @@ void loop() {
       if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
         PhGAB.setParameters(10,10,10);
         PhGAB.filtered(pHraw);
-        pHmV=4096/pow(2,18)*pHraw/1;
+        //pHmV=4096/pow(2,18)*pHraw/1;
       }else{
         PhGAB.setParameters(0.001, 200, 1);
         pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
@@ -395,20 +266,16 @@ void loop() {
 
   #if c_ADS1115 == 1
     adc.setCompareChannels(ADS1115_COMP_0_3);
-    pHraw=PhMediana.filtered(adc.getResult_mV());
+    pHraw=adc.getResult_mV();
     if (millis() < 60000){
       PhGAB.setParameters(1,1,1);
       PhGAB.filtered(pHraw);
-      pHmV=pHraw;
+      //pHmV=pHraw;
     }else{
       PhGAB.setParameters(0.001, 200, 1);
       pHmV=PhGAB.filtered(pHraw);
     }
   #endif // c_ADS1115
-
-  // #if c_US025 == 1
-  //   Dist=us(US_ECHO,US_TRIG,25,60);
-  // #endif // c_US025
 
   #if c_MCP23017 == 1
   
@@ -421,6 +288,29 @@ void loop() {
     mcp.digitalWrite(0,LOW);
 
   #endif // c_MCP23017
+
+  #if c_PR == 1
+  pinMode(PR_AnalogPort, INPUT);
+   float PR0=0;
+   double prcount = 0;
+   while (prcount < PR_MiddleCount){
+    prcount++;
+    PR0=analogRead(PR_AnalogPort)+PR0;
+   }
+   PR=PR0/PR_MiddleCount;
+  #endif // c_PR
+
+  #if c_US025 == 1
+    float Dist0=distanceSensor.measureDistanceCm(25);
+    if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
+      DstGAB.setParameters(1,1,1);
+      DstGAB.filtered(Dist0);
+    }else{
+      DstGAB.setParameters(0.001, 50, 5); // параметры: период дискретизации (измерений), process variation, noise variation
+      Dist=DstGAB.filtered(Dist0);
+    }
+  #endif // c_US025
+
 
 } // loop
 
