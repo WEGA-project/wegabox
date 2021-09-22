@@ -122,7 +122,7 @@ void TaskUS(void * parameters) {
   for(;;){
     long ndist=0;
     float Dist0=0;
-    while (ndist < 2400){
+    while (ndist < 3000){
       ndist++;
       Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
       vTaskDelay(30 / portTICK_PERIOD_MS);
