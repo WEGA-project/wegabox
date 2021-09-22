@@ -311,16 +311,7 @@ void loop() {
    PR=PR0/PR_MiddleCount;
   #endif // c_PR
 
-  #if c_US025 == 1
-    long ndist=0;
-    float Dist0=0;
-    while (ndist < 10){
-      ndist++;
-      Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
-    }
-    Dist=Dist0/n;
-
-  #endif // c_US025
+ 
 
 
 } // loop
