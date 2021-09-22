@@ -312,14 +312,6 @@ void loop() {
   #endif // c_PR
 
   #if c_US025 == 1
-    // float Dist0=distanceSensor.measureDistanceCm(25);
-    // if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
-    //   DstGAB.setParameters(1,1,1);
-    //   DstGAB.filtered(Dist0);
-    // }else{
-    //   DstGAB.setParameters(0.001, 50, 5); // параметры: период дискретизации (измерений), process variation, noise variation
-    //   Dist=DstGAB.filtered(Dist0);
-    // }
     long ndist=0;
     float Dist0=0;
     while (ndist < 10){
