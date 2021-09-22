@@ -43,6 +43,7 @@ void TaskWegaApi(void * parameters){
   
 }
 
+#if c_PR == 1
 void TaskPR(void * parameters){
   pinMode(PR_AnalogPort, INPUT);
   for(;;){
@@ -57,6 +58,7 @@ void TaskPR(void * parameters){
    vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
+#endif //  c_PR
 
 
 void TaskEC(void * parameters){
@@ -66,18 +68,19 @@ void TaskEC(void * parameters){
     float Ap0 = 0;
     float An0 = 0;
     double eccount = 0;
-
-    #if c_NTC == 1
-      float NTC0=0;
-    #endif // c_NTC 
-
-    pinMode(EC_AnalogPort, INPUT);
-    pinMode(NTC_port, INPUT);
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
+    pinMode(EC_AnalogPort, INPUT);
+  #endif // c_EC
 
-    while (eccount < EC_MiddleCount){
-      eccount++;
+  #if c_NTC == 1
+    float NTC0=0;
+    pinMode(NTC_port, INPUT);
+  #endif // c_NTC 
+
+  while (eccount < EC_MiddleCount){
+    eccount++;
+    #if c_EC == 1
       digitalWrite(EC_DigitalPort1, HIGH);
       Ap0 = analogRead(EC_AnalogPort) + Ap0;
       digitalWrite(EC_DigitalPort1, LOW);
@@ -85,86 +88,71 @@ void TaskEC(void * parameters){
       digitalWrite(EC_DigitalPort2, HIGH);
       An0 = analogRead(EC_AnalogPort) + An0;
       digitalWrite(EC_DigitalPort2, LOW);
+    #endif // c_EC
 
-    ArduinoOTA.handle();
-    vTaskDelay(1 / portTICK_PERIOD_MS); 
+  ArduinoOTA.handle();
+  vTaskDelay(1 / portTICK_PERIOD_MS); 
 
-    #if c_NTC == 1
-      NTC0=analogRead(NTC_port)+NTC0;
-    #endif // c_NTC 
-
-    }
+  #if c_NTC == 1
+    NTC0=analogRead(NTC_port)+NTC0;
+  #endif // c_NTC 
+  }
     
+  #if c_EC == 1
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
     pinMode(EC_AnalogPort, INPUT);
 
     Ap = Ap0 / eccount;
     An = An0 / eccount;
-
-    #if c_NTC == 1
-      NTC = NTC0 / eccount;
-    #endif // c_NTC
-
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-    server.handleClient();
   #endif // c_EC
-  }
 
+  #if c_NTC == 1
+    NTC = NTC0 / eccount;
+  #endif // c_NTC
+
+  vTaskDelay(200 / portTICK_PERIOD_MS);
+  server.handleClient();
+
+  }
 }
 
 #if c_US025 == 1
-void TaskDist(void * parameters){
-  float temp=25;
-  long count, startmic, microssum, endmicros;
-
+void TaskUS(void * parameters) {
   for(;;){
-    server.handleClient();
-    ArduinoOTA.handle();
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-
-    
-    
-    count=0;
-    microssum=0;
-
-    while (count < US_MiddleCount) {
-      count++;
-      ArduinoOTA.handle();
-      pinMode(US_TRIG, OUTPUT );
-      pinMode(US_ECHO, INPUT);
-      digitalWrite(US_TRIG,1);
-      delayMicroseconds(10);
-      digitalWrite(US_TRIG,0);
-      long n=0;
-      long limit=10000;
-
-      while (n<limit){
-        n++;
-        if(digitalRead(US_ECHO) == 1)  
-        {
-          startmic=micros();
-          long z=0;
-          while (digitalRead(US_ECHO) == 1 and z<20000) {
-            z++;
-            endmicros=micros();
-          }
-          n = limit;
-          vTaskDelay(200 / portTICK_PERIOD_MS);
-          //delay(200);
-        
-        }
-        
-      }
-
-      microssum=microssum+(endmicros-startmic);
+    long ndist=0;
+    float Dist0=0;
+    while (ndist < 2400){
+      ndist++;
+      Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
+      vTaskDelay(30 / portTICK_PERIOD_MS);
     }
-
-    float vSound=20.046796*sqrt(273.15+temp);
-    float DistCm = (vSound/10000)*((float(microssum)/count)/2);
-    
-    if (DistCm > 0 and DistCm < 200 ) Dist=DstGAB.filtered(DistCm); // В сантиметрах слать только реальные значения от 0 до 2 метров
-    
+    Dist=Dist0/ndist;
   }
-} // TaskDist
+}
 #endif // c_US025
+
+// #if c_MCP3421 == 1
+// void TaskMCP3421(void * parameters) {
+
+//   for(;;){
+//     long value = 0;
+//     float pHraw0=0;
+//     MCP342x::Config status;
+//     uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
+//     if (!err) {
+//       long nph=0;
+//       while (nph<10){
+//         nph++;
+//         adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
+//         pHraw0=value+pHraw0;
+//         ArduinoOTA.handle();
+//         vTaskDelay(30 / portTICK_PERIOD_MS);
+//       }
+//       pHraw=pHraw0/nph;
+//       pHmV=4096/pow(2,18)*pHraw/4;
+//     }
+//   }
+// }
+
+// #endif // c_MCP3421
