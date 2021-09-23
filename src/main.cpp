@@ -200,9 +200,9 @@ void setup() {
   xTaskCreate(TaskUS,"TaskUS",10000,NULL,1,NULL);
   #endif // c_PR
 
-  // #if c_MCP3421 == 1
-  // xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,1,NULL);
-  // #endif // c_MCP3421
+  #if c_hall == 1
+  xTaskCreate(TaskHall,"TaskHall",10000,NULL,1,NULL);
+  #endif // c_hall
 
 
 }
@@ -237,21 +237,21 @@ void loop() {
     myAHT10.begin();
 
     float AirTemp0=myAHT10.readTemperature();
-    if(AirTemp0 != 255) AirTemp=AirTemp0;
+    if(AirTemp0 != 255 and AirTemp0 != -50 ) AirTemp=AirTemp0;
     
     float AirHum0=myAHT10.readHumidity();
     if(AirHum0 != 255) AirHum=AirHum0;
   #endif
 
-  #if c_hall == 1
-      long n=0;
-      double sensorValue=0;
-      while ( n< 10){
-       n++;
-       sensorValue = hallRead()+sensorValue;
-       }
-    hall=sensorValue/n;
-  #endif
+  // #if c_hall == 1
+  //     long n=0;
+  //     double sensorValue=0;
+  //     while ( n< 10){
+  //      n++;
+  //      sensorValue = hallRead()+sensorValue;
+  //      }
+  //   hall=sensorValue/n;
+  // #endif
 
   #if c_MCP3421 == 1
     long value = 0;

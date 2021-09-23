@@ -16,19 +16,19 @@ void TaskWegaApi(void * parameters){
     httpstr +=  "?db=" + wegadb;
     httpstr +=  "&auth=" + wegaauth;
     httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
-    if(RootTemp) httpstr +=  "&RootTemp=" + fFTS(RootTemp,3);
-    if(AirTemp) httpstr +=  "&AirTemp=" +fFTS(AirTemp, 3);
-    if(AirHum) httpstr +=  "&AirHum=" +fFTS(AirHum, 3);
-    if(hall) httpstr +=  "&hall=" +fFTS(hall, 3);
-    if(pHmV) httpstr +=  "&pHmV=" +fFTS(pHmV, 4);
-    if(pHraw) httpstr +=  "&pHraw=" +fFTS(pHraw, 4);
-    if(CO2) httpstr +=  "&CO2=" +fFTS(CO2, 0);
-    if(tVOC) httpstr +=  "&tVOC=" +fFTS(tVOC, 0);
-    if(NTC) httpstr +=  "&NTC=" +fFTS(NTC, 3);
-    if(Ap) httpstr +=  "&Ap=" +fFTS(Ap, 3);
-    if(An) httpstr +=  "&An=" +fFTS(An, 3);
-    if(Dist) httpstr +=  "&Dist=" +fFTS(Dist, 3);
-    if(PR) httpstr +=  "&PR=" +fFTS(PR, 3);
+    if(RootTemp) httpstr +=  "&" + db_RootTemp + "=" +fFTS(RootTemp,3);
+    if(AirTemp) httpstr +=  "&" + db_AirTemp + "=" +fFTS(AirTemp, 3);
+    if(AirHum) httpstr +=  "&" + db_AirHum + "=" +fFTS(AirHum, 3);
+    if(hall) httpstr +=  "&" + db_hall + "=" +fFTS(hall, 3);
+    if(pHmV) httpstr +=  "&" + db_pHmV + "=" +fFTS(pHmV, 4);
+    if(pHraw) httpstr +=  "&" + db_pHraw + "=" +fFTS(pHraw, 4);
+    if(CO2) httpstr +=  "&" + db_CO2 + "=" +fFTS(CO2, 0);
+    if(tVOC) httpstr +=  "&" + db_tVOC + "=" +fFTS(tVOC, 0);
+    if(NTC) httpstr +=  "&" + db_NTC + "=" +fFTS(NTC, 3);
+    if(Ap) httpstr +=  "&" + db_Ap + "=" +fFTS(Ap, 3);
+    if(An) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
+    if(Dist) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
+    if(PR) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
 
     http.begin(client, httpstr);
     http.GET();
@@ -122,37 +122,27 @@ void TaskUS(void * parameters) {
   for(;;){
     long ndist=0;
     float Dist0=0;
-    while (ndist < 3000){
+    while (ndist < 15000){ // примерно 15 тыс измерений в минуту
       ndist++;
       Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
-      vTaskDelay(30 / portTICK_PERIOD_MS);
+      vTaskDelay(5 / portTICK_PERIOD_MS);
     }
     Dist=Dist0/ndist;
   }
 }
 #endif // c_US025
 
-// #if c_MCP3421 == 1
-// void TaskMCP3421(void * parameters) {
-
-//   for(;;){
-//     long value = 0;
-//     float pHraw0=0;
-//     MCP342x::Config status;
-//     uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
-//     if (!err) {
-//       long nph=0;
-//       while (nph<10){
-//         nph++;
-//         adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
-//         pHraw0=value+pHraw0;
-//         ArduinoOTA.handle();
-//         vTaskDelay(30 / portTICK_PERIOD_MS);
-//       }
-//       pHraw=pHraw0/nph;
-//       pHmV=4096/pow(2,18)*pHraw/4;
-//     }
-//   }
-// }
-
-// #endif // c_MCP3421
+#if c_hall == 1
+void TaskHall(void * parameters) {
+  for(;;){
+    long n=0;
+    double sensorValue=0;
+    while ( n < 100){
+      n++;
+      sensorValue = hallRead()+sensorValue;
+      }
+    vTaskDelay(1500 / portTICK_PERIOD_MS);
+    hall=sensorValue/n;
+  }
+}
+#endif
