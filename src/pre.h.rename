@@ -25,6 +25,7 @@ String wegaauth = "adab637320e5c47624cdd15169276981";
 // каждому устройству должна быть назначена своя отдельная база!             
 String wegadb   = "wegabox";
 
+
 // Подключенные устройства
 #define c_DS18B20 1 
 #define c_AHT10 1
@@ -38,3 +39,19 @@ String wegadb   = "wegabox";
 #define c_US025 1
 #define c_MCP23017 0
 #define c_PR 1
+
+
+// Имена полей в базе WEGA
+String db_RootTemp="RootTemp";
+String db_AirTemp="AirTemp";
+String db_AirHum="AirHum";
+String db_hall="hall";
+String db_pHmV="pHmV";
+String db_pHraw="pHraw";
+String db_CO2="CO2";
+String db_tVOC="tVOC";
+String db_NTC="NTC";
+String db_Ap="Ap";
+String db_An="An";
+String db_Dist="Dist";
+String db_PR="PR";
