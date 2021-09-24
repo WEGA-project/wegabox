@@ -25,6 +25,8 @@ String wegaauth = "adab637320e5c47624cdd15169276981";
 // каждому устройству должна быть назначена своя отдельная база!             
 String wegadb   = "wegabox";
 
+// Имя системы
+#define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
 
 // Подключенные устройства
 #define c_DS18B20 1 

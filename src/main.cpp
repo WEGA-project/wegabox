@@ -21,7 +21,6 @@ GABfilter DstGAB(0.01, 150, 1);
 float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
 TaskHandle_t TaskAHT10Handler;
 
-#define HOSTNAME "WEGABOX" // Имя системы и DDNS .local
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
 #include <Wire.h>          // Шина I2C
 #define I2C_SDA 21         // SDA
@@ -40,6 +39,10 @@ TaskHandle_t TaskAHT10Handler;
   AHT10 myAHT10(AHT10_ADDRESS_0X38);
 #endif
 
+#if c_AM2320 == 1
+  #include <AM232X.h>
+  AM232X AM2320;
+#endif
 
 #if c_CCS811 == 1
   #include "ccs811.h"  // CCS811 library
@@ -140,6 +143,13 @@ void setup() {
 
   #if c_AHT10 == 1
   Wire.begin(I2C_SDA, I2C_SCL);
+  #endif
+
+  #if c_AM2320 == 1
+    if (! AM2320.begin() )
+    {
+      Serial.println("AM2320 Sensor not found");      
+    }
   #endif
 
   #if c_CCS811 == 1
@@ -311,7 +321,19 @@ void loop() {
    PR=PR0/PR_MiddleCount;
   #endif // c_PR
 
- 
+  #if c_AM2320 == 1
+    int status = AM2320.read();
+    switch (status)
+    {
+      case AM232X_OK:
+        AirHum=AM2320.getHumidity();
+        AirTemp=AM2320.getTemperature();
+        break;
+      default:
+        Serial.println(status);
+      break;
+    }
+  #endif
 
 
 } // loop
