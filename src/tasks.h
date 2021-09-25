@@ -29,6 +29,7 @@ void TaskWegaApi(void * parameters){
     if(An) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
     if(Dist) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
     if(PR) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
+    if(AirPress) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
 
     http.begin(client, httpstr);
     http.GET();

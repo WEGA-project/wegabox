@@ -18,7 +18,7 @@ GABfilter DstGAB(0.01, 150, 1);
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
+float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
 TaskHandle_t TaskAHT10Handler;
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
@@ -96,6 +96,15 @@ TaskHandle_t TaskAHT10Handler;
  #define PR_MiddleCount 100
 #endif // c_PR
 
+#if c_BME280 == 1
+  #include <Adafruit_BME280.h>
+  Adafruit_BME280 bme; // use I2C interface
+  Adafruit_Sensor *bme_temp = bme.getTemperatureSensor();
+  Adafruit_Sensor *bme_pressure = bme.getPressureSensor();
+  Adafruit_Sensor *bme_humidity = bme.getHumiditySensor();
+#endif //c_BME280
+
+
 #include <tasks.h>
 
 void handleRoot() {
@@ -114,6 +123,8 @@ void handleRoot() {
        if(An)   { httpstr +=  "An=" +   fFTS(An,3) + "<br>"; }
        if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
        if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
+       if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
+
 
   server.send(200, "text/html",  httpstr);
   }
@@ -215,6 +226,15 @@ void setup() {
   xTaskCreate(TaskHall,"TaskHall",10000,NULL,1,NULL);
   #endif // c_hall
 
+  #if c_BME280 == 1
+    if (!bme.begin()) {
+      Serial.println(F("Could not find a valid BME280 sensor, check wiring!"));
+      while (1) delay(10);
+    }
+    bme_temp->printSensorDetails();
+    bme_pressure->printSensorDetails();
+    bme_humidity->printSensorDetails();
+  #endif //c_BME280
 
 }
 
@@ -327,6 +347,15 @@ void loop() {
     }
   #endif
 
+  #if c_BME280 == 1
+    sensors_event_t temp_event, pressure_event, humidity_event;
+    bme_temp->getEvent(&temp_event);
+    bme_pressure->getEvent(&pressure_event);
+    bme_humidity->getEvent(&humidity_event);
+    AirTemp=temp_event.temperature;
+    AirHum=humidity_event.relative_humidity;
+    AirPress=pressure_event.pressure;
+  #endif //c_BME280
 
 } // loop
 
