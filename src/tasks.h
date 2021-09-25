@@ -38,11 +38,13 @@ void TaskWegaApi(void * parameters){
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
     ArduinoOTA.handle();   
-    delay (20000); // Периодичность отправки данных в базу (в мс)
+    delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
   }
   
 }
 
+
+// Измерение фоторезистора
 #if c_PR == 1
 void TaskPR(void * parameters){
   pinMode(PR_AnalogPort, INPUT);
@@ -60,74 +62,82 @@ void TaskPR(void * parameters){
 }
 #endif //  c_PR
 
+// Измерение термистора
+#if c_NTC == 1
+  void TaskNTC(void * parameters){
+    pinMode(NTC_port, INPUT);
+    for(;;){
+    float NTC0=0;
+    double ntccount = 0;
+    while (ntccount < NTC_MiddleCount){
+      ntccount++;
+      NTC0=analogRead(NTC_port)+NTC0;
+      vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+    NTC=NTC0/NTC_MiddleCount;
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+  }
+#endif // c_NTC
 
+// Измерение ЕС
+#if c_EC == 1
 void TaskEC(void * parameters){
   for(;;){
-  
-  #if c_EC == 1
     float Ap0 = 0;
     float An0 = 0;
     double eccount = 0;
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
     pinMode(EC_AnalogPort, INPUT);
-  #endif // c_EC
-
-  #if c_NTC == 1
-    float NTC0=0;
-    pinMode(NTC_port, INPUT);
-  #endif // c_NTC 
 
   while (eccount < EC_MiddleCount){
     eccount++;
-    #if c_EC == 1
       digitalWrite(EC_DigitalPort1, HIGH);
+      delayMicroseconds(1);
       Ap0 = analogRead(EC_AnalogPort) + Ap0;
       digitalWrite(EC_DigitalPort1, LOW);
       
+      
       digitalWrite(EC_DigitalPort2, HIGH);
+      delayMicroseconds(1);
       An0 = analogRead(EC_AnalogPort) + An0;
       digitalWrite(EC_DigitalPort2, LOW);
-    #endif // c_EC
-
-  ArduinoOTA.handle();
-  vTaskDelay(1 / portTICK_PERIOD_MS); 
-
-  #if c_NTC == 1
-    NTC0=analogRead(NTC_port)+NTC0;
-  #endif // c_NTC 
+      
+  //ArduinoOTA.handle();
+  //vTaskDelay(1 / portTICK_PERIOD_MS); 
+  //delay(100);
   }
     
-  #if c_EC == 1
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
     pinMode(EC_AnalogPort, INPUT);
 
     Ap = Ap0 / eccount;
     An = An0 / eccount;
-  #endif // c_EC
 
-  #if c_NTC == 1
-    NTC = NTC0 / eccount;
-  #endif // c_NTC
-
-  vTaskDelay(200 / portTICK_PERIOD_MS);
-  server.handleClient();
+  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  //server.handleClient();
 
   }
 }
+#endif // c_EC
 
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
-    long ndist=0;
-    float Dist0=0;
-    while (ndist < 15000){ // примерно 15 тыс измерений в минуту
-      ndist++;
-      Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
-      vTaskDelay(5 / portTICK_PERIOD_MS);
-    }
-    Dist=Dist0/ndist;
+    //long ndist=0;
+    float Dist0;
+    // while (ndist < 9){ // примерно 15 тыс измерений в минуту
+    //   ndist++;
+    //   Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
+      
+    //   //vTaskDelay(5 / portTICK_PERIOD_MS);
+    //   delay(100);
+    // }
+    Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
+    Dist=Dist0/100;
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
 #endif // c_US025

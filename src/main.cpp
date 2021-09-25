@@ -63,14 +63,14 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_NTC == 1
  #define NTC_port 32
- #define NTC_MiddleCount 10000
+ #define NTC_MiddleCount 100000
 #endif
 
 #if c_EC == 1
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 50000
+  #define EC_MiddleCount 400000
 #endif
 
 #if c_US025 == 1
@@ -175,8 +175,8 @@ void setup() {
 
   #if c_ADS1115 == 1
    adc.init();
-   adc.setConvRate(ADS1115_128_SPS);
-   adc.setVoltageRange_mV(ADS1115_RANGE_0256);
+   adc.setConvRate(ADS1115_16_SPS);
+   adc.setVoltageRange_mV(ADS1115_RANGE_4096);
    adc.setMeasureMode(ADS1115_CONTINUOUS);
   #endif // c_ADS1115
 
@@ -194,12 +194,13 @@ void setup() {
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   #if c_EC == 1
-  xTaskCreate(TaskEC,"TaskEC",10000,NULL,4,NULL);
+  xTaskCreate(TaskEC,"TaskEC",10000,NULL,1,NULL);
   #endif
 
-  #if c_US025 == 1
-  //xTaskCreate(TaskDist,"TaskDist",10000,NULL,1,NULL);
+  #if c_NTC == 1
+  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,4,NULL);
   #endif
+
 
   #if c_PR == 1
   xTaskCreate(TaskPR,"TaskPR",10000,NULL,1,NULL);
@@ -253,15 +254,6 @@ void loop() {
     if(AirHum0 != 255) AirHum=AirHum0;
   #endif
 
-  // #if c_hall == 1
-  //     long n=0;
-  //     double sensorValue=0;
-  //     while ( n< 10){
-  //      n++;
-  //      sensorValue = hallRead()+sensorValue;
-  //      }
-  //   hall=sensorValue/n;
-  // #endif
 
   #if c_MCP3421 == 1
     long value = 0;
