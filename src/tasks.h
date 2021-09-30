@@ -127,15 +127,7 @@ void TaskEC(void * parameters){
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
-    //long ndist=0;
     float Dist0;
-    // while (ndist < 9){ // примерно 15 тыс измерений в минуту
-    //   ndist++;
-    //   Dist0=distanceSensor.measureDistanceCm(25)+Dist0;
-      
-    //   //vTaskDelay(5 / portTICK_PERIOD_MS);
-    //   delay(100);
-    // }
     Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
     Dist=Dist0/100;
     vTaskDelay(2000 / portTICK_PERIOD_MS);

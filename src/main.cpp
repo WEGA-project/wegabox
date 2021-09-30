@@ -9,7 +9,7 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include "GyverFilters.h"
-GMedian<7, int> PhMediana; 
+GMedian<7, int> PhMediana;
 GMedian<7, int> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
 GABfilter DstGAB(0.01, 150, 1);
@@ -133,6 +133,8 @@ void handleRoot() {
 
 void setup() {
   Serial.begin(9600);
+  Wire.begin(I2C_SDA, I2C_SCL);
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -153,7 +155,7 @@ void setup() {
   #endif
 
   #if c_AHT10 == 1
-  Wire.begin(I2C_SDA, I2C_SCL);
+  myAHT10.begin();
   #endif
 
   #if c_AM2320 == 1
@@ -185,6 +187,7 @@ void setup() {
   #endif
 
   #if c_ADS1115 == 1
+   Wire.begin(I2C_SDA, I2C_SCL);
    adc.init();
    adc.setConvRate(ADS1115_16_SPS);
    adc.setVoltageRange_mV(ADS1115_RANGE_4096);
@@ -265,7 +268,7 @@ void loop() {
   #if c_AHT10 == 1
     myAHT10.softReset();
     delay(100);
-    myAHT10.begin();
+    
 
     float AirTemp0=myAHT10.readTemperature();
     if(AirTemp0 != 255 and AirTemp0 != -50 ) AirTemp=AirTemp0;
