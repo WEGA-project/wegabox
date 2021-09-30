@@ -1,3 +1,5 @@
+// В этом файле расположены функции выполняющиеся параллельно freeRTOC
+
 void TaskOTA(void * parameters){
   for(;;){
     server.handleClient();
@@ -88,31 +90,34 @@ void TaskEC(void * parameters){
     float Ap0 = 0;
     float An0 = 0;
     double eccount = 0;
-    pinMode(EC_DigitalPort1, OUTPUT);
-    pinMode(EC_DigitalPort2, OUTPUT);
+
     pinMode(EC_AnalogPort, INPUT);
 
   while (eccount < EC_MiddleCount){
+    pinMode(EC_DigitalPort1, OUTPUT);
+    pinMode(EC_DigitalPort2, OUTPUT);
+    digitalWrite(EC_DigitalPort1, LOW);
+    digitalWrite(EC_DigitalPort2, LOW);
+
     eccount++;
       digitalWrite(EC_DigitalPort1, HIGH);
-      delayMicroseconds(1);
-      Ap0 = analogRead(EC_AnalogPort) + Ap0;
-      digitalWrite(EC_DigitalPort1, LOW);
-      
-      
-      digitalWrite(EC_DigitalPort2, HIGH);
-      delayMicroseconds(1);
-      An0 = analogRead(EC_AnalogPort) + An0;
       digitalWrite(EC_DigitalPort2, LOW);
+        Ap0 = analogRead(EC_AnalogPort) + Ap0;
+                
+      digitalWrite(EC_DigitalPort2, HIGH);
+      digitalWrite(EC_DigitalPort1, LOW);
+        An0 = analogRead(EC_AnalogPort) + An0;
       
-  //ArduinoOTA.handle();
-  //vTaskDelay(1 / portTICK_PERIOD_MS); 
-  //delay(100);
-  }
-    
+      
+  
+    //vTaskDelay(1 / portTICK_PERIOD_MS); 
+
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
-    pinMode(EC_AnalogPort, INPUT);
+
+  }
+    pinMode(EC_AnalogPort, INPUT);    
+
 
     Ap = Ap0 / eccount;
     An = An0 / eccount;
@@ -130,7 +135,7 @@ void TaskUS(void * parameters) {
     float Dist0;
     Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
     Dist=Dist0/100;
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 #endif // c_US025
