@@ -114,6 +114,7 @@ void TaskEC(void * parameters){
 
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
+    vTaskDelay(1 / portTICK_PERIOD_MS);
 
   }
     pinMode(EC_AnalogPort, INPUT);    
@@ -132,10 +133,12 @@ void TaskEC(void * parameters){
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
-    float Dist0;
-    Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
-    Dist=Dist0/100;
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    // float Dist0;
+    // Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
+    // Dist=Dist0/100;
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // Level ultrasound (echo, trig, temp, averaging counter) > cm 
+    Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
   }
 }
 #endif // c_US025

@@ -25,7 +25,19 @@ void setup() {
   #endif
 
   #if c_AHT10 == 1
-  myAHT10.begin();
+    if (!aht.begin()) {
+      Serial.println("Failed to find AHT10/AHT20 chip");
+      while (1) {
+        delay(10);
+      }
+    }
+
+    Serial.println("AHT10/AHT20 Found!");
+    aht_temp = aht.getTemperatureSensor();
+    aht_temp->printSensorDetails();
+
+    aht_humidity = aht.getHumiditySensor();
+    aht_humidity->printSensorDetails();
   #endif
 
   #if c_AM2320 == 1
@@ -74,25 +86,25 @@ void setup() {
   server.handleClient();
   ArduinoOTA.handle();
 
-  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
+  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,5,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   #if c_EC == 1
-  xTaskCreate(TaskEC,"TaskEC",10000,NULL,1,NULL);
+  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,4,NULL,0);
   #endif
 
   #if c_NTC == 1
-  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,4,NULL);
+  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,0,NULL);
   #endif
 
 
   #if c_PR == 1
-  xTaskCreate(TaskPR,"TaskPR",10000,NULL,1,NULL);
+  xTaskCreate(TaskPR,"TaskPR",10000,NULL,0,NULL);
   #endif // c_PR
 
 
   #if c_US025 == 1
-  xTaskCreate(TaskUS,"TaskUS",10000,NULL,1,NULL);
+  xTaskCreatePinnedToCore(TaskUS,"TaskUS",10000,NULL,2,NULL,1);
   #endif // c_PR
 
   #if c_hall == 1
@@ -104,7 +116,7 @@ void setup() {
         Serial.println("Could not find a valid BME280 sensor, check wiring!");
         while (1);
     }
-    
+
   #endif //c_BME280
 
 }

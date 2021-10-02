@@ -39,8 +39,9 @@ TaskHandle_t TaskAHT10Handler;
 #endif
 
 #if c_AHT10 == 1
-  #include <AHT10.h>
-  AHT10 myAHT10(AHT10_ADDRESS_0X38);
+  #include <Adafruit_AHTX0.h>
+  Adafruit_AHTX0 aht;
+  Adafruit_Sensor *aht_humidity, *aht_temp;
 #endif
 
 #if c_AM2320 == 1
@@ -74,19 +75,13 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 400000
+  #define EC_MiddleCount 60000
 #endif
 
 #if c_US025 == 1
-// Level ultrasound (echo, trig, temp, averaging counter) > cm 
-//dst=us(13,14,25,60);
   #define US_ECHO 13
   #define US_TRIG 14
-  #define US_MiddleCount 1
-
-  #include <HCSR04.h>
-  UltraSonicDistanceSensor distanceSensor(13, 14);  // Initialize sensor that uses digital pins 13 and 12.
-
+  #define US_MiddleCount 6000
 
 #endif // c_US025
 
@@ -159,15 +154,14 @@ void loop() {
 
 
   #if c_AHT10 == 1
-    myAHT10.softReset();
-    delay(100);
-    
+    sensors_event_t humidity;
+    sensors_event_t temp;
+    aht_humidity->getEvent(&humidity);
+    aht_temp->getEvent(&temp);
 
-    float AirTemp0=myAHT10.readTemperature();
-    if(AirTemp0 != 255 and AirTemp0 != -50 ) AirTemp=AirTemp0;
+    AirTemp=temp.temperature;
+    AirHum=humidity.relative_humidity;
     
-    float AirHum0=myAHT10.readHumidity();
-    if(AirHum0 != 255) AirHum=AirHum0;
   #endif
 
 
