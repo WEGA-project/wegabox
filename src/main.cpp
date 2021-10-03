@@ -13,7 +13,7 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include "GyverFilters.h"
-GMedian<7, int> PhMediana;
+GMedian<17, int> PhMediana;
 GMedian<3, int> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
 GABfilter DstGAB(0.01, 150, 1);
@@ -42,6 +42,7 @@ TaskHandle_t TaskAHT10Handler;
   #include <Adafruit_AHTX0.h>
   Adafruit_AHTX0 aht;
   Adafruit_Sensor *aht_humidity, *aht_temp;
+  
 #endif
 
 #if c_AM2320 == 1
@@ -102,6 +103,9 @@ TaskHandle_t TaskAHT10Handler;
 Adafruit_BME280 bme; // I2C
 #endif //c_BME280
 
+extern "C" {      
+   uint8_t temprature_sens_read(); 
+}
 
 #include <tasks.h>
 
@@ -122,129 +126,14 @@ void handleRoot() {
        if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
        if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
        if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
-
+       httpstr +=  "CPUTEMP=" +   fFTS((temprature_sens_read()-32) * 5/9 ,1) + "<br>";
 
   server.send(200, "text/html",  httpstr);
   }
 
 #include <setup.h>
+#include <loop.h>
 
-void loop() {
-
-
-  #if c_DS18B20 == 1
-    sens18b20.begin();
-    sens18b20.requestTemperatures();
-    float ds0=sens18b20.getTempCByIndex(0);
-    if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
-  #endif
-
-  #if c_CCS811 == 1
-      // Read
-    ccs811.set_envdata_Celsius_percRH(AirTemp,AirHum);
-    uint16_t eco2, etvoc, errstat, raw;
-    ccs811.read(&eco2,&etvoc,&errstat,&raw); 
-    
-    // Print measurement results based on status
-    if( errstat==CCS811_ERRSTAT_OK ) { 
-      CO2=eco2;
-      tVOC=etvoc;
-    } 
-  #endif
-
-
-  #if c_AHT10 == 1
-    sensors_event_t humidity;
-    sensors_event_t temp;
-    aht_humidity->getEvent(&humidity);
-    aht_temp->getEvent(&temp);
-
-    AirTemp=temp.temperature;
-    AirHum=humidity.relative_humidity;
-    
-  #endif
-
-
-  #if c_MCP3421 == 1
-    long value = 0;
-    MCP342x::Config status;
-    // Initiate a conversion; convertAndRead() will wait until it can be read
-    uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
-    if (err) {
-      Serial.print("Convert error: ");
-      Serial.println(err);
-    }
-    else {
-      pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
-      if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
-        PhGAB.setParameters(10,10,10);
-        PhGAB.filtered(pHraw);
-        //pHmV=4096/pow(2,18)*pHraw/1;
-      }else{
-        PhGAB.setParameters(0.001, 200, 1);
-        pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
-      }
-    }
-  #endif // c_MCP3421
-
-  #if c_ADS1115 == 1
-    adc.setCompareChannels(ADS1115_COMP_0_3);
-    pHraw=adc.getResult_mV();
-    if (millis() < 60000){
-      PhGAB.setParameters(1,1,1);
-      PhGAB.filtered(pHraw);
-      //pHmV=pHraw;
-    }else{
-      PhGAB.setParameters(0.001, 200, 1);
-      pHmV=PhGAB.filtered(pHraw);
-    }
-  #endif // c_ADS1115
-
-  #if c_MCP23017 == 1
-  
-    mcp.pinMode(0,OUTPUT);
-    mcp.pinMode(1,OUTPUT);
-    
-    mcp.digitalWrite(0,HIGH);
-    mcp.digitalWrite(1,LOW);
-    delay (2000);
-    mcp.digitalWrite(0,LOW);
-
-  #endif // c_MCP23017
-
-  #if c_PR == 1
-  pinMode(PR_AnalogPort, INPUT);
-   float PR0=0;
-   double prcount = 0;
-   while (prcount < PR_MiddleCount){
-    prcount++;
-    PR0=analogRead(PR_AnalogPort)+PR0;
-   }
-   PR=PR0/PR_MiddleCount;
-  #endif // c_PR
-
-  #if c_AM2320 == 1
-    int status = AM2320.read();
-    switch (status)
-    {
-      case AM232X_OK:
-        AirHum=AM2320.getHumidity();
-        AirTemp=AM2320.getTemperature();
-        break;
-      default:
-        Serial.println(status);
-      break;
-    }
-  #endif
-
-  #if c_BME280 == 1
-    bme.takeForcedMeasurement();
-    AirTemp=bme.readTemperature();
-    AirHum=bme.readHumidity();
-    AirPress=bme.readPressure();
-  #endif //c_BME280
-
-} // loop
 
 
 
