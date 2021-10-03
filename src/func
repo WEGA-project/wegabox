@@ -5,7 +5,7 @@ String fFTS(float x, byte precision) {
   return String(tmp);
 }
 
-// Функция прямого опроса ультразвукового датчика возврат в микросекундах эха
+// Функция прямого опроса ультразвукового датчика
 float us(int trg, int ech, float temp, long cnt) {
   long count=0;
   long SumMicros=0;
@@ -48,3 +48,6 @@ float us(int trg, int ech, float temp, long cnt) {
    float vSound=20.046796*sqrt(273.15+temp);
  return (vSound/10000)*((float(SumMicros)/count)/2);
 }
+
+
+

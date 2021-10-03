@@ -2,6 +2,10 @@
 
 
 void setup() {
+
+  server.handleClient();
+  ArduinoOTA.handle();
+
   Serial.begin(9600);
   Wire.begin(I2C_SDA, I2C_SCL);
 
@@ -82,19 +86,24 @@ void setup() {
       while (1);
     }
   #endif // c_MCP23017
- 
-  server.handleClient();
-  ArduinoOTA.handle();
 
-  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,5,NULL);
+  #if c_BME280 == 1
+    if (! bme.begin(0x77, &Wire)) {
+        Serial.println("Could not find a valid BME280 sensor, check wiring!");
+        while (1);
+    }
+  #endif //c_BME280
+
+
+  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,4,NULL);
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   #if c_EC == 1
-  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,4,NULL,0);
+  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
   #endif
 
   #if c_NTC == 1
-  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,0,NULL);
+  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,1,NULL);
   #endif
 
 
@@ -108,15 +117,10 @@ void setup() {
   #endif // c_PR
 
   #if c_hall == 1
-  xTaskCreate(TaskHall,"TaskHall",10000,NULL,1,NULL);
+  xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);
   #endif // c_hall
 
-  #if c_BME280 == 1
-    if (! bme.begin(0x77, &Wire)) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
-        while (1);
-    }
-
-  #endif //c_BME280
+  server.handleClient();
+  ArduinoOTA.handle();
 
 }
