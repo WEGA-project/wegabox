@@ -92,33 +92,46 @@ void TaskEC(void * parameters){
     double eccount = 0;
 
     pinMode(EC_AnalogPort, INPUT);
-
-  while (eccount < EC_MiddleCount){
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
+
+ 
     digitalWrite(EC_DigitalPort1, LOW);
     digitalWrite(EC_DigitalPort2, LOW);
+
+   while (eccount < EC_MiddleCount and OtaStart != true){
+
+    // long i=0;
+    // while ( i<10 and OtaStart != true ){
+    //   i++;
+    //   digitalWrite(EC_DigitalPort1, HIGH);
+    //   digitalWrite(EC_DigitalPort2, LOW);       
+    //   digitalWrite(EC_DigitalPort2, HIGH);
+    //   digitalWrite(EC_DigitalPort1, LOW);
+    // }
+
+    //digitalWrite(EC_DigitalPort1, LOW);
+    //digitalWrite(EC_DigitalPort2, LOW);
+
 
     eccount++;
       digitalWrite(EC_DigitalPort1, HIGH);
       digitalWrite(EC_DigitalPort2, LOW);
+      //delayMicroseconds(2);
         Ap0 = analogRead(EC_AnalogPort) + Ap0;
                 
       digitalWrite(EC_DigitalPort2, HIGH);
       digitalWrite(EC_DigitalPort1, LOW);
+      //delayMicroseconds(2);
         An0 = analogRead(EC_AnalogPort) + An0;
-      
-      
-  
-    //vTaskDelay(1 / portTICK_PERIOD_MS); 
+     
 
+    //vTaskDelay(1 / portTICK_PERIOD_MS);
+  }
+
+    pinMode(EC_AnalogPort, INPUT);    
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-
-  }
-    pinMode(EC_AnalogPort, INPUT);    
-
 
     Ap = Ap0 / eccount;
     An = An0 / eccount;

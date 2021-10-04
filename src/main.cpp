@@ -23,6 +23,7 @@ GABfilter DstGAB(0.01, 150, 1);
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
+bool OtaStart = false;
 TaskHandle_t TaskAHT10Handler;
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
@@ -76,7 +77,7 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 60000
+  #define EC_MiddleCount 120000
 #endif
 
 #if c_US025 == 1
@@ -126,7 +127,7 @@ void handleRoot() {
        if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
        if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
        if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
-       httpstr +=  "CPUTEMP=" +   fFTS((temprature_sens_read()-32) * 5/9 ,1) + "<br>";
+       //httpstr +=  "CPUTEMP=" +   fFTS((temprature_sens_read()-32) * 5/9 ,1) + "<br>";
 
   server.send(200, "text/html",  httpstr);
   }
