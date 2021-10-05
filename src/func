@@ -7,10 +7,10 @@ String fFTS(float x, byte precision) {
 
 // Функция прямого опроса ультразвукового датчика
 float us(int trg, int ech, float temp, long cnt) {
-  long count=0;
-  long SumMicros=0;
-  long StartMicros,EndMicros;
-  long LengthImpulse;
+  unsigned long count=0;
+  unsigned long SumMicros=0;
+  unsigned long StartMicros,EndMicros;
+  unsigned long LengthImpulse;
 
   pinMode(trg, OUTPUT );
   pinMode(ech, INPUT);
@@ -33,7 +33,7 @@ float us(int trg, int ech, float temp, long cnt) {
         EndMicros=micros(); // засекаем время окончания
          
         LengthImpulse=EndMicros-StartMicros; // Считаем длинну эха 
-        delay (10);
+        delay (5);
         
         break; // Выходим из цикла
       }
@@ -43,10 +43,13 @@ float us(int trg, int ech, float temp, long cnt) {
     }
      
     SumMicros=LengthImpulse + SumMicros; // Суммируем время всех проходов
-
+    
+    //SumMicros=Dstkalman.filtered( LengthImpulse); // Суммируем время всех проходов
+    //SumMicros=DstAverage.filtered( DstMediana.filtered(LengthImpulse)); // Суммируем время всех проходов
   }
    float vSound=20.046796*sqrt(273.15+temp);
  return (vSound/10000)*((float(SumMicros)/count)/2);
+ //return (vSound/10000)*((float(SumMicros))/2);
 }
 
 

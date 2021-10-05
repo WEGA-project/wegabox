@@ -64,9 +64,6 @@ void setup() {
   #if c_AHT10 == 1
     if (!aht.begin()) {
       Serial.println("Failed to find AHT10/AHT20 chip");
-      while (1) {
-        delay(10);
-      }
     }
 
     Serial.println("AHT10/AHT20 Found!");
@@ -98,11 +95,9 @@ void setup() {
     Wire.requestFrom(address, (uint8_t)1);
     if (!Wire.available()) {
       Serial.print("No device found at address ");
-      Serial.println(address, HEX);
-      while (1);
+      Serial.println(address, HEX);     
    }
-    // adc.configure(config);
-    // startConversion = true;
+
   #endif
 
   #if c_ADS1115 == 1
@@ -132,7 +127,8 @@ void setup() {
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   #if c_EC == 1
-  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
+  //xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
+  xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
   #endif
 
   #if c_NTC == 1
@@ -146,14 +142,41 @@ void setup() {
 
 
   #if c_US025 == 1
-  xTaskCreatePinnedToCore(TaskUS,"TaskUS",10000,NULL,2,NULL,1);
+  xTaskCreate(TaskUS,"TaskUS",10000,NULL,2,NULL);
   #endif // c_PR
 
   #if c_hall == 1
   xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);
   #endif // c_hall
 
-  server.handleClient();
-  ArduinoOTA.handle();
+  #if c_CPUTEMP == 1
+  xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
+  #endif // c_CPUTEMP
+
+
+  #if c_AHT10 == 1
+  xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
+  #endif // c_TaskAHT10
+
+  #if c_MCP3421 == 1
+  xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,0,NULL);
+  #endif // c_MCP3421
+
+  #if c_CCS811 == 1
+  xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,NULL);
+  #endif // c_CCS811
+
+  #if c_DS18B20 == 1
+  xTaskCreate(TaskDS18B20,"TaskDS18B20",10000,NULL,0,NULL);
+  #endif // c_DS18B20
+
+  #if c_ADS1115 == 1
+  xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,0,NULL);
+  #endif // c_ADS1115
+
+  #if c_AM2320 == 1
+  xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,NULL);
+  #endif // c_AM2320
+
 
 }

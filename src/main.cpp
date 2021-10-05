@@ -14,15 +14,23 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include "GyverFilters.h"
 GMedian<17, int> PhMediana;
-GMedian<3, int> DstMediana;    
+GMedian<60, long> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
-GABfilter DstGAB(0.01, 150, 1);
+GABfilter DstGAB(0.001, 1000, 1);
+RingAverage<long, 600> DstAverage;
+// также может быть объявлен как (разброс измерения, скорость изменения значений)
+GKalman Dstkalman(1, 0.1);
+GKalman CpuTempKalman(1, 0.001);
+
+#include <soc/rtc_wdt.h>
+
+
 
 #include <pre.h>
 #include <func>
 
 // Переменные
-float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR;
+float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
 bool OtaStart = false;
 TaskHandle_t TaskAHT10Handler;
 
@@ -77,13 +85,13 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 120000
+  #define EC_MiddleCount 100000
 #endif
 
 #if c_US025 == 1
   #define US_ECHO 13
   #define US_TRIG 14
-  #define US_MiddleCount 6000
+  #define US_MiddleCount 602
 
 #endif // c_US025
 
@@ -104,9 +112,11 @@ TaskHandle_t TaskAHT10Handler;
 Adafruit_BME280 bme; // I2C
 #endif //c_BME280
 
-extern "C" {      
-   uint8_t temprature_sens_read(); 
-}
+#if c_CPUTEMP == 1
+  extern "C" {      
+    uint8_t temprature_sens_read(); 
+  }
+#endif //c_CPUTEMP
 
 #include <tasks.h>
 
@@ -127,7 +137,8 @@ void handleRoot() {
        if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
        if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
        if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
-       //httpstr +=  "CPUTEMP=" +   fFTS((temprature_sens_read()-32) * 5/9 ,1) + "<br>";
+       if(CPUTemp)   { httpstr +=  "CPUTemp=" +   fFTS(CPUTemp,3) + "<br>"; }
+       
 
   server.send(200, "text/html",  httpstr);
   }

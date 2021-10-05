@@ -32,6 +32,7 @@ void TaskWegaApi(void * parameters){
     if(Dist) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
     if(PR) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
     if(AirPress) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
+    if(CPUTemp) httpstr +=  "&" + db_CPUTemp + "=" +fFTS(CPUTemp, 3);
 
     http.begin(client, httpstr);
     http.GET();
@@ -40,10 +41,10 @@ void TaskWegaApi(void * parameters){
       if (WiFi.status() != WL_CONNECTED) {
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
-    ArduinoOTA.handle();   
-    delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
+    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
+    //delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
+
   }
-  
 }
 
 
@@ -78,7 +79,7 @@ void TaskPR(void * parameters){
       vTaskDelay(1 / portTICK_PERIOD_MS);
     }
     NTC=NTC0/NTC_MiddleCount;
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
   }
 #endif // c_NTC
@@ -101,31 +102,18 @@ void TaskEC(void * parameters){
 
    while (eccount < EC_MiddleCount and OtaStart != true){
 
-    // long i=0;
-    // while ( i<10 and OtaStart != true ){
-    //   i++;
-    //   digitalWrite(EC_DigitalPort1, HIGH);
-    //   digitalWrite(EC_DigitalPort2, LOW);       
-    //   digitalWrite(EC_DigitalPort2, HIGH);
-    //   digitalWrite(EC_DigitalPort1, LOW);
-    // }
-
-    //digitalWrite(EC_DigitalPort1, LOW);
-    //digitalWrite(EC_DigitalPort2, LOW);
-
-
     eccount++;
       digitalWrite(EC_DigitalPort1, HIGH);
       digitalWrite(EC_DigitalPort2, LOW);
       //delayMicroseconds(2);
         Ap0 = analogRead(EC_AnalogPort) + Ap0;
-                
+    rtc_wdt_feed();
+
       digitalWrite(EC_DigitalPort2, HIGH);
       digitalWrite(EC_DigitalPort1, LOW);
       //delayMicroseconds(2);
         An0 = analogRead(EC_AnalogPort) + An0;
      
-
     //vTaskDelay(1 / portTICK_PERIOD_MS);
   }
 
@@ -136,7 +124,7 @@ void TaskEC(void * parameters){
     Ap = Ap0 / eccount;
     An = An0 / eccount;
 
-  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  vTaskDelay(5000 / portTICK_PERIOD_MS);
   //server.handleClient();
 
   }
@@ -146,12 +134,11 @@ void TaskEC(void * parameters){
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
-    // float Dist0;
-    // Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
-    // Dist=Dist0/100;
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // Level ultrasound (echo, trig, temp, averaging counter) > cm 
-    Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
+
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+    Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+   
   }
 }
 #endif // c_US025
@@ -166,7 +153,142 @@ void TaskHall(void * parameters) {
       sensorValue = hallRead()+sensorValue;
       }
     vTaskDelay(1500 / portTICK_PERIOD_MS);
+    
     hall=sensorValue/n;
+  }
+}
+#endif //c_hall
+
+#if c_CPUTEMP == 1
+void TaskCPUtemp(void * parameters) {
+  for(;;){
+    //CPUTemp=CpuTempKalman.filtered( ( temprature_sens_read()-32) * (5/9) );
+     int CPUTemp0 = temprature_sens_read();
+     //if (CPUTemp0 != 128 ) CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
+     CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+    rtc_wdt_feed();
+  }
+}
+#endif //c_CPUTEMP
+
+
+#if c_AHT10 == 1
+  void TaskAHT10(void * parameters) {
+  for(;;){
+    
+    
+    sensors_event_t humidity;
+    sensors_event_t temp;
+
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    aht_humidity->getEvent(&humidity);
+    aht_temp->getEvent(&temp);
+    
+    AirTemp=temp.temperature;
+    AirHum=humidity.relative_humidity;
+    }
+  }
+  #endif // c_AHT10    
+    
+
+  #if c_CCS811 == 1
+    void TaskCCS811(void * parameters) {
+  for(;;){
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+      // Read
+    ccs811.set_envdata_Celsius_percRH(AirTemp,AirHum);
+    uint16_t eco2, etvoc, errstat, raw;
+    ccs811.read(&eco2,&etvoc,&errstat,&raw); 
+    
+    // Print measurement results based on status
+    if( errstat==CCS811_ERRSTAT_OK ) { 
+      CO2=eco2;
+      tVOC=etvoc;
+    }
+  }
+} 
+  #endif
+
+
+
+    #if c_MCP3421 == 1
+void TaskMCP3421(void * parameters) {
+  for(;;){
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+
+    long value = 0;
+    MCP342x::Config status;
+    // Initiate a conversion; convertAndRead() will wait until it can be read
+    uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
+    if (err) {
+      Serial.print("Convert error: ");
+      Serial.println(err);
+    }
+    else {
+      pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
+      if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
+        PhGAB.setParameters(10,10,10);
+        PhGAB.filtered(pHraw);
+        //pHmV=4096/pow(2,18)*pHraw/1;
+      }else{
+        PhGAB.setParameters(0.001, 200, 1);
+        pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
+      }
+    }
+  }
+}
+  #endif // c_MCP3421
+
+
+
+#if c_DS18B20 == 1
+void TaskDS18B20(void * parameters) {
+  for(;;){
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+sens18b20.begin();
+sens18b20.requestTemperatures();
+float ds0=sens18b20.getTempCByIndex(0);
+if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
+  }
+}
+#endif
+
+#if c_ADS1115 == 1
+void TaskADS1115(void * parameters) {
+for(;;){
+  vTaskDelay(100 / portTICK_PERIOD_MS);
+  adc.setCompareChannels(ADS1115_COMP_0_3);
+  pHraw=adc.getResult_mV();
+  if (millis() < 60000){
+    PhGAB.setParameters(1,1,1);
+    PhGAB.filtered(pHraw);
+    //pHmV=pHraw;
+  }else{
+    PhGAB.setParameters(0.001, 200, 1);
+    pHmV=PhGAB.filtered(pHraw);
+  }
+}
+}
+#endif // c_ADS1115
+
+
+
+#if c_AM2320 == 1
+void TaskAHT10(void * parameters) {
+for(;;){
+  vTaskDelay(10000 / portTICK_PERIOD_MS);
+int status = AM2320.read();
+switch (status)
+{
+  case AM232X_OK:
+    AirHum=AM2320.getHumidity();
+    AirTemp=AM2320.getTemperature();
+    break;
+  default:
+    Serial.println(status);
+  break;
+    }
   }
 }
 #endif
