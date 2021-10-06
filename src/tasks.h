@@ -193,6 +193,9 @@ void TaskCPUtemp(void * parameters) {
    float AirHum0=myAHT10.readHumidity();
    if (!AirTemp0 or !AirHum0) { 
      myAHT10.softReset();
+     delay(50);
+     myAHT10.begin();
+     myAHT10.setNormalMode();
      }
   else {
    if (AirTemp0 != 255 ) AirTemp=AirTemp0;
