@@ -62,16 +62,23 @@ void setup() {
   #endif
 
   #if c_AHT10 == 1
-    if (!aht.begin()) {
-      Serial.println("Failed to find AHT10/AHT20 chip");
-    }
+    // if (!aht.begin()) {
+    //   Serial.println("Failed to find AHT10/AHT20 chip");
+    // }
 
-    Serial.println("AHT10/AHT20 Found!");
-    aht_temp = aht.getTemperatureSensor();
-    aht_temp->printSensorDetails();
+    // Serial.println("AHT10/AHT20 Found!");
+    // aht_temp = aht.getTemperatureSensor();
+    // aht_temp->printSensorDetails();
 
-    aht_humidity = aht.getHumiditySensor();
-    aht_humidity->printSensorDetails();
+    // aht_humidity = aht.getHumiditySensor();
+    // aht_humidity->printSensorDetails();
+
+  
+     
+   myAHT10.softReset();
+   delay(50);
+    myAHT10.begin();
+    myAHT10.setNormalMode();
   #endif
 
   #if c_AM2320 == 1

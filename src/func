@@ -7,10 +7,11 @@ String fFTS(float x, byte precision) {
 
 // Функция прямого опроса ультразвукового датчика
 float us(int trg, int ech, float temp, long cnt) {
-  unsigned long count=0;
-  unsigned long SumMicros=0;
-  unsigned long StartMicros,EndMicros;
-  unsigned long LengthImpulse;
+  long count=0;
+  long SumMicros=0;
+  long StartMicros=0;
+  long EndMicros=0;
+  long LengthImpulse=0;
 
   pinMode(trg, OUTPUT );
   pinMode(ech, INPUT);
@@ -26,7 +27,7 @@ float us(int trg, int ech, float temp, long cnt) {
     long z=0;
     while (digitalRead(ech) == 1 and z<20000) {  // Ловим приход эха
      z++; 
-      if (z<19999)  // Если эхо не вернулось считаем его длинну или  выходим из функции если ответ не услышан
+      if (z<19999)  // Если эхо вернулось считаем его длинну или  выходим из функции если ответ не услышан
       {
         StartMicros=micros();  // Засекаем время старта
         while ( digitalRead(ech) == 1 ) // Ждем пока эхо не закончится

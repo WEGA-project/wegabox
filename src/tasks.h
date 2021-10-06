@@ -107,7 +107,7 @@ void TaskEC(void * parameters){
       digitalWrite(EC_DigitalPort2, LOW);
       //delayMicroseconds(2);
         Ap0 = analogRead(EC_AnalogPort) + Ap0;
-    rtc_wdt_feed();
+    
 
       digitalWrite(EC_DigitalPort2, HIGH);
       digitalWrite(EC_DigitalPort1, LOW);
@@ -176,17 +176,30 @@ void TaskCPUtemp(void * parameters) {
 #if c_AHT10 == 1
   void TaskAHT10(void * parameters) {
   for(;;){
+    // aht.begin(); 
     
-    
-    sensors_event_t humidity;
-    sensors_event_t temp;
+    // sensors_event_t humidity;
+    // sensors_event_t temp;
 
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-    aht_humidity->getEvent(&humidity);
-    aht_temp->getEvent(&temp);
+    // vTaskDelay(10000 / portTICK_PERIOD_MS);
+    // aht_humidity->getEvent(&humidity);
+    // aht_temp->getEvent(&temp);
     
-    AirTemp=temp.temperature;
-    AirHum=humidity.relative_humidity;
+    // AirTemp=temp.temperature;
+    // AirHum=humidity.relative_humidity;
+   
+
+   float AirTemp0=myAHT10.readTemperature();
+   float AirHum0=myAHT10.readHumidity();
+   if (!AirTemp0 or !AirHum0) { 
+     myAHT10.softReset();
+     }
+  else {
+   if (AirTemp0 != 255 ) AirTemp=AirTemp0;
+   if (AirHum0 != 255 ) AirHum=AirHum0;
+  }
+   vTaskDelay(10000 / portTICK_PERIOD_MS);
+    
     }
   }
   #endif // c_AHT10    

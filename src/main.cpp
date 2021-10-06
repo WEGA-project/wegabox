@@ -22,6 +22,7 @@ RingAverage<long, 600> DstAverage;
 GKalman Dstkalman(1, 0.1);
 GKalman CpuTempKalman(1, 0.001);
 
+
 #include <soc/rtc_wdt.h>
 
 
@@ -48,9 +49,13 @@ TaskHandle_t TaskAHT10Handler;
 #endif
 
 #if c_AHT10 == 1
-  #include <Adafruit_AHTX0.h>
-  Adafruit_AHTX0 aht;
-  Adafruit_Sensor *aht_humidity, *aht_temp;
+  // #include <Adafruit_AHTX0.h>
+  // Adafruit_AHTX0 aht;
+  // Adafruit_Sensor *aht_humidity, *aht_temp;
+
+  #include <AHT10.h>
+  uint8_t readStatus = 0;
+  AHT10 myAHT10(AHT10_ADDRESS_0X38);
   
 #endif
 
