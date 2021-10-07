@@ -19,7 +19,7 @@ GABfilter PhGAB(0.001, 150, 1);
 GABfilter DstGAB(0.001, 1000, 1);
 RingAverage<long, 600> DstAverage;
 // также может быть объявлен как (разброс измерения, скорость изменения значений)
-GKalman Dstkalman(1, 0.1);
+GKalman Dstkalman(1, 0.01);
 GKalman CpuTempKalman(1, 0.001);
 
 
@@ -79,6 +79,7 @@ TaskHandle_t TaskAHT10Handler;
   #include<ADS1115_WE.h> 
   #define I2C_ADDRESS 0x48
   ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
+  #define ADS1115_MiddleCount 5000
 #endif
 
 #if c_NTC == 1

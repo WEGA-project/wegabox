@@ -191,7 +191,7 @@ void TaskCPUtemp(void * parameters) {
 
    float AirTemp0=myAHT10.readTemperature();
    float AirHum0=myAHT10.readHumidity();
-   if (!AirTemp0 or !AirHum0) { 
+   if (!AirTemp0 or !AirHum0 or AirTemp0 == -50 or AirTemp0 == -255 or AirHum0 == -255) { 
      myAHT10.softReset();
      delay(50);
      myAHT10.begin();
@@ -271,21 +271,21 @@ if(ds0 != -127 and ds0 !=85) RootTemp=ds0;
 #endif
 
 #if c_ADS1115 == 1
-void TaskADS1115(void * parameters) {
-for(;;){
-  vTaskDelay(100 / portTICK_PERIOD_MS);
-  adc.setCompareChannels(ADS1115_COMP_0_3);
-  pHraw=adc.getResult_mV();
-  if (millis() < 60000){
-    PhGAB.setParameters(1,1,1);
-    PhGAB.filtered(pHraw);
-    //pHmV=pHraw;
-  }else{
-    PhGAB.setParameters(0.001, 200, 1);
-    pHmV=PhGAB.filtered(pHraw);
+  void TaskADS1115(void * parameters) {
+    for(;;){
+      vTaskDelay(10000 / portTICK_PERIOD_MS);
+      adc.setCompareChannels(ADS1115_COMP_0_3);
+      adc.setConvRate(ADS1115_860_SPS);
+      long cont=0;
+      double sensorValue=0;
+      while ( cont < ADS1115_MiddleCount){
+        cont++;
+        sensorValue = adc.getResult_mV()+sensorValue;
+      }
+      pHmV=sensorValue/cont;
+
+    }
   }
-}
-}
 #endif // c_ADS1115
 
 
