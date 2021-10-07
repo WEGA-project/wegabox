@@ -137,8 +137,14 @@ void TaskUS(void * parameters) {
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-   
+    if(millis()<60000){
+      //Dstkalman.setParameters(1,1);
+      us(US_ECHO,US_TRIG,25,US_MiddleCount);
+      }
+    else{
+      //Dstkalman.setParameters(1,0.01);
+      Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+      }
   }
 }
 #endif // c_US025
@@ -176,36 +182,28 @@ void TaskCPUtemp(void * parameters) {
 #if c_AHT10 == 1
   void TaskAHT10(void * parameters) {
   for(;;){
-    // aht.begin(); 
-    
-    // sensors_event_t humidity;
-    // sensors_event_t temp;
-
-    // vTaskDelay(10000 / portTICK_PERIOD_MS);
-    // aht_humidity->getEvent(&humidity);
-    // aht_temp->getEvent(&temp);
-    
-    // AirTemp=temp.temperature;
-    // AirHum=humidity.relative_humidity;
-   
-
+   readStatus = myAHT10.readRawData();
+  
+  if (readStatus != AHT10_ERROR)
+  {
    float AirTemp0=myAHT10.readTemperature();
    float AirHum0=myAHT10.readHumidity();
-   if (!AirTemp0 or !AirHum0 or AirTemp0 == -50 or AirTemp0 == -255 or AirHum0 == -255) { 
-     myAHT10.softReset();
-     delay(50);
-     myAHT10.begin();
-     myAHT10.setNormalMode();
-     }
-  else {
    if (AirTemp0 != 255 ) AirTemp=AirTemp0;
    if (AirHum0 != 255 ) AirHum=AirHum0;
   }
+  else
+  {
+    myAHT10.softReset();
+    delay(50);
+    myAHT10.begin();
+    myAHT10.setNormalMode();
+  }
+
    vTaskDelay(10000 / portTICK_PERIOD_MS);
     
     }
   }
-  #endif // c_AHT10    
+#endif // c_AHT10    
     
 
   #if c_CCS811 == 1
