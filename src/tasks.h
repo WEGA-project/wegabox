@@ -306,3 +306,16 @@ switch (status)
   }
 }
 #endif
+
+#if c_BME280 == 1
+  void TaskBME280(void * parameters) {
+  for(;;){  
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    bme.begin();
+    //bme.takeForcedMeasurement();
+    AirTemp=bme.readTemperature();
+    AirHum=bme.readHumidity();
+    AirPress=bme.readPressure();
+}
+  }
+#endif 
