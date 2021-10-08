@@ -14,7 +14,7 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include "GyverFilters.h"
 GMedian<17, int> PhMediana;
-GMedian<60, long> DstMediana;    
+GMedian<7, long> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
 GABfilter DstGAB(0.001, 1000, 1);
 RingAverage<long, 600> DstAverage;
@@ -33,6 +33,9 @@ GKalman CpuTempKalman(1, 0.001);
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
 bool OtaStart = false;
+bool ECwork = false;
+bool USwork = false;
+
 TaskHandle_t TaskAHT10Handler;
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
@@ -91,13 +94,15 @@ TaskHandle_t TaskAHT10Handler;
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
   #define EC_AnalogPort 33
-  #define EC_MiddleCount 100000
+  #define EC_MiddleCount 600000
 #endif
 
 #if c_US025 == 1
   #define US_ECHO 13
   #define US_TRIG 14
-  #define US_MiddleCount 900000
+  #include <HCSR04.h>
+  UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
+  #define US_MiddleCount 9000
 
 #endif // c_US025
 
@@ -108,7 +113,7 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_PR == 1
  #define PR_AnalogPort 35
- #define PR_MiddleCount 100
+ #define PR_MiddleCount 1000
 #endif // c_PR
 
 #if c_BME280 == 1

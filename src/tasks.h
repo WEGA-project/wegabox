@@ -61,7 +61,7 @@ void TaskPR(void * parameters){
     vTaskDelay(1 / portTICK_PERIOD_MS);
    }
    PR=PR0/PR_MiddleCount;
-   vTaskDelay(500 / portTICK_PERIOD_MS);
+   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
   }
 }
 #endif //  c_PR
@@ -79,7 +79,7 @@ void TaskPR(void * parameters){
       vTaskDelay(1 / portTICK_PERIOD_MS);
     }
     NTC=NTC0/NTC_MiddleCount;
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     }
   }
 #endif // c_NTC
@@ -88,42 +88,47 @@ void TaskPR(void * parameters){
 #if c_EC == 1
 void TaskEC(void * parameters){
   for(;;){
-    float Ap0 = 0;
+
+if ( USwork==false ){
+
+    ECwork=true;
+     float Ap0 = 0;
     float An0 = 0;
     double eccount = 0;
 
     pinMode(EC_AnalogPort, INPUT);
+
+  while (eccount < EC_MiddleCount and OtaStart != true){
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
-
- 
     digitalWrite(EC_DigitalPort1, LOW);
     digitalWrite(EC_DigitalPort2, LOW);
-
-   while (eccount < EC_MiddleCount and OtaStart != true){
 
     eccount++;
       digitalWrite(EC_DigitalPort1, HIGH);
       digitalWrite(EC_DigitalPort2, LOW);
-      //delayMicroseconds(2);
         Ap0 = analogRead(EC_AnalogPort) + Ap0;
-    
-
+                
       digitalWrite(EC_DigitalPort2, HIGH);
       digitalWrite(EC_DigitalPort1, LOW);
-      //delayMicroseconds(2);
         An0 = analogRead(EC_AnalogPort) + An0;
-     
-    //vTaskDelay(1 / portTICK_PERIOD_MS);
-  }
+      
+      
+  
+    //vTaskDelay(1 / portTICK_PERIOD_MS); 
 
-    pinMode(EC_AnalogPort, INPUT);    
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
 
+  }
+    pinMode(EC_AnalogPort, INPUT);    
+
+
     Ap = Ap0 / eccount;
     An = An0 / eccount;
+    ECwork=false;
 
+}
   vTaskDelay(5000 / portTICK_PERIOD_MS);
   //server.handleClient();
 
@@ -134,18 +139,52 @@ void TaskEC(void * parameters){
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
+    
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-    Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
-    //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    // if(millis()<60000){
-    //   //Dstkalman.setParameters(1,1);
-    //   us(US_ECHO,US_TRIG,25,US_MiddleCount);
-    //   }
-    // else{
-    //   //Dstkalman.setParameters(1,0.01);
-    //   Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    //   }
+    //     float Dist0;
+    // Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
+    // Dist=Dist0/100;
+    // vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    // vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
+    // //Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
+
+
+    //Dist=distanceSensor.measureDistanceCm(25);
+if (ECwork==false){
+  USwork=true;
+    long cont=0;
+    double sensorValue=0;
+
+    
+      
+    while ( cont < US_MiddleCount){
+      
+      float dist0=distanceSensor.measureDistanceCm(25);
+      if(dist0 != -1 ) {
+        sensorValue=dist0+sensorValue;
+        cont++;  
+        delay (5); 
+         }
+    } 
+    
+    
+    Dist=sensorValue/cont;
+
+    USwork=false;
+    }
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+
+
+    // //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+    // // if(millis()<60000){
+    // //   //Dstkalman.setParameters(1,1);
+    // //   us(US_ECHO,US_TRIG,25,US_MiddleCount);
+    // //   }
+    // // else{
+    // //   //Dstkalman.setParameters(1,0.01);
+    // //   Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+    // //   }
   }
 }
 #endif // c_US025
@@ -159,7 +198,7 @@ void TaskHall(void * parameters) {
       n++;
       sensorValue = hallRead()+sensorValue;
       }
-    vTaskDelay(1500 / portTICK_PERIOD_MS);
+    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     
     hall=sensorValue/n;
   }
@@ -200,7 +239,7 @@ void TaskCPUtemp(void * parameters) {
     myAHT10.setNormalMode();
   }
 
-   vTaskDelay(10000 / portTICK_PERIOD_MS);
+   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     
     }
   }
@@ -260,7 +299,7 @@ void TaskMCP3421(void * parameters) {
 #if c_DS18B20 == 1
 void TaskDS18B20(void * parameters) {
   for(;;){
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
 sens18b20.begin();
 sens18b20.requestTemperatures();
 float ds0=sens18b20.getTempCByIndex(0);
@@ -292,7 +331,7 @@ if(ds0 != -127 and ds0 !=85) RootTemp=ds0;
 #if c_AM2320 == 1
 void TaskAHT10(void * parameters) {
 for(;;){
-  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
 int status = AM2320.read();
 switch (status)
 {
@@ -311,7 +350,7 @@ switch (status)
 #if c_BME280 == 1
   void TaskBME280(void * parameters) {
   for(;;){  
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     bme.begin();
     AirTemp=bme.readTemperature();
     AirHum=bme.readHumidity();
