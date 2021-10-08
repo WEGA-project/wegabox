@@ -123,10 +123,8 @@ void setup() {
   #endif // c_MCP23017
 
   #if c_BME280 == 1
-    if (! bme.begin(0x77, &Wire)) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
-        while (1);
-    }
+    bme.begin(0x77, &Wire);
+    bme.begin();
   #endif //c_BME280
 
 
@@ -185,5 +183,8 @@ void setup() {
   xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,NULL);
   #endif // c_AM2320
 
+  #if c_BME280 == 1
+  xTaskCreate(TaskBME280,"BME280",10000,NULL,0,NULL);
+  #endif // c_BME280
 
 }

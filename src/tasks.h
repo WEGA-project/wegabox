@@ -136,15 +136,16 @@ void TaskUS(void * parameters) {
   for(;;){
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
+    Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
     //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    if(millis()<60000){
-      //Dstkalman.setParameters(1,1);
-      us(US_ECHO,US_TRIG,25,US_MiddleCount);
-      }
-    else{
-      //Dstkalman.setParameters(1,0.01);
-      Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-      }
+    // if(millis()<60000){
+    //   //Dstkalman.setParameters(1,1);
+    //   us(US_ECHO,US_TRIG,25,US_MiddleCount);
+    //   }
+    // else{
+    //   //Dstkalman.setParameters(1,0.01);
+    //   Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
+    //   }
   }
 }
 #endif // c_US025
@@ -306,3 +307,15 @@ switch (status)
   }
 }
 #endif
+
+#if c_BME280 == 1
+  void TaskBME280(void * parameters) {
+  for(;;){  
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    bme.begin();
+    AirTemp=bme.readTemperature();
+    AirHum=bme.readHumidity();
+    AirPress=bme.readPressure();
+    }
+  }
+#endif 

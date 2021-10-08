@@ -65,13 +65,5 @@ void loop() {
   #endif // c_MCP23017
 
 
-  #if c_BME280 == 1
-    bme.takeForcedMeasurement();
-    AirTemp=bme.readTemperature();
-    AirHum=bme.readHumidity();
-    AirPress=bme.readPressure();
-  #endif //c_BME280
-
-
 
 } // loop

@@ -97,7 +97,7 @@ TaskHandle_t TaskAHT10Handler;
 #if c_US025 == 1
   #define US_ECHO 13
   #define US_TRIG 14
-  #define US_MiddleCount 602
+  #define US_MiddleCount 900000
 
 #endif // c_US025
 
