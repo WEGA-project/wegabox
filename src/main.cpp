@@ -16,12 +16,17 @@ WebServer server(80);
 GMedian<17, int> PhMediana;
 GMedian<7, long> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
-GABfilter DstGAB(0.001, 1000, 1);
+
 RingAverage<long, 600> DstAverage;
 // также может быть объявлен как (разброс измерения, скорость изменения значений)
 GKalman Dstkalman(1, 0.01);
 GKalman CpuTempKalman(1, 0.001);
 
+GABfilter ApGAB(0.0001,1,1);
+GABfilter AnGAB(0.0001,1,1);
+GABfilter NTCGAB(0.0001,1,1);
+GABfilter PRGAB(0.001, 1, 1);
+GABfilter DstGAB(0.001, 1, 1);
 
 #include <soc/rtc_wdt.h>
 
@@ -102,7 +107,7 @@ TaskHandle_t TaskAHT10Handler;
   #define US_TRIG 14
   #include <HCSR04.h>
   UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
-  #define US_MiddleCount 9000
+  #define US_MiddleCount 900
 
 #endif // c_US025
 

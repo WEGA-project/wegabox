@@ -9,7 +9,8 @@ void TaskOTA(void * parameters){
 }
 
 void TaskWegaApi(void * parameters){
-  for(;;){
+    for(;;){
+    if (OtaStart == true) {delay (120000);}else{
     // Sending to WEGA-API 
     WiFiClient client;
     HTTPClient http;
@@ -41,6 +42,7 @@ void TaskWegaApi(void * parameters){
       if (WiFi.status() != WL_CONNECTED) {
         WiFi.disconnect(true);
         WiFi.begin(ssid, password);  }
+    }
     vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     //delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
 
@@ -52,146 +54,103 @@ void TaskWegaApi(void * parameters){
 #if c_PR == 1
 void TaskPR(void * parameters){
   pinMode(PR_AnalogPort, INPUT);
+  float PR0;
+
   for(;;){
-   float PR0=0;
-   double prcount = 0;
-   while (prcount < PR_MiddleCount){
-    prcount++;
-    PR0=analogRead(PR_AnalogPort)+PR0;
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-   }
-   PR=PR0/PR_MiddleCount;
-   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
+    if (OtaStart == true) {delay (120000);}else{
+   
+   
+    PR0=PRGAB.filtered (analogRead(PR_AnalogPort));
+   
+  
+   vTaskDelay(100 / portTICK_PERIOD_MS);
+   if (millis()>60000){PR=PR0; }
   }
+}
 }
 #endif //  c_PR
 
-// Измерение термистора
-#if c_NTC == 1
-  void TaskNTC(void * parameters){
-    pinMode(NTC_port, INPUT);
-    for(;;){
-    float NTC0=0;
-    double ntccount = 0;
-    while (ntccount < NTC_MiddleCount){
-      ntccount++;
-      NTC0=analogRead(NTC_port)+NTC0;
-      vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-    NTC=NTC0/NTC_MiddleCount;
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    }
-  }
-#endif // c_NTC
 
 // Измерение ЕС
 #if c_EC == 1
 void TaskEC(void * parameters){
   for(;;){
+    if (OtaStart == true) {delay (120000);}else{
+    
+    float An0,Ap0;
+    pinMode(EC_AnalogPort, INPUT);  
 
-if ( USwork==false ){
-
-    ECwork=true;
-     float Ap0 = 0;
-    float An0 = 0;
-    double eccount = 0;
-
-    pinMode(EC_AnalogPort, INPUT);
-
-  while (eccount < EC_MiddleCount and OtaStart != true){
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
-    digitalWrite(EC_DigitalPort1, LOW);
-    digitalWrite(EC_DigitalPort2, LOW);
-
-    eccount++;
-      digitalWrite(EC_DigitalPort1, HIGH);
-      digitalWrite(EC_DigitalPort2, LOW);
-        Ap0 = analogRead(EC_AnalogPort) + Ap0;
-                
-      digitalWrite(EC_DigitalPort2, HIGH);
       digitalWrite(EC_DigitalPort1, LOW);
-        An0 = analogRead(EC_AnalogPort) + An0;
-      
-      
-  
-    //vTaskDelay(1 / portTICK_PERIOD_MS); 
+      digitalWrite(EC_DigitalPort2, LOW);
 
+
+      digitalWrite(EC_DigitalPort1, HIGH);
+        Ap0 = ApGAB.filtered (analogRead(EC_AnalogPort));
+      digitalWrite(EC_DigitalPort1, LOW);
+
+
+      digitalWrite(EC_DigitalPort2, HIGH);
+        An0 = AnGAB.filtered (analogRead(EC_AnalogPort));
+      digitalWrite(EC_DigitalPort2, LOW);
+
+      digitalWrite(EC_DigitalPort1, LOW);
+      digitalWrite(EC_DigitalPort2, LOW);
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
 
+    if (millis()>60000){
+      Ap=Ap0;
+      An=An0;
+    }
   }
-    pinMode(EC_AnalogPort, INPUT);    
-
-
-    Ap = Ap0 / eccount;
-    An = An0 / eccount;
-    ECwork=false;
-
-}
-  vTaskDelay(5000 / portTICK_PERIOD_MS);
-  //server.handleClient();
+  vTaskDelay(1 / portTICK_PERIOD_MS);
+ 
 
   }
 }
 #endif // c_EC
 
+// Измерение термистора
+#if c_NTC == 1
+  void TaskNTC(void * parameters){
+    pinMode(NTC_port, INPUT);
+    float NTC0;
+    for(;;){
+      if (OtaStart == true) {delay (120000);}else{
+        NTC0=NTCGAB.filtered (analogRead(NTC_port));
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+        if (millis()>60000){NTC=NTC0; }
+      }
+    }
+  }
+#endif // c_NTC
+
+
 #if c_US025 == 1
 void TaskUS(void * parameters) {
   for(;;){
-    
-
-    //     float Dist0;
-    // Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
-    // Dist=Dist0/100;
-    // vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-    // vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    // //Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
-
-
-    //Dist=distanceSensor.measureDistanceCm(25);
-if (ECwork==false){
-  USwork=true;
-    long cont=0;
-    double sensorValue=0;
-
-    
-      
-    while ( cont < US_MiddleCount){
-      
-      float dist0=distanceSensor.measureDistanceCm(25);
-      if(dist0 != -1 ) {
-        sensorValue=dist0+sensorValue;
-        cont++;  
-        delay (5); 
-         }
-    } 
-    
-    
-    Dist=sensorValue/cont;
-
-    USwork=false;
+    float dst0;
+    if (OtaStart == true) {delay (120000);}else{
+      float us=distanceSensor.measureDistanceCm(25);
+      if(us != -1 ) {    
+        dst0=DstGAB.filtered(us);  
+        delay (50); 
+        if (millis()>60000){
+          Dist=dst0; 
+        }
+      }
     }
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-
-
-    // //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    // // if(millis()<60000){
-    // //   //Dstkalman.setParameters(1,1);
-    // //   us(US_ECHO,US_TRIG,25,US_MiddleCount);
-    // //   }
-    // // else{
-    // //   //Dstkalman.setParameters(1,0.01);
-    // //   Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    // //   }
-  }
+   }
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 }
 #endif // c_US025
 
 #if c_hall == 1
 void TaskHall(void * parameters) {
   for(;;){
+    if (OtaStart == true) {delay (120000);}else{
     long n=0;
     double sensorValue=0;
     while ( n < 100){
@@ -202,6 +161,7 @@ void TaskHall(void * parameters) {
     
     hall=sensorValue/n;
   }
+}
 }
 #endif //c_hall
 
