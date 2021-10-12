@@ -15,16 +15,16 @@ WebServer server(80);
 #include "GyverFilters.h"
 GMedian<17, int> PhMediana;
 GMedian<7, long> DstMediana;    
-GABfilter PhGAB(0.001, 150, 1);
 
 GKalman CpuTempKalman(1, 0.001);
 
-GABfilter ApGAB(1,1,1);
-GABfilter AnGAB(1,1,1);
-GABfilter NTCGAB(1,1,1);
+GABfilter ApGAB(1, 1, 1);
+GABfilter AnGAB(1, 1, 1);
+GABfilter NTCGAB(1, 1, 1);
 GABfilter PRGAB(1, 1, 1);
 GABfilter DstGAB(1, 1, 1);
 GABfilter HallGAB(0.001, 1, 1);
+GABfilter PhGAB(0.001, 150, 1);
 
 #include <soc/rtc_wdt.h>
 
