@@ -17,16 +17,14 @@ GMedian<17, int> PhMediana;
 GMedian<7, long> DstMediana;    
 GABfilter PhGAB(0.001, 150, 1);
 
-RingAverage<long, 600> DstAverage;
-// также может быть объявлен как (разброс измерения, скорость изменения значений)
-GKalman Dstkalman(1, 0.01);
 GKalman CpuTempKalman(1, 0.001);
 
-GABfilter ApGAB(0.0001,1,1);
-GABfilter AnGAB(0.0001,1,1);
-GABfilter NTCGAB(0.0001,1,1);
-GABfilter PRGAB(0.001, 1, 1);
-GABfilter DstGAB(0.001, 1, 1);
+GABfilter ApGAB(1,1,1);
+GABfilter AnGAB(1,1,1);
+GABfilter NTCGAB(1,1,1);
+GABfilter PRGAB(1, 1, 1);
+GABfilter DstGAB(1, 1, 1);
+GABfilter HallGAB(0.001, 1, 1);
 
 #include <soc/rtc_wdt.h>
 

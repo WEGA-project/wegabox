@@ -64,7 +64,10 @@ void TaskPR(void * parameters){
    
   
    vTaskDelay(100 / portTICK_PERIOD_MS);
-   if (millis()>60000){PR=PR0; }
+   if (millis()>60000){
+     PRGAB.setParameters(0.0001,1,1);
+     PR=PR0; 
+     }
   }
 }
 }
@@ -101,6 +104,8 @@ void TaskEC(void * parameters){
     pinMode(EC_DigitalPort2, INPUT);
 
     if (millis()>60000){
+      ApGAB.setParameters(0.0001,1.0,1.0);
+      ApGAB.setParameters(0.0001,1.0,1.0);
       Ap=Ap0;
       An=An0;
     }
@@ -121,7 +126,10 @@ void TaskEC(void * parameters){
       if (OtaStart == true) {delay (120000);}else{
         NTC0=NTCGAB.filtered (analogRead(NTC_port));
         vTaskDelay(1 / portTICK_PERIOD_MS);
-        if (millis()>60000){NTC=NTC0; }
+        if (millis()>60000){
+          NTCGAB.setParameters(0.0001,1,1);
+          NTC=NTC0;
+        }
       }
     }
   }
@@ -138,6 +146,7 @@ void TaskUS(void * parameters) {
         dst0=DstGAB.filtered(us);  
         delay (50); 
         if (millis()>60000){
+          DstGAB.setParameters(0.0001,1,1);
           Dist=dst0; 
         }
       }
@@ -151,15 +160,9 @@ void TaskUS(void * parameters) {
 void TaskHall(void * parameters) {
   for(;;){
     if (OtaStart == true) {delay (120000);}else{
-    long n=0;
-    double sensorValue=0;
-    while ( n < 100){
-      n++;
-      sensorValue = hallRead()+sensorValue;
-      }
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    
-    hall=sensorValue/n;
+
+    hall=HallGAB.filtered( hallRead() );
+    vTaskDelay(300 / portTICK_PERIOD_MS);
   }
 }
 }
@@ -168,12 +171,12 @@ void TaskHall(void * parameters) {
 #if c_CPUTEMP == 1
 void TaskCPUtemp(void * parameters) {
   for(;;){
-    //CPUTemp=CpuTempKalman.filtered( ( temprature_sens_read()-32) * (5/9) );
+    
      int CPUTemp0 = temprature_sens_read();
-     //if (CPUTemp0 != 128 ) CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
+     
      CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
     vTaskDelay(100 / portTICK_PERIOD_MS);
-    rtc_wdt_feed();
+    
   }
 }
 #endif //c_CPUTEMP
