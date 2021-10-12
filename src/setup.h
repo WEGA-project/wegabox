@@ -45,10 +45,7 @@ void setup() {
 
 
   ArduinoOTA.begin();
-
-
-
-  while (millis() < 10000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения
+  while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
   
   
   MDNS.begin( HOSTNAME );
@@ -62,19 +59,6 @@ void setup() {
   #endif
 
   #if c_AHT10 == 1
-    // if (!aht.begin()) {
-    //   Serial.println("Failed to find AHT10/AHT20 chip");
-    // }
-
-    // Serial.println("AHT10/AHT20 Found!");
-    // aht_temp = aht.getTemperatureSensor();
-    // aht_temp->printSensorDetails();
-
-    // aht_humidity = aht.getHumiditySensor();
-    // aht_humidity->printSensorDetails();
-
-  
-     
    myAHT10.softReset();
    delay(50);
     myAHT10.begin();

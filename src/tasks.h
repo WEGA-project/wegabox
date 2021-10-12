@@ -85,27 +85,40 @@ void TaskEC(void * parameters){
 
     pinMode(EC_DigitalPort1, OUTPUT);
     pinMode(EC_DigitalPort2, OUTPUT);
-      digitalWrite(EC_DigitalPort1, LOW);
-      digitalWrite(EC_DigitalPort2, LOW);
+      // digitalWrite(EC_DigitalPort1, LOW);
+      // digitalWrite(EC_DigitalPort2, LOW);
 
+    // for (int i=0; i <= 1500; i++){
+    //   digitalWrite(EC_DigitalPort1, HIGH);
+    //   digitalWrite(EC_DigitalPort1, LOW);
+    //   digitalWrite(EC_DigitalPort2, HIGH);
+    //   digitalWrite(EC_DigitalPort2, LOW);
+    // }
 
       digitalWrite(EC_DigitalPort1, HIGH);
         Ap0 = ApGAB.filtered (analogRead(EC_AnalogPort));
       digitalWrite(EC_DigitalPort1, LOW);
 
-
       digitalWrite(EC_DigitalPort2, HIGH);
         An0 = AnGAB.filtered (analogRead(EC_AnalogPort));
       digitalWrite(EC_DigitalPort2, LOW);
 
-      digitalWrite(EC_DigitalPort1, LOW);
-      digitalWrite(EC_DigitalPort2, LOW);
+    // for (int i=0; i <= 1500; i++){
+    //   digitalWrite(EC_DigitalPort1, HIGH);
+    //   digitalWrite(EC_DigitalPort1, LOW);
+    //   digitalWrite(EC_DigitalPort2, HIGH);
+    //   digitalWrite(EC_DigitalPort2, LOW);
+    // }
+
+
+
     pinMode(EC_DigitalPort1, INPUT);
     pinMode(EC_DigitalPort2, INPUT);
 
     if (millis()>60000){
-      ApGAB.setParameters(0.0001,1.0,1.0);
-      ApGAB.setParameters(0.0001,1.0,1.0);
+      
+      ApGAB.setParameters(0.0001,1,1);
+      AnGAB.setParameters(0.0001,1,1);
       Ap=Ap0;
       An=An0;
     }
@@ -146,7 +159,7 @@ void TaskUS(void * parameters) {
         dst0=DstGAB.filtered(us);  
         delay (50); 
         if (millis()>60000){
-          DstGAB.setParameters(0.0001,1,1);
+          DstGAB.setParameters(0.001,1,1);
           Dist=dst0; 
         }
       }
