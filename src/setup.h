@@ -121,7 +121,7 @@ void setup() {
   #endif
 
   #if c_NTC == 1
-  xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,1,NULL);
+  //xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,1,NULL);
   #endif
 
 

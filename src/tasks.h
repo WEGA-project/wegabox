@@ -124,29 +124,35 @@ void TaskEC(void * parameters){
     }
   }
   vTaskDelay(1 / portTICK_PERIOD_MS);
- 
-
-  }
-}
-#endif // c_EC
-
-// Измерение термистора
-#if c_NTC == 1
-  void TaskNTC(void * parameters){
-    pinMode(NTC_port, INPUT);
-    float NTC0;
-    for(;;){
-      if (OtaStart == true) {delay (120000);}else{
-        NTC0=NTCGAB.filtered (analogRead(NTC_port));
+        pinMode(NTC_port, INPUT);
+         float NTC0=NTCGAB.filtered (analogRead(NTC_port));
         vTaskDelay(1 / portTICK_PERIOD_MS);
         if (millis()>60000){
           NTCGAB.setParameters(0.0001,1,1);
           NTC=NTC0;
         }
-      }
-    }
+
   }
-#endif // c_NTC
+}
+#endif // c_EC
+
+// // Измерение термистора
+// #if c_NTC == 1
+//   void TaskNTC(void * parameters){
+//     pinMode(NTC_port, INPUT);
+//     float NTC0;
+//     for(;;){
+//       if (OtaStart == true) {delay (120000);}else{
+//         NTC0=NTCGAB.filtered (analogRead(NTC_port));
+//         vTaskDelay(1 / portTICK_PERIOD_MS);
+//         if (millis()>60000){
+//           NTCGAB.setParameters(0.0001,1,1);
+//           NTC=NTC0;
+//         }
+//       }
+//     }
+//   }
+// #endif // c_NTC
 
 
 #if c_US025 == 1
