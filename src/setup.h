@@ -19,6 +19,7 @@ void setup() {
   ArduinoOTA
     .onStart([]() {
       OtaStart = true;
+    
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
         type = "sketch";
@@ -51,6 +52,7 @@ void setup() {
   MDNS.begin( HOSTNAME );
   MDNS.addService("http", "tcp", 80);
   server.on("/",handleRoot);
+  server.on("/reset",handleReset);
   server.begin();
 
   #if c_DS18B20 == 1
@@ -112,12 +114,13 @@ void setup() {
   #endif //c_BME280
 
 
-  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,4,NULL);
+  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,5,NULL);
+
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   #if c_EC == 1
-  //xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
-  xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
+  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
+  //xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
   #endif
 
   #if c_NTC == 1

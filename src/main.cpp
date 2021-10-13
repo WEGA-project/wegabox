@@ -26,7 +26,6 @@ GABfilter DstGAB(1, 1, 1);
 GABfilter HallGAB(0.001, 1, 1);
 GABfilter PhGAB(0.001, 150, 1);
 
-#include <soc/rtc_wdt.h>
 
 
 
@@ -133,6 +132,13 @@ Adafruit_BME280 bme; // I2C
 #endif //c_CPUTEMP
 
 #include <tasks.h>
+
+void handleReset(){
+  server.send(200, "text/plain",  "restart");
+  delay(5000);
+  ESP.restart();
+  
+}
 
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";

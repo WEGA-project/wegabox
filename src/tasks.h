@@ -4,7 +4,7 @@ void TaskOTA(void * parameters){
   for(;;){
     server.handleClient();
     ArduinoOTA.handle();
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
   }
 }
 
@@ -73,65 +73,71 @@ void TaskPR(void * parameters){
 }
 #endif //  c_PR
 
-
 // Измерение ЕС
 #if c_EC == 1
-void TaskEC(void * parameters){
-  for(;;){
-    if (OtaStart == true) {delay (120000);}else{
-    
-    float An0,Ap0;
-    pinMode(EC_AnalogPort, INPUT);  
-
-    pinMode(EC_DigitalPort1, OUTPUT);
-    pinMode(EC_DigitalPort2, OUTPUT);
-      // digitalWrite(EC_DigitalPort1, LOW);
-      // digitalWrite(EC_DigitalPort2, LOW);
-
-    // for (int i=0; i <= 1500; i++){
-    //   digitalWrite(EC_DigitalPort1, HIGH);
-    //   digitalWrite(EC_DigitalPort1, LOW);
-    //   digitalWrite(EC_DigitalPort2, HIGH);
-    //   digitalWrite(EC_DigitalPort2, LOW);
-    // }
-
-      digitalWrite(EC_DigitalPort1, HIGH);
-        Ap0 = ApGAB.filtered (analogRead(EC_AnalogPort));
-      digitalWrite(EC_DigitalPort1, LOW);
-
-      digitalWrite(EC_DigitalPort2, HIGH);
-        An0 = AnGAB.filtered (analogRead(EC_AnalogPort));
-      digitalWrite(EC_DigitalPort2, LOW);
-
-    // for (int i=0; i <= 1500; i++){
-    //   digitalWrite(EC_DigitalPort1, HIGH);
-    //   digitalWrite(EC_DigitalPort1, LOW);
-    //   digitalWrite(EC_DigitalPort2, HIGH);
-    //   digitalWrite(EC_DigitalPort2, LOW);
-    // }
-
-
-
-    pinMode(EC_DigitalPort1, INPUT);
-    pinMode(EC_DigitalPort2, INPUT);
-
-    if (millis()>60000){
-      
-      ApGAB.setParameters(0.0001,1,1);
-      AnGAB.setParameters(0.0001,1,1);
-      Ap=Ap0;
-      An=An0;
+void TaskEC(void *parameters)
+{
+  for (;;)
+  {
+    pinMode(NTC_port, INPUT);
+    if (OtaStart == true)
+    {
+      delay(120000);
     }
-  }
-  vTaskDelay(1 / portTICK_PERIOD_MS);
-        pinMode(NTC_port, INPUT);
-         float NTC0=NTCGAB.filtered (analogRead(NTC_port));
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-        if (millis()>60000){
-          NTCGAB.setParameters(0.0001,1,1);
-          NTC=NTC0;
-        }
+    else
+    {
+      double An0 = 0;
+      double Ap0 = 0;
+      pinMode(EC_AnalogPort, INPUT);
 
+        pinMode(EC_DigitalPort1, OUTPUT);
+        pinMode(EC_DigitalPort2, OUTPUT);
+        ECwork = true;
+      long i = 0;
+      while (i < 70 )
+      {
+        i++;
+        digitalWrite(EC_DigitalPort1, HIGH);
+        Ap0 = analogRead(EC_AnalogPort) + Ap0;
+        digitalWrite(EC_DigitalPort1, LOW);
+
+        digitalWrite(EC_DigitalPort2, HIGH);
+        An0 = analogRead(EC_AnalogPort) + An0;
+        digitalWrite(EC_DigitalPort2, LOW);
+      }
+        pinMode(EC_DigitalPort1, INPUT);
+        pinMode(EC_DigitalPort2, INPUT);
+        ECwork = false;
+      
+
+      ApGAB.filtered(Ap0 / i);
+      AnGAB.filtered(An0 / i);
+
+      if (millis() > 120000)
+      {
+        ApGAB.setParameters(0.0001, 1, 1);
+        AnGAB.setParameters(0.0001, 1, 1);
+        Ap = ApGAB.filtered(Ap0 / i);
+        An = AnGAB.filtered(An0 / i);
+      }
+    }
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+
+    long NTC0 = 0;
+    long i = 0;
+    while (i < 10 )
+    {
+      i++;
+      NTC0 = analogRead(NTC_port) + NTC0;
+    }
+    NTCGAB.filtered(NTC0 / i);
+    if (millis() > 120000)
+    {
+      NTCGAB.setParameters(0.0001, 1, 1);
+      NTC = NTCGAB.filtered(NTC0 / i);
+    }
+
+    //vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
 #endif // c_EC
@@ -143,11 +149,14 @@ void TaskEC(void * parameters){
 //     float NTC0;
 //     for(;;){
 //       if (OtaStart == true) {delay (120000);}else{
-//         NTC0=NTCGAB.filtered (analogRead(NTC_port));
+//         if (ECwork == false){
+//           NTC0=NTCGAB.filtered (analogRead(NTC_port));
+          
+//           if (millis()>60000){
+//             NTCGAB.setParameters(0.0001,1,1);
+//             NTC=NTC0;
+//           }
 //         vTaskDelay(1 / portTICK_PERIOD_MS);
-//         if (millis()>60000){
-//           NTCGAB.setParameters(0.0001,1,1);
-//           NTC=NTC0;
 //         }
 //       }
 //     }
