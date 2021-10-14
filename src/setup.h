@@ -2,8 +2,11 @@
 
 
 void setup() {
-  
- 
+      pinMode(18, INPUT);
+      pinMode(19, INPUT);
+      pinMode(33, INPUT);
+      pinMode(32, INPUT);
+      
   Serial.begin(9600);
   Wire.begin(I2C_SDA, I2C_SCL);
 
@@ -19,6 +22,10 @@ void setup() {
   ArduinoOTA
     .onStart([]() {
       OtaStart = true;
+      pinMode(18, INPUT);
+      pinMode(19, INPUT);
+      pinMode(33, INPUT);
+      pinMode(32, INPUT);
     
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
@@ -118,12 +125,12 @@ void setup() {
   #endif //c_BME280
 
 
-  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,5,NULL);
+  xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,2,NULL);
 
-  xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
+  xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);
 
   //#if c_EC == 1
-  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
+  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,1,NULL,0);
   //xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
   //#endif
 
@@ -138,7 +145,7 @@ void setup() {
 
 
   #if c_US025 == 1
-  xTaskCreate(TaskUS,"TaskUS",10000,NULL,2,NULL);
+  xTaskCreate(TaskUS,"TaskUS",10000,NULL,0,NULL);
   #endif // c_PR
 
   #if c_hall == 1

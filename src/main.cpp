@@ -18,8 +18,8 @@ GMedian<7, long> DstMediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
-GABfilter ApGAB(1, 1, 1);
-GABfilter AnGAB(1, 1, 1);
+GABfilter ApGAB(0.1, 1, 1);
+GABfilter AnGAB(0.1, 1, 1);
 GABfilter NTCGAB(1, 1, 1);
 GABfilter PRGAB(1, 1, 1);
 GABfilter DstGAB(1, 1, 1);
@@ -29,6 +29,9 @@ GABfilter PhGAB(0.001, 150, 1);
 GMedian<254, long> ApMed;
 GMedian<254, long> AnMed;
 GMedian<254, long> NTCMed;
+
+
+
 
 #include <pre.h>
 #include <func>

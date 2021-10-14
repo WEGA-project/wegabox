@@ -76,7 +76,7 @@ void TaskPR(void * parameters){
 // Измерение ЕС и NTC
 void TaskEC(void *parameters)
 {
-  
+  long s;
 for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
 
@@ -88,48 +88,51 @@ for(;;){
       pinMode(EC_DigitalPort1, OUTPUT);
       pinMode(EC_DigitalPort2, OUTPUT);
       ECwork = true;
-      
+      s=0;
+      while(s<200){
+        s++;
         digitalWrite(EC_DigitalPort1, HIGH);
-        Ap0 = analogRead(EC_AnalogPort);
+        Ap0 = analogRead(EC_AnalogPort)+Ap0;
         digitalWrite(EC_DigitalPort1, LOW);
 
         digitalWrite(EC_DigitalPort2, HIGH);
-        An0 = analogRead(EC_AnalogPort);
+        An0 = analogRead(EC_AnalogPort)+An0;
         digitalWrite(EC_DigitalPort2, LOW);
-      
+      }
 
       pinMode(EC_DigitalPort1, INPUT);
       pinMode(EC_DigitalPort2, INPUT);
       ECwork = false;
       
 
-      ApGAB.filtered(Ap0);
-      AnGAB.filtered(An0 );
+      ApGAB.filtered(Ap0/s);
+      AnGAB.filtered(An0/s);
 
       if (millis() > 120000)
       {
-        ApGAB.setParameters(0.00001, 1, 1);
-        AnGAB.setParameters(0.00001, 1, 1);
-        Ap = ApGAB.filtered(Ap0 );
-        An = AnGAB.filtered(An0 );
+        ApGAB.setParameters(0.001, 1, 1);
+        AnGAB.setParameters(0.001, 1, 1);
+        Ap = ApGAB.filtered(Ap0/s);
+        An = AnGAB.filtered(An0/s);
       }
-      vTaskDelay(25 / portTICK_PERIOD_MS);
+      vTaskDelay(15 / portTICK_PERIOD_MS);
 #endif // c_EC
-
-
-      
 
 
 #if c_NTC == 1
       pinMode(NTC_port, INPUT);
-      long NTC0;
-        NTC0 = analogRead(NTC_port);
-        NTCGAB.filtered(NTC0);
+      long NTC0=0;
+      s=0;
+      while(s<900){
+        s++;
+        NTC0 = analogRead(NTC_port)+NTC0;
+      }
 
+      NTCGAB.filtered(NTC0/s);
       if (millis() > 120000)
       {
-        NTCGAB.setParameters(0.00001, 1, 1);
-        NTC = NTCGAB.filtered(NTC0);
+        NTCGAB.setParameters(0.001, 1, 1);
+        NTC = NTCGAB.filtered(NTC0/s);
       }
       vTaskDelay(5 / portTICK_PERIOD_MS);
 #endif // c_NTC      
@@ -168,8 +171,8 @@ void TaskUS(void * parameters) {
       if(us != -1 ) {    
         dst0=DstGAB.filtered(us);  
         delay (50); 
-        if (millis()>60000){
-          DstGAB.setParameters(0.001,1,1);
+        if (millis()>120000){
+          DstGAB.setParameters(0.0001,1,1);
           Dist=dst0; 
         }
       }
