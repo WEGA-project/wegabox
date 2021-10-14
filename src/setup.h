@@ -2,7 +2,7 @@
 
 
 void setup() {
-
+  
  
   Serial.begin(9600);
   Wire.begin(I2C_SDA, I2C_SCL);
@@ -53,6 +53,10 @@ void setup() {
   MDNS.addService("http", "tcp", 80);
   server.on("/",handleRoot);
   server.on("/reset",handleReset);
+
+  
+  server.on("/status",handleStatus);
+
   server.begin();
 
   #if c_DS18B20 == 1
@@ -110,7 +114,7 @@ void setup() {
 
   #if c_BME280 == 1
     bme.begin(0x77, &Wire);
-    bme.begin();
+    //bme.begin();
   #endif //c_BME280
 
 
@@ -118,10 +122,10 @@ void setup() {
 
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
-  #if c_EC == 1
+  //#if c_EC == 1
   xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
   //xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
-  #endif
+  //#endif
 
   #if c_NTC == 1
   //xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,1,NULL);
@@ -173,5 +177,8 @@ void setup() {
   #if c_BME280 == 1
   xTaskCreate(TaskBME280,"BME280",10000,NULL,0,NULL);
   #endif // c_BME280
+
+
+
 
 }

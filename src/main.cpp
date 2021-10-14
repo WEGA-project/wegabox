@@ -16,7 +16,7 @@ WebServer server(80);
 GMedian<17, int> PhMediana;
 GMedian<7, long> DstMediana;    
 
-GKalman CpuTempKalman(1, 0.001);
+GKalman CpuTempKalman(1, 0.0001);
 
 GABfilter ApGAB(1, 1, 1);
 GABfilter AnGAB(1, 1, 1);
@@ -26,17 +26,21 @@ GABfilter DstGAB(1, 1, 1);
 GABfilter HallGAB(0.001, 1, 1);
 GABfilter PhGAB(0.001, 150, 1);
 
-
-
+GMedian<254, long> ApMed;
+GMedian<254, long> AnMed;
+GMedian<254, long> NTCMed;
 
 #include <pre.h>
 #include <func>
+
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
+
+
 
 TaskHandle_t TaskAHT10Handler;
 
@@ -54,14 +58,9 @@ TaskHandle_t TaskAHT10Handler;
 #endif
 
 #if c_AHT10 == 1
-  // #include <Adafruit_AHTX0.h>
-  // Adafruit_AHTX0 aht;
-  // Adafruit_Sensor *aht_humidity, *aht_temp;
-
   #include <AHT10.h>
   uint8_t readStatus = 0;
   AHT10 myAHT10(AHT10_ADDRESS_0X38);
-  
 #endif
 
 #if c_AM2320 == 1
@@ -132,6 +131,7 @@ Adafruit_BME280 bme; // I2C
 #endif //c_CPUTEMP
 
 #include <tasks.h>
+#include <status.h>
 
 void handleReset(){
   server.send(200, "text/plain",  "restart");

@@ -10,7 +10,7 @@ void TaskOTA(void * parameters){
 
 void TaskWegaApi(void * parameters){
     for(;;){
-    if (OtaStart == true) {delay (120000);}else{
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
     // Sending to WEGA-API 
     WiFiClient client;
     HTTPClient http;
@@ -57,7 +57,7 @@ void TaskPR(void * parameters){
   float PR0;
 
   for(;;){
-    if (OtaStart == true) {delay (120000);}else{
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
    
    
     PR0=PRGAB.filtered (analogRead(PR_AnalogPort));
@@ -73,74 +73,69 @@ void TaskPR(void * parameters){
 }
 #endif //  c_PR
 
-// Измерение ЕС
-#if c_EC == 1
+// Измерение ЕС и NTC
 void TaskEC(void *parameters)
 {
-  for (;;)
-  {
-    pinMode(NTC_port, INPUT);
-    if (OtaStart == true)
-    {
-      delay(120000);
-    }
-    else
-    {
+  
+for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
+
+#if c_EC == 1
+      pinMode(EC_AnalogPort, INPUT);
       double An0 = 0;
       double Ap0 = 0;
-      pinMode(EC_AnalogPort, INPUT);
 
-        pinMode(EC_DigitalPort1, OUTPUT);
-        pinMode(EC_DigitalPort2, OUTPUT);
-        ECwork = true;
-      long i = 0;
-      while (i < 70 )
-      {
-        i++;
+      pinMode(EC_DigitalPort1, OUTPUT);
+      pinMode(EC_DigitalPort2, OUTPUT);
+      ECwork = true;
+      
         digitalWrite(EC_DigitalPort1, HIGH);
-        Ap0 = analogRead(EC_AnalogPort) + Ap0;
+        Ap0 = analogRead(EC_AnalogPort);
         digitalWrite(EC_DigitalPort1, LOW);
 
         digitalWrite(EC_DigitalPort2, HIGH);
-        An0 = analogRead(EC_AnalogPort) + An0;
+        An0 = analogRead(EC_AnalogPort);
         digitalWrite(EC_DigitalPort2, LOW);
-      }
-        pinMode(EC_DigitalPort1, INPUT);
-        pinMode(EC_DigitalPort2, INPUT);
-        ECwork = false;
       
 
-      ApGAB.filtered(Ap0 / i);
-      AnGAB.filtered(An0 / i);
+      pinMode(EC_DigitalPort1, INPUT);
+      pinMode(EC_DigitalPort2, INPUT);
+      ECwork = false;
+      
+
+      ApGAB.filtered(Ap0);
+      AnGAB.filtered(An0 );
 
       if (millis() > 120000)
       {
-        ApGAB.setParameters(0.0001, 1, 1);
-        AnGAB.setParameters(0.0001, 1, 1);
-        Ap = ApGAB.filtered(Ap0 / i);
-        An = AnGAB.filtered(An0 / i);
+        ApGAB.setParameters(0.00001, 1, 1);
+        AnGAB.setParameters(0.00001, 1, 1);
+        Ap = ApGAB.filtered(Ap0 );
+        An = AnGAB.filtered(An0 );
       }
-    }
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+      vTaskDelay(25 / portTICK_PERIOD_MS);
+#endif // c_EC
 
-    long NTC0 = 0;
-    long i = 0;
-    while (i < 10 )
-    {
-      i++;
-      NTC0 = analogRead(NTC_port) + NTC0;
-    }
-    NTCGAB.filtered(NTC0 / i);
-    if (millis() > 120000)
-    {
-      NTCGAB.setParameters(0.0001, 1, 1);
-      NTC = NTCGAB.filtered(NTC0 / i);
-    }
 
-    //vTaskDelay(500 / portTICK_PERIOD_MS);
+      
+
+
+#if c_NTC == 1
+      pinMode(NTC_port, INPUT);
+      long NTC0;
+        NTC0 = analogRead(NTC_port);
+        NTCGAB.filtered(NTC0);
+
+      if (millis() > 120000)
+      {
+        NTCGAB.setParameters(0.00001, 1, 1);
+        NTC = NTCGAB.filtered(NTC0);
+      }
+      vTaskDelay(5 / portTICK_PERIOD_MS);
+#endif // c_NTC      
+    }
   }
 }
-#endif // c_EC
 
 // // Измерение термистора
 // #if c_NTC == 1
@@ -168,7 +163,7 @@ void TaskEC(void *parameters)
 void TaskUS(void * parameters) {
   for(;;){
     float dst0;
-    if (OtaStart == true) {delay (120000);}else{
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
       float us=distanceSensor.measureDistanceCm(25);
       if(us != -1 ) {    
         dst0=DstGAB.filtered(us);  
@@ -187,7 +182,7 @@ void TaskUS(void * parameters) {
 #if c_hall == 1
 void TaskHall(void * parameters) {
   for(;;){
-    if (OtaStart == true) {delay (120000);}else{
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
 
     hall=HallGAB.filtered( hallRead() );
     vTaskDelay(300 / portTICK_PERIOD_MS);
@@ -199,6 +194,7 @@ void TaskHall(void * parameters) {
 #if c_CPUTEMP == 1
 void TaskCPUtemp(void * parameters) {
   for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
     
      int CPUTemp0 = temprature_sens_read();
      
@@ -207,12 +203,14 @@ void TaskCPUtemp(void * parameters) {
     
   }
 }
+}
 #endif //c_CPUTEMP
 
 
 #if c_AHT10 == 1
   void TaskAHT10(void * parameters) {
   for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
    readStatus = myAHT10.readRawData();
   
   if (readStatus != AHT10_ERROR)
@@ -234,6 +232,7 @@ void TaskCPUtemp(void * parameters) {
     
     }
   }
+}
 #endif // c_AHT10    
     
 
@@ -260,6 +259,7 @@ void TaskCPUtemp(void * parameters) {
     #if c_MCP3421 == 1
 void TaskMCP3421(void * parameters) {
   for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
     long value = 0;
@@ -283,6 +283,7 @@ void TaskMCP3421(void * parameters) {
     }
   }
 }
+}
   #endif // c_MCP3421
 
 
@@ -290,6 +291,7 @@ void TaskMCP3421(void * parameters) {
 #if c_DS18B20 == 1
 void TaskDS18B20(void * parameters) {
   for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
     vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
 sens18b20.begin();
 sens18b20.requestTemperatures();
@@ -297,11 +299,13 @@ float ds0=sens18b20.getTempCByIndex(0);
 if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
   }
 }
+}
 #endif
 
 #if c_ADS1115 == 1
   void TaskADS1115(void * parameters) {
     for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
       vTaskDelay(10000 / portTICK_PERIOD_MS);
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setConvRate(ADS1115_860_SPS);
@@ -315,6 +319,7 @@ if(ds0 != -127 and ds0 !=85) RootTemp=ds0;
 
     }
   }
+}
 #endif // c_ADS1115
 
 
@@ -322,6 +327,7 @@ if(ds0 != -127 and ds0 !=85) RootTemp=ds0;
 #if c_AM2320 == 1
 void TaskAHT10(void * parameters) {
 for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
 int status = AM2320.read();
 switch (status)
@@ -336,16 +342,19 @@ switch (status)
     }
   }
 }
+}
 #endif
 
 #if c_BME280 == 1
   void TaskBME280(void * parameters) {
-  for(;;){  
+  for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{  
     vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
     bme.begin();
     AirTemp=bme.readTemperature();
     AirHum=bme.readHumidity();
     AirPress=bme.readPressure();
     }
+  }
   }
 #endif 
