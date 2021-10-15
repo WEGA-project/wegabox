@@ -2,11 +2,16 @@
 
 
 void setup() {
-      pinMode(18, INPUT);
-      pinMode(19, INPUT);
-      pinMode(33, INPUT);
-      pinMode(32, INPUT);
-      
+  #if c_EC == 1
+      pinMode(EC_DigitalPort1, INPUT);
+      pinMode(EC_DigitalPort2, INPUT);
+      pinMode(EC_AnalogPort, INPUT);      
+  #endif // c_EC
+
+  #if c_NTC == 1
+    pinMode(NTC_port, INPUT);
+  #endif // c_NTC  
+
   Serial.begin(9600);
   Wire.begin(I2C_SDA, I2C_SCL);
 
@@ -22,10 +27,17 @@ void setup() {
   ArduinoOTA
     .onStart([]() {
       OtaStart = true;
-      pinMode(18, INPUT);
-      pinMode(19, INPUT);
-      pinMode(33, INPUT);
-      pinMode(32, INPUT);
+      
+      #if c_EC == 1
+          pinMode(EC_DigitalPort1, INPUT);
+          pinMode(EC_DigitalPort2, INPUT);
+          pinMode(EC_AnalogPort, INPUT);      
+      #endif // c_EC
+
+      #if c_NTC == 1
+        pinMode(NTC_port, INPUT);
+      #endif // c_NTC  
+
     
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)

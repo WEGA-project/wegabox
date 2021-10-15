@@ -18,9 +18,9 @@ GMedian<7, long> DstMediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
-GABfilter ApGAB(0.1, 1, 1);
-GABfilter AnGAB(0.1, 1, 1);
-GABfilter NTCGAB(1, 1, 1);
+GABfilter ApGAB(0.05, 1, 1);
+GABfilter AnGAB(0.05, 1, 1);
+GABfilter NTCGAB(0.05, 1, 1);
 GABfilter PRGAB(1, 1, 1);
 GABfilter DstGAB(1, 1, 1);
 GABfilter HallGAB(0.001, 1, 1);

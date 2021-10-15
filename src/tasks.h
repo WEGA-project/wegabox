@@ -89,7 +89,7 @@ for(;;){
       pinMode(EC_DigitalPort2, OUTPUT);
       ECwork = true;
       s=0;
-      while(s<200){
+      while(s<400){
         s++;
         digitalWrite(EC_DigitalPort1, HIGH);
         Ap0 = analogRead(EC_AnalogPort)+Ap0;
@@ -108,10 +108,10 @@ for(;;){
       ApGAB.filtered(Ap0/s);
       AnGAB.filtered(An0/s);
 
-      if (millis() > 120000)
+      if (millis() > 180000)
       {
-        ApGAB.setParameters(0.001, 1, 1);
-        AnGAB.setParameters(0.001, 1, 1);
+        ApGAB.setParameters(0.0001, 1, 1);
+        AnGAB.setParameters(0.0001, 1, 1);
         Ap = ApGAB.filtered(Ap0/s);
         An = AnGAB.filtered(An0/s);
       }
@@ -123,15 +123,15 @@ for(;;){
       pinMode(NTC_port, INPUT);
       long NTC0=0;
       s=0;
-      while(s<900){
+      while(s<300){
         s++;
         NTC0 = analogRead(NTC_port)+NTC0;
       }
 
       NTCGAB.filtered(NTC0/s);
-      if (millis() > 120000)
+      if (millis() > 180000)
       {
-        NTCGAB.setParameters(0.001, 1, 1);
+        NTCGAB.setParameters(0.0001, 1, 1);
         NTC = NTCGAB.filtered(NTC0/s);
       }
       vTaskDelay(5 / portTICK_PERIOD_MS);
