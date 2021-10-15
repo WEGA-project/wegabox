@@ -311,6 +311,7 @@ if(ds0 != -127 and ds0 !=85) RootTemp=ds0;
     if (OtaStart == true) {vTaskDelete( NULL );}else{
       vTaskDelay(10000 / portTICK_PERIOD_MS);
       adc.setCompareChannels(ADS1115_COMP_0_3);
+      adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
       long cont=0;
       double sensorValue=0;
