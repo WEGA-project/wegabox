@@ -137,6 +137,9 @@ void setup() {
   #endif //c_BME280
 
 
+
+  //xTaskCreate(TaskECclean,"TaskECclean",10000,NULL,3,NULL);
+
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,2,NULL);
 
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);

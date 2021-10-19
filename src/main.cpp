@@ -58,17 +58,20 @@ TaskHandle_t TaskAHT10Handler;
   #include <DallasTemperature.h>
   OneWire oneWire(ONE_WIRE_BUS);
   DallasTemperature sens18b20(&oneWire);
+  String st_DS18B20;
 #endif
 
 #if c_AHT10 == 1
   #include <AHT10.h>
   uint8_t readStatus = 0;
   AHT10 myAHT10(AHT10_ADDRESS_0X38);
+  String st_AHT10;
 #endif
 
 #if c_AM2320 == 1
   #include <AM232X.h>
   AM232X AM2320;
+  String st_AM2320;
 #endif
 
 #if c_CCS811 == 1

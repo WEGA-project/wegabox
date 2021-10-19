@@ -115,7 +115,7 @@ for(;;){
         Ap = ApGAB.filtered(Ap0/s);
         An = AnGAB.filtered(An0/s);
       }
-      vTaskDelay(15 / portTICK_PERIOD_MS);
+      vTaskDelay(30 / portTICK_PERIOD_MS);
 #endif // c_EC
 
 
@@ -123,18 +123,18 @@ for(;;){
       pinMode(NTC_port, INPUT);
       long NTC0=0;
       s=0;
-      while(s<300){
+      while(s<128){
         s++;
-        NTC0 = analogRead(NTC_port)+NTC0;
+        NTC0 = NTCMed.filtered(analogRead(NTC_port))+NTC0 ;
       }
 
       NTCGAB.filtered(NTC0/s);
       if (millis() > 180000)
       {
-        NTCGAB.setParameters(0.0001, 1, 1);
+        NTCGAB.setParameters(0.001, 1, 1);
         NTC = NTCGAB.filtered(NTC0/s);
       }
-      vTaskDelay(5 / portTICK_PERIOD_MS);
+      //vTaskDelay(5 / portTICK_PERIOD_MS);
 #endif // c_NTC      
     }
   }
@@ -172,7 +172,7 @@ void TaskUS(void * parameters) {
         dst0=DstGAB.filtered(us);  
         delay (50); 
         if (millis()>120000){
-          DstGAB.setParameters(0.0001,1,1);
+          DstGAB.setParameters(0.00001,1,1);
           Dist=dst0; 
         }
       }
@@ -362,3 +362,25 @@ switch (status)
   }
   }
 #endif 
+
+void TaskECclean(void * parameters) {
+  for(;;){
+    vTaskDelay(1000*60*60 / portTICK_PERIOD_MS); 
+      pinMode(EC_DigitalPort1, OUTPUT);
+      pinMode(EC_DigitalPort2, OUTPUT);
+     
+      long s=0;
+      while(s<4000000){
+        s++;
+        digitalWrite(EC_DigitalPort1, HIGH);
+        digitalWrite(EC_DigitalPort1, LOW);
+
+        digitalWrite(EC_DigitalPort2, HIGH);
+        digitalWrite(EC_DigitalPort2, LOW);
+      }
+     
+      pinMode(EC_DigitalPort1, INPUT);
+      pinMode(EC_DigitalPort2, INPUT);
+     
+  }
+}
