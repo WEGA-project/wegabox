@@ -77,55 +77,85 @@ void TaskPR(void * parameters){
 void TaskEC(void *parameters)
 {
   long s;
+  unsigned long t_EC0;
 for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
 
 #if c_EC == 1
-      pinMode(EC_AnalogPort, INPUT);
+      //pinMode(EC_AnalogPort, INPUT);
       double An0 = 0;
       double Ap0 = 0;
 
       pinMode(EC_DigitalPort1, OUTPUT);
       pinMode(EC_DigitalPort2, OUTPUT);
       ECwork = true;
-      s=0;
-      while(s<400){
-        s++;
-        digitalWrite(EC_DigitalPort1, HIGH);
-        Ap0 = analogRead(EC_AnalogPort)+Ap0;
+      
+    
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(EC_AnalogPort,ADC_ATTEN_DB_11);
+    
+      vPortCPUInitializeMutex(&ec_mutex);
+      t_EC0=micros();
+      
+      for (long i=0;i<EC_MiddleCount and OtaStart != true;i++){
+        portENTER_CRITICAL(&ec_mutex);
+         //portDISABLE_INTERRUPTS();
+
+            // digitalWrite(EC_DigitalPort1, HIGH);
+            // digitalWrite(EC_DigitalPort1, LOW);
+            // digitalWrite(EC_DigitalPort2, HIGH);
+            // digitalWrite(EC_DigitalPort2, LOW);        
+        
+        digitalWrite(EC_DigitalPort1, HIGH); 
+        Ap0 =adc1_get_raw(EC_AnalogPort)+Ap0;
         digitalWrite(EC_DigitalPort1, LOW);
 
+
+
+            // digitalWrite(EC_DigitalPort2, HIGH);
+            // digitalWrite(EC_DigitalPort2, LOW);  
+            // digitalWrite(EC_DigitalPort1, HIGH);
+            // digitalWrite(EC_DigitalPort1, LOW);
+
         digitalWrite(EC_DigitalPort2, HIGH);
-        An0 = analogRead(EC_AnalogPort)+An0;
+        An0 =adc1_get_raw(EC_AnalogPort)+An0;
         digitalWrite(EC_DigitalPort2, LOW);
+
+        portEXIT_CRITICAL(&ec_mutex);
+        //portENABLE_INTERRUPTS();
       }
+      
+      t_EC=micros()-t_EC0;
+
 
       pinMode(EC_DigitalPort1, INPUT);
       pinMode(EC_DigitalPort2, INPUT);
       ECwork = false;
-      
+      f_EC = EC_MiddleCount /(float(t_EC)/1000000);
 
-      ApGAB.filtered(Ap0/s);
-      AnGAB.filtered(An0/s);
+      ApGAB.filtered(Ap0/EC_MiddleCount);
+      AnGAB.filtered(An0/EC_MiddleCount);
 
       if (millis() > 180000)
       {
-        ApGAB.setParameters(0.0001, 1, 1);
-        AnGAB.setParameters(0.0001, 1, 1);
-        Ap = ApGAB.filtered(Ap0/s);
-        An = AnGAB.filtered(An0/s);
+        ApGAB.setParameters(0.1, 1, 1);
+        AnGAB.setParameters(0.1, 1, 1);
+        Ap = ApGAB.filtered(Ap0/EC_MiddleCount);
+        An = AnGAB.filtered(An0/EC_MiddleCount);
       }
+
       vTaskDelay(30 / portTICK_PERIOD_MS);
 #endif // c_EC
 
 
 #if c_NTC == 1
-      pinMode(NTC_port, INPUT);
+      adc1_config_channel_atten(NTC_port,ADC_ATTEN_DB_11);
+      
       long NTC0=0;
       s=0;
       while(s<128){
-        s++;
-        NTC0 = NTCMed.filtered(analogRead(NTC_port))+NTC0 ;
+        s++;        
+        NTC0 = NTCMed.filtered(adc1_get_raw(NTC_port))+NTC0 ;
       }
 
       NTCGAB.filtered(NTC0/s);

@@ -75,8 +75,9 @@ void setup() {
 
   
   server.on("/status",handleStatus);
-
   server.begin();
+
+
 
   #if c_DS18B20 == 1
       sens18b20.begin();

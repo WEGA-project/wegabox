@@ -30,11 +30,10 @@ GMedian<254, long> ApMed;
 GMedian<254, long> AnMed;
 GMedian<254, long> NTCMed;
 
-
-
-
+static portMUX_TYPE ec_mutex;
 #include <pre.h>
 #include <func>
+#include <driver/adc.h>
 
 
 // Переменные
@@ -42,8 +41,9 @@ float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,D
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
-
-
+unsigned long t_EC=0;
+//,t_Dist,t_NTC,t_pH;
+float f_EC=0;
 
 TaskHandle_t TaskAHT10Handler;
 
@@ -93,15 +93,15 @@ TaskHandle_t TaskAHT10Handler;
 #endif
 
 #if c_NTC == 1
- #define NTC_port 32
+ #define NTC_port ADC1_CHANNEL_4
  #define NTC_MiddleCount 100000
 #endif
 
 #if c_EC == 1
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
-  #define EC_AnalogPort 33
-  #define EC_MiddleCount 600000
+  #define EC_AnalogPort ADC1_CHANNEL_5
+  #define EC_MiddleCount 6000
 #endif
 
 #if c_US025 == 1
