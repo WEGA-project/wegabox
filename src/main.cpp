@@ -18,9 +18,9 @@ GMedian<7, long> DstMediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
-GABfilter ApGAB(0.05, 1, 1);
-GABfilter AnGAB(0.05, 1, 1);
-GABfilter NTCGAB(0.05, 1, 1);
+GABfilter ApGAB(10, 1, 1);
+GABfilter AnGAB(10, 1, 1);
+GABfilter NTCGAB(10, 1, 1);
 GABfilter PRGAB(1, 1, 1);
 GABfilter DstGAB(1, 1, 1);
 GABfilter HallGAB(0.001, 1, 1);
@@ -30,11 +30,14 @@ GMedian<254, long> ApMed;
 GMedian<254, long> AnMed;
 GMedian<254, long> NTCMed;
 
-static portMUX_TYPE ec_mutex;
+
 #include <pre.h>
 #include <func>
 #include <driver/adc.h>
 
+#include "soc/rtc_wdt.h"
+#include "esp_int_wdt.h"
+#include "esp_task_wdt.h"
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
@@ -93,15 +96,15 @@ TaskHandle_t TaskAHT10Handler;
 #endif
 
 #if c_NTC == 1
- #define NTC_port ADC1_CHANNEL_4
- #define NTC_MiddleCount 100000
+ #define NTC_port ADC1_CHANNEL_4 // gpio32
+ #define NTC_MiddleCount 48000
 #endif
 
 #if c_EC == 1
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
-  #define EC_AnalogPort ADC1_CHANNEL_5
-  #define EC_MiddleCount 6000
+  #define EC_AnalogPort ADC1_CHANNEL_5 // gpio33
+  #define EC_MiddleCount 4800  // 12000 в секунду
 #endif
 
 #if c_US025 == 1
@@ -109,7 +112,7 @@ TaskHandle_t TaskAHT10Handler;
   #define US_TRIG 14
   #include <HCSR04.h>
   UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
-  #define US_MiddleCount 900
+  #define US_MiddleCount 6000
 
 #endif // c_US025
 
