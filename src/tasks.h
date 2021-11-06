@@ -113,8 +113,9 @@ static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
   disableCore0WDT();
   disableLoopWDT();
   vPortCPUInitializeMutex(&my_mutex);
+  long ect=millis();
       for (long i=0;i<EC_MiddleCount and OtaStart != true;i++){
-
+      
 	//vPortCPUInitializeMutex(&my_mutex);
 
       pinMode(EC_DigitalPort1, OUTPUT);
@@ -132,7 +133,7 @@ static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
           An0 =adc1_get_raw(EC_AnalogPort)+An0;
           //delayMicroseconds(3);
           digitalWrite(EC_DigitalPort2, LOW);
-portEXIT_CRITICAL(&my_mutex);
+  portEXIT_CRITICAL(&my_mutex);
 
 
       pinMode(EC_DigitalPort1, INPUT);
@@ -140,16 +141,20 @@ portEXIT_CRITICAL(&my_mutex);
 
 //vPortCPUReleaseMutex(&my_mutex);
       //delayMicroseconds(5000);
+
+      if (millis()-ect>50) {
+        
+      
+      vTaskDelay(300 / portTICK_PERIOD_MS);
+      ect=millis();
+      }
       
       }
       
       t_EC=micros()-t_EC0;
 esp_task_wdt_reset();
 
-rtc_wdt_protect_on();
-  rtc_wdt_enable();
-  enableCore0WDT();
-   enableLoopWDT();
+
 
       float Mid_Ap0=float(Ap0)/EC_MiddleCount;
       float Mid_An0=float(An0)/EC_MiddleCount;
@@ -194,11 +199,15 @@ rtc_wdt_protect_on();
       unsigned long NTC0=0;
       s=0;
       while(s<NTC_MiddleCount and OtaStart != true ){
-        s++;        
+        s++;   
+             
         NTC0 = adc1_get_raw(NTC_port)+NTC0 ;
-        //esp_task_wdt_reset();
+        esp_task_wdt_reset();
       }
-
+rtc_wdt_protect_on();
+  rtc_wdt_enable();
+  enableCore0WDT();
+   enableLoopWDT();
       //NTCGAB.filtered(NTC0/s);
       // if (millis() > 180000 and OtaStart != true)
       // {
@@ -207,7 +216,7 @@ rtc_wdt_protect_on();
       //   NTC = float(NTC0)/s;
       // }
       NTC = float(NTC0)/s;
-      vTaskDelay(20000 / portTICK_PERIOD_MS);
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
 #endif // c_NTC      
     }
   
