@@ -6,22 +6,22 @@ void handleStatus(){
   statusstr += "EC Times=" + fFTS(float(t_EC/1000),3)+ " msec\n";
   statusstr += "EC Freq=" + fFTS(f_EC,3)+ " Hz\n";
 
-DeviceAddress insideThermometer;
-  sens18b20.begin();
-  sens18b20.getDeviceCount();
-  if (sens18b20.readPowerSupply()) statusstr += "parasite power requirements=ON\n";  // no address means "scan all devices for parasite mode"
-  else statusstr += "parasite power requirements=OFF\n";
-  sens18b20.getAddress(insideThermometer, 0);
- float ds18b20s = sens18b20.readPowerSupply(insideThermometer);
-statusstr += "ds18b20s=" + fFTS(ds18b20s,3)+ " C\n";
+// DeviceAddress insideThermometer;
+//   sens18b20.begin();
+//   sens18b20.getDeviceCount();
+//   if (sens18b20.readPowerSupply()) statusstr += "parasite power requirements=ON\n";  // no address means "scan all devices for parasite mode"
+//   else statusstr += "parasite power requirements=OFF\n";
+//   sens18b20.getAddress(insideThermometer, 0);
+//  float ds18b20s = sens18b20.readPowerSupply(insideThermometer);
+// statusstr += "ds18b20s=" + fFTS(ds18b20s,3)+ " C\n";
 
 
 
   // sens18b20.readPowerSupply();
-  // sens18b20.begin();
-  //     sens18b20.requestTemperatures();
-  //     float ds18b20s = sens18b20.getTempCByIndex(0);
-  // statusstr += "ds18b20s=" + fFTS(ds18b20s,3)+ " C\n";  
+//  sens18b20.begin();
+      sens18b20.requestTemperatures();
+      float ds18b20s = sens18b20.getTempCByIndex(0);
+  statusstr += "ds18b20s=" + fFTS(ds18b20s,3)+ " C\n";  
 
 
   // // sens18b20.begin();

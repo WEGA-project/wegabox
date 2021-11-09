@@ -79,150 +79,130 @@ void TaskPR(void * parameters){
 // Измерение ЕС и NTC
 void TaskEC(void *parameters)
 {
-for(;;){
+  for (;;)
+  {
 
-
-
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
+    if (OtaStart == true)
+    {
+      vTaskDelete(NULL);
+    }
+    else
+    {
 
 #if c_EC == 1
-  long s;
-  unsigned long t_EC0;
-
+      long s;
+      unsigned long t_EC0;
 
       //pinMode(EC_AnalogPort, INPUT);
       unsigned long An0 = 0;
       unsigned long Ap0 = 0;
-      
 
       pinMode(EC_DigitalPort1, OUTPUT);
       pinMode(EC_DigitalPort2, OUTPUT);
       ECwork = true;
-      
-    
-    adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten(EC_AnalogPort,ADC_ATTEN_DB_11);
 
-      t_EC0=micros();
+      adc1_config_width(ADC_WIDTH_BIT_12);
+      adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11);
+
+      t_EC0 = micros();
       digitalWrite(EC_DigitalPort1, LOW);
       digitalWrite(EC_DigitalPort2, LOW);
-	
-static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
-  rtc_wdt_protect_off();
-  rtc_wdt_disable();
-  disableCore0WDT();
-  disableLoopWDT();
-  vPortCPUInitializeMutex(&my_mutex);
-  long ect=millis();
-      for (long i=0;i<EC_MiddleCount and OtaStart != true;i++){
-      
-	//vPortCPUInitializeMutex(&my_mutex);
 
-      pinMode(EC_DigitalPort1, OUTPUT);
-      pinMode(EC_DigitalPort2, OUTPUT);
-      digitalWrite(EC_DigitalPort1, LOW);
-      digitalWrite(EC_DigitalPort2, LOW);
-      
-	portENTER_CRITICAL(&my_mutex);
-          digitalWrite(EC_DigitalPort1, HIGH); 
-          Ap0 =adc1_get_raw(EC_AnalogPort)+Ap0;
-          //delayMicroseconds(3);
-          digitalWrite(EC_DigitalPort1, LOW);
+      static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
+      rtc_wdt_protect_off();
+      rtc_wdt_disable();
+      disableCore0WDT();
+      disableLoopWDT();
+      vPortCPUInitializeMutex(&my_mutex);
+      long ect = millis();
+      for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
+      {
 
-          digitalWrite(EC_DigitalPort2, HIGH);
-          An0 =adc1_get_raw(EC_AnalogPort)+An0;
-          //delayMicroseconds(3);
-          digitalWrite(EC_DigitalPort2, LOW);
-  portEXIT_CRITICAL(&my_mutex);
+        pinMode(EC_DigitalPort1, OUTPUT);
+        pinMode(EC_DigitalPort2, OUTPUT);
+        digitalWrite(EC_DigitalPort1, LOW);
+        digitalWrite(EC_DigitalPort2, LOW);
 
+        portENTER_CRITICAL(&my_mutex);
+        digitalWrite(EC_DigitalPort1, HIGH);
+        Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
+        //delayMicroseconds(3);
+        digitalWrite(EC_DigitalPort1, LOW);
 
-      pinMode(EC_DigitalPort1, INPUT);
-      pinMode(EC_DigitalPort2, INPUT);
+        digitalWrite(EC_DigitalPort2, HIGH);
+        An0 = adc1_get_raw(EC_AnalogPort) + An0;
+        //delayMicroseconds(3);
+        digitalWrite(EC_DigitalPort2, LOW);
+        portEXIT_CRITICAL(&my_mutex);
 
-//vPortCPUReleaseMutex(&my_mutex);
-      //delayMicroseconds(5000);
+        if (millis() - ect > 10)
+        {
 
-      if (millis()-ect>50) {
-        
-      
-      vTaskDelay(300 / portTICK_PERIOD_MS);
-      ect=millis();
+          for (long i = 0; i < 200; i++)
+          {
+            portENTER_CRITICAL(&my_mutex);
+
+            digitalWrite(EC_DigitalPort1, HIGH);
+            //delayMicroseconds(1);
+            digitalWrite(EC_DigitalPort1, LOW);
+            //delayMicroseconds(1);
+            digitalWrite(EC_DigitalPort2, HIGH);
+            //delayMicroseconds(1);
+            digitalWrite(EC_DigitalPort2, LOW);
+            //delayMicroseconds(1);
+
+            portEXIT_CRITICAL(&my_mutex);
+          }
+
+          ect = millis();
+        }
+
+        pinMode(EC_DigitalPort1, INPUT);
+        pinMode(EC_DigitalPort2, INPUT);
       }
-      
-      }
-      
-      t_EC=micros()-t_EC0;
-esp_task_wdt_reset();
 
+      t_EC = micros() - t_EC0;
+      esp_task_wdt_reset();
 
-
-      float Mid_Ap0=float(Ap0)/EC_MiddleCount;
-      float Mid_An0=float(An0)/EC_MiddleCount;
+      float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
+      float Mid_An0 = float(An0) / EC_MiddleCount;
 
       pinMode(EC_DigitalPort1, INPUT);
       pinMode(EC_DigitalPort2, INPUT);
       ECwork = false;
-      f_EC = EC_MiddleCount /(float(t_EC)/1000000);
+      f_EC = EC_MiddleCount / (float(t_EC) / 1000000);
 
-      // float GAB_Ap0=ApGAB.filtered(Mid_Ap0);
-      // float GAB_An0=AnGAB.filtered(Mid_An0);
+      if (Mid_Ap0 < 4095)
+        Ap = Mid_Ap0;
+      if (Mid_An0 > 0)
+        An = Mid_An0;
 
-      // if ( abs(GAB_Ap0-Mid_Ap0)/Mid_Ap0 < 0.05)
-      // {
-      //   ApGAB.setParameters(0.05, 1, 1);
-      //   AnGAB.setParameters(0.05, 1, 1);
-      //   Ap = GAB_Ap0;
-      //   An = GAB_An0;
-
-      // }
-      // else
-      // {
-      //   ApGAB.setParameters(10, 1, 1);
-      //   AnGAB.setParameters(10, 1, 1); 
-      //   Ap = Mid_Ap0;
-      //   An = Mid_An0;
-      // }
-        // Ap = float(Ap0)/EC_MiddleCount;
-        // An = float(An0)/EC_MiddleCount;
-        if(Mid_Ap0 < 4095) Ap = Mid_Ap0;
-        if(Mid_An0 > 0) An = Mid_An0;
-       
-      vTaskDelay(100 / portTICK_PERIOD_MS);
-
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
 
 #endif // c_EC
 
 // Измерение термистора
 #if c_NTC == 1
-      adc1_config_channel_atten(NTC_port,ADC_ATTEN_DB_11);
-      
-      unsigned long NTC0=0;
-      s=0;
-      while(s<NTC_MiddleCount and OtaStart != true ){
-        s++;   
-             
-        NTC0 = adc1_get_raw(NTC_port)+NTC0 ;
+      adc1_config_channel_atten(NTC_port, ADC_ATTEN_DB_11);
+
+      unsigned long NTC0 = 0;
+      s = 0;
+      while (s < NTC_MiddleCount and OtaStart != true)
+      {
+        s++;
+
+        NTC0 = adc1_get_raw(NTC_port) + NTC0;
         esp_task_wdt_reset();
       }
-rtc_wdt_protect_on();
-  rtc_wdt_enable();
-  enableCore0WDT();
-   enableLoopWDT();
-      //NTCGAB.filtered(NTC0/s);
-      // if (millis() > 180000 and OtaStart != true)
-      // {
-      //   NTCGAB.setParameters(1, 1, 1);
-      //   NTC = NTCGAB.filtered(float(NTC0)/s);
-      //   NTC = float(NTC0)/s;
-      // }
-      NTC = float(NTC0)/s;
-      vTaskDelay(5000 / portTICK_PERIOD_MS);
-#endif // c_NTC      
-    }
-  
+      rtc_wdt_protect_on();
+      rtc_wdt_enable();
+      enableCore0WDT();
+      enableLoopWDT();
 
-  
-  
+      NTC = float(NTC0) / s;
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
+#endif // c_NTC
+    }
   }
 }
 
@@ -400,9 +380,9 @@ void TaskDS18B20(void *parameters)
     }
     else
     {
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
-      //sens18b20.begin();
-      //vTaskDelay(500 / portTICK_PERIOD_MS);
+      //vTaskDelay(2000 / portTICK_PERIOD_MS);
+      sens18b20.begin();
+      vTaskDelay(500 / portTICK_PERIOD_MS);
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
       if (ds0 != -127 and ds0 != 85)
