@@ -34,24 +34,49 @@ void TaskWegaApi(void * parameters){
 
 
 // Получение данных от WEGA-API
-DynamicJsonDocument doc(2048);
+DynamicJsonDocument doc(4096);
 DeserializationError error = deserializeJson(doc, wegareply);
+if (error){err_wegaapi_json = error.f_str();}
 
-if (error){err_wegaapi_json = 0;}else{err_wegaapi_json = 1;}
-// {
-//   err_wegaapi_json = false;
-  //dt = doc["dt"];
-  EC_R1 = doc["EC_R1"];
-  EC_R2_p1 = doc["EC_R2_p1"];
-  EC_R2_p2 = doc["EC_R2_p2"];
-  //String A1 = doc["A1"];
-  //long    uptime = doc["uptime"]; // "51"
-  //float    param1 = doc["param1"]; // 73
+// Получение переменных для терморезистора
+String tR_type;
+float tR_DAC,tR_B,tR_val_korr;
 
-  //statusstr += "param1="+ fFTS(param1,3)+ "\n";
-  //statusstr += "dt=" + dt + "\n";
-  //statusstr += "A1=" + A1 + "\n";
-//}
+tR_DAC=doc["tR_DAC"];
+tR_B=doc["tR_B"];
+tR_val_korr=doc["tR_val_korr"];
+
+// Вычисление температуры терморезистора
+if (tR_type = "direct"){
+float r=log((-NTC+tR_DAC)/NTC);
+wNTC= (tR_B*25-r*237.15*25-r*pow(237.15,2))/(tR_B+r*25+r*237.15)+tR_val_korr;
+}
+// Вычисление ЕС
+// Вычисление сопротивлений
+float A1,A2,R1,Rx1,Rx2,Dr,R2p,R2n;
+A1=Ap;
+A2=An;
+R1=doc["EC_R1"];
+Rx1=doc["EC_Rx1"];
+Rx2=doc["EC_Rx2"];
+Dr=doc["Dr"];
+
+R2p=(((-A2*R1-A2*Rx1+R1*Dr+Rx1*Dr)/A2));
+R2n=(-(-A1*R1-A1*Rx2+Rx2*Dr)/(-A1+Dr));
+wR2=(R2p+R2n)/2;
+// Расчет функции калибровки
+float ec1=doc["EC_val_p1"];
+float ec2=doc["EC_val_p2"];
+float ex1=doc["EC_R2_p1"];
+float ex2=doc["EC_R2_p2"];
+float eckorr=doc["EC_val_korr"];
+float kt=doc["EC_kT"];
+float eb=(-log10(ec1/ec2))/(log10(ex2/ex1));
+float ea=pow(ex1,(-eb))*ec1;
+float ec=ea*pow(wR2,eb);
+wEC=ec/(1+kt*(wNTC-25))+eckorr;
+
+
 
     http.end();
 

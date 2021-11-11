@@ -42,6 +42,7 @@ GMedian<254, long> NTCMed;
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
+float wNTC,wR2,wEC;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
@@ -50,7 +51,7 @@ unsigned long t_EC=0;
 //,t_Dist,t_NTC,t_pH;
 float f_EC=0;
 String wegareply;
-bool err_wegaapi_json=1;
+String err_wegaapi_json;
 String dt;
 // Калибровочные значения для определения ЕС
 float EC_R1, EC_R2_p1, EC_R2_p2;
