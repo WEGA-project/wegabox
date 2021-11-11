@@ -72,8 +72,6 @@ void setup() {
   MDNS.addService("http", "tcp", 80);
   server.on("/",handleRoot);
   server.on("/reset",handleReset);
-
-  
   server.on("/status",handleStatus);
   server.begin();
 
@@ -143,6 +141,7 @@ void setup() {
 
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,2,NULL);
 
+  
   xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);
 
   // rtc_wdt_protect_off();
