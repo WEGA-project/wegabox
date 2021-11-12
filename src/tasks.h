@@ -337,7 +337,7 @@ void TaskDS18B20(void *parameters)
     else
     {
       //vTaskDelay(2000 / portTICK_PERIOD_MS);
-      sens18b20.begin();
+      //sens18b20.begin();
       vTaskDelay(500 / portTICK_PERIOD_MS);
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
