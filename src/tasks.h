@@ -4,7 +4,7 @@ void TaskOTA(void * parameters){
   for(;;){
     server.handleClient();
     ArduinoOTA.handle();
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
@@ -64,12 +64,12 @@ void TaskEC(void *parameters)
       digitalWrite(EC_DigitalPort1, LOW);
       digitalWrite(EC_DigitalPort2, LOW);
 
-      static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
+      // static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
       rtc_wdt_protect_off();
       rtc_wdt_disable();
       disableCore0WDT();
       disableLoopWDT();
-      vPortCPUInitializeMutex(&my_mutex);
+      // vPortCPUInitializeMutex(&my_mutex);
       long ect = millis();
       for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
       {
@@ -79,52 +79,50 @@ void TaskEC(void *parameters)
         digitalWrite(EC_DigitalPort1, LOW);
         digitalWrite(EC_DigitalPort2, LOW);
 
-        portENTER_CRITICAL(&my_mutex);
+        //portENTER_CRITICAL(&my_mutex);
         digitalWrite(EC_DigitalPort1, HIGH);
         Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
-        //delayMicroseconds(3);
         digitalWrite(EC_DigitalPort1, LOW);
+          delayMicroseconds(1);
+          
+        digitalWrite(EC_DigitalPort2, HIGH);
+          delayMicroseconds(1);
+        digitalWrite(EC_DigitalPort2, LOW);
+          //delayMicroseconds(1);
+
+        digitalWrite(EC_DigitalPort1, HIGH);
+          delayMicroseconds(1);
+        digitalWrite(EC_DigitalPort1, LOW);
+          //delayMicroseconds(1);
 
         digitalWrite(EC_DigitalPort2, HIGH);
         An0 = adc1_get_raw(EC_AnalogPort) + An0;
-        //delayMicroseconds(3);
         digitalWrite(EC_DigitalPort2, LOW);
-        portEXIT_CRITICAL(&my_mutex);
+          //delayMicroseconds(1);
 
-        if (millis() - ect > 10)
+        //portEXIT_CRITICAL(&my_mutex);
+
+        if (millis() - ect > 1000)
         {
-
-          for (long i = 0; i < 200; i++)
-          {
-            portENTER_CRITICAL(&my_mutex);
-
-            digitalWrite(EC_DigitalPort1, HIGH);
-            //delayMicroseconds(1);
-            digitalWrite(EC_DigitalPort1, LOW);
-            //delayMicroseconds(1);
-            digitalWrite(EC_DigitalPort2, HIGH);
-            //delayMicroseconds(1);
-            digitalWrite(EC_DigitalPort2, LOW);
-            //delayMicroseconds(1);
-
-            portEXIT_CRITICAL(&my_mutex);
-          }
-
+          pinMode(EC_DigitalPort1, INPUT);
+          pinMode(EC_DigitalPort2, INPUT);
+          vTaskDelay(300 / portTICK_PERIOD_MS);
           ect = millis();
         }
 
-        pinMode(EC_DigitalPort1, INPUT);
-        pinMode(EC_DigitalPort2, INPUT);
+
       }
 
       t_EC = micros() - t_EC0;
-      esp_task_wdt_reset();
+      pinMode(EC_DigitalPort1, INPUT);
+      pinMode(EC_DigitalPort2, INPUT);
+
+      //esp_task_wdt_reset();
 
       float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
       float Mid_An0 = float(An0) / EC_MiddleCount;
 
-      pinMode(EC_DigitalPort1, INPUT);
-      pinMode(EC_DigitalPort2, INPUT);
+
       ECwork = false;
       f_EC = EC_MiddleCount / (float(t_EC) / 1000000);
 
@@ -133,7 +131,7 @@ void TaskEC(void *parameters)
       if (Mid_An0 > 0)
         An = Mid_An0;
 
-      vTaskDelay(5000 / portTICK_PERIOD_MS);
+      
 
 #endif // c_EC
 
@@ -148,7 +146,7 @@ void TaskEC(void *parameters)
         s++;
 
         NTC0 = adc1_get_raw(NTC_port) + NTC0;
-        esp_task_wdt_reset();
+        //esp_task_wdt_reset();
       }
       rtc_wdt_protect_on();
       rtc_wdt_enable();
@@ -161,27 +159,6 @@ void TaskEC(void *parameters)
     }
   }
 }
-
-// // Измерение термистора
-// #if c_NTC == 1
-//   void TaskNTC(void * parameters){
-//     pinMode(NTC_port, INPUT);
-//     float NTC0;
-//     for(;;){
-//       if (OtaStart == true) {delay (120000);}else{
-//         if (ECwork == false){
-//           NTC0=NTCGAB.filtered (analogRead(NTC_port));
-          
-//           if (millis()>60000){
-//             NTCGAB.setParameters(0.0001,1,1);
-//             NTC=NTC0;
-//           }
-//         vTaskDelay(1 / portTICK_PERIOD_MS);
-//         }
-//       }
-//     }
-//   }
-// #endif // c_NTC
 
 #if c_US025 == 1
 void TaskUS(void *parameters)
@@ -212,7 +189,7 @@ void TaskUS(void *parameters)
         Dist = dst0 / dcnt;
       }
     }
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -336,9 +313,9 @@ void TaskDS18B20(void *parameters)
     }
     else
     {
-      //vTaskDelay(2000 / portTICK_PERIOD_MS);
-      //sens18b20.begin();
-      vTaskDelay(500 / portTICK_PERIOD_MS);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      sens18b20.begin();
+      vTaskDelay(300 / portTICK_PERIOD_MS);
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
       if (ds0 != -127 and ds0 != 85)

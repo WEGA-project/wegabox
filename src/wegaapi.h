@@ -43,7 +43,8 @@ void TaskWegaApi(void * parameters){
 DynamicJsonDocument doc(4096);
 DeserializationError error = deserializeJson(doc, wegareply);
 if (error){err_wegaapi_json = error.f_str();}
-
+else
+{
 // Получение переменных для терморезистора
 String tR_type;
 float tR_DAC,tR_B,tR_val_korr;
@@ -60,17 +61,23 @@ wNTC= (tR_B*25-r*237.15*25-r*pow(237.15,2))/(tR_B+r*25+r*237.15)+tR_val_korr;
 // Вычисление ЕС
 // Вычисление сопротивлений
 float A1,A2,R1,Rx1,Rx2,Dr,R2p,R2n;
-A1=Ap;
-A2=An;
+String A1name=doc["A1"];
+String A2name=doc["A2"];
+A1=doc[A1name];
+A2=doc[A2name];
 R1=doc["EC_R1"];
 Rx1=doc["EC_Rx1"];
 Rx2=doc["EC_Rx2"];
 Dr=doc["Dr"];
 
+//if (A1 and A2){
 R2p=(((-A2*R1-A2*Rx1+R1*Dr+Rx1*Dr)/A2));
 R2n=(-(-A1*R1-A1*Rx2+Rx2*Dr)/(-A1+Dr));
 wR2=(R2p+R2n)/2;
+//}
 // Расчет функции калибровки
+if (wR2>0){
+
 float ec1=doc["EC_val_p1"];
 float ec2=doc["EC_val_p2"];
 float ex1=doc["EC_R2_p1"];
@@ -81,8 +88,8 @@ float eb=(-log10(ec1/ec2))/(log10(ex2/ex1));
 float ea=pow(ex1,(-eb))*ec1;
 float ec=ea*pow(wR2,eb);
 wEC=ec/(1+kt*(wNTC-25))+eckorr;
-
-
+}
+}
 
     http.end();
 

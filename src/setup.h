@@ -142,7 +142,7 @@ void setup() {
   xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,2,NULL);
 
   
-  xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);
+  xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
 
   // rtc_wdt_protect_off();
   // rtc_wdt_disable();
@@ -152,9 +152,9 @@ void setup() {
 
 
   #if c_EC == 1
-  xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
+  //xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
   //mutex_v = xSemaphoreCreateMutex();
-  //xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
+  xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
   #endif
 
   #if c_NTC == 1

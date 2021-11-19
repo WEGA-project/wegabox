@@ -38,37 +38,24 @@ void handleRoot() {
   server.send(200, "text/html",  httpstr);
   }
 
-
 // Страница статуса http://[ip]/status
-void handleStatus(){
+void handleStatus()
+{
 
-  String statusstr="status ok \n";
+  String statusstr = "status ok \n";
 
-  statusstr += "Uptime=" + fFTS(millis()/1000,0) + "\n";
-  statusstr += "EC Times=" + fFTS(float(t_EC/1000),3)+ " msec\n";
-  statusstr += "EC Freq=" + fFTS(f_EC,3)+ " Hz\n";
+  statusstr += "Uptime=" + fFTS(millis() / 1000, 0) + "\n";
+  statusstr += "EC Times=" + fFTS(float(t_EC / 1000), 3) + " msec\n";
+  statusstr += "EC Freq=" + fFTS(f_EC, 3) + " Hz\n";
 
+  if (wegareply != "")
+  {
+    statusstr += "WEGAAPI: " + wegareply + "\n";
+    statusstr += "WEGA-API JSON STATUS: " + err_wegaapi_json + "\n";
+    statusstr += "wNTC=" + fFTS(wNTC, 3) + " C\n";
+    statusstr += "wR2=" + fFTS(wR2, 3) + " Omh\n";
+    statusstr += "wEC=" + fFTS(wEC, 3) + " mS/cm\n";
+  }
 
-  //     sens18b20.requestTemperatures();
-  //     float ds18b20s = sens18b20.getTempCByIndex(0);
-  // statusstr += "ds18b20s=" + fFTS(ds18b20s,3)+ " C\n";  
-
- 
-
-statusstr += "WEGAAPI: " + wegareply + "\n";  
-//if (err_wegaapi_json==0) {
-
-statusstr += "WEGA-API JSON STATUS: "+err_wegaapi_json+"\n";
-statusstr += "EC EC_R2_p1=" + fFTS(EC_R2_p1,3)+ "Omh\n";
-statusstr += "EC EC_R2_p2=" + fFTS(EC_R2_p2,3)+ "Omh\n";
-//}
-//else
-//{
-//statusstr += "WEGA-API JSON ERROR\n"; 
-//}
-statusstr += "wNTC=" + fFTS(wNTC,3)+ " C\n";
-statusstr += "wR2=" + fFTS(wR2,3)+ " Omh\n";
-statusstr += "wEC=" + fFTS(wEC,3)+ " mS/cm\n";
-server.send(200, "text/plain",  statusstr);
-
+  server.send(200, "text/plain", statusstr);
 }
