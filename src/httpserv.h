@@ -11,7 +11,7 @@ void handleReset(){
 void handleRoot() {
   String httpstr="<meta http-equiv='refresh' content='10'>";
        httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
-       
+       httpstr += "Firmware=" + String(Firmware) + "<br>";
        if(RootTemp) { httpstr +=  "RootTemp=" + fFTS(RootTemp,3) + "<br>"; }
        if(AirTemp)  { httpstr +=  "AirTemp=" +  fFTS(AirTemp,3) + "<br>"; }
        if(AirHum)   { httpstr +=  "AirHum=" +   fFTS(AirHum,3) + "<br>"; }
