@@ -17,6 +17,7 @@ void TaskWegaApi(void * parameters){
     if(pHraw) httpstr +=  "&" + db_pHraw + "=" +fFTS(pHraw, 4);
     if(CO2) httpstr +=  "&" + db_CO2 + "=" +fFTS(CO2, 0);
     if(tVOC) httpstr +=  "&" + db_tVOC + "=" +fFTS(tVOC, 0);
+    
     if(NTC) httpstr +=  "&" + db_NTC + "=" +fFTS(NTC, 3);
     if(Ap) httpstr +=  "&" + db_Ap + "=" +fFTS(Ap, 3);
     if(An) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
@@ -28,9 +29,10 @@ void TaskWegaApi(void * parameters){
     if(t_EC) httpstr +=  "&t_EC=" +fFTS(t_EC, 3);
     if(f_EC) httpstr +=  "&f_EC=" +fFTS(f_EC, 3);
 
-    if(wNTC) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
-    if(wR2) httpstr +=  "&wR2=" +fFTS(wR2, 3);
-    if(wEC) httpstr +=  "&wEC=" +fFTS(wEC, 3);
+    if(wNTC >0) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
+    if(wR2 >0) httpstr +=  "&wR2=" +fFTS(wR2, 3);
+    if(wEC >0) httpstr +=  "&wEC=" +fFTS(wEC, 3);
+    if(eRAW >0) httpstr +=  "&eRAW=" +fFTS(eRAW, 3);
 
 
     

@@ -265,6 +265,7 @@ void TaskCPUtemp(void * parameters) {
     if( errstat==CCS811_ERRSTAT_OK ) { 
       CO2=eco2;
       tVOC=etvoc;
+      eRAW=raw;
     }
   }
 } 

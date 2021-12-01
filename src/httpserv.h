@@ -27,9 +27,9 @@ void handleRoot() {
        if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
        if(CPUTemp)   { httpstr +=  "CPUTemp=" +   fFTS(CPUTemp,3) + "<br>"; }
 
-      if(wNTC)   { httpstr +=  "wNTC=" +   fFTS(wNTC,3) + "<br>"; }
-      if(wR2)   { httpstr +=  "wR2=" +   fFTS(wR2,3) + "<br>"; }
-      if(wEC)   { httpstr +=  "wEC=" +   fFTS(wEC,3) + "<br>"; }
+        if(wNTC >0 )   { httpstr +=  "wNTC=" +   fFTS(wNTC,3) + "<br>"; }
+        if(wR2 >0 )   { httpstr +=  "wR2=" +   fFTS(wR2,3) + "<br>"; }
+        if(wEC >0 )   { httpstr +=  "wEC=" +   fFTS(wEC,3) + "<br>"; }
 
 
 
@@ -54,7 +54,7 @@ void handleStatus()
     statusstr += "WEGA-API JSON STATUS: " + err_wegaapi_json + "\n";
     statusstr += "wNTC=" + fFTS(wNTC, 3) + " C\n";
     statusstr += "wR2=" + fFTS(wR2, 3) + " Omh\n";
-    statusstr += "wEC=" + fFTS(wEC, 3) + " mS/cm\n";
+    statusstr += "wEC=" + fFTS(wEC, 3) + " mS/cm\n";    
   }
 
   server.send(200, "text/plain", statusstr);

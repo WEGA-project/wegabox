@@ -41,7 +41,7 @@ GMedian<254, long> NTCMed;
 #include "esp_task_wdt.h"
 
 // Переменные
-float AirTemp, AirHum, AirPress, RootTemp, CO2, tVOC,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp;
+float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp,CO2, tVOC, eRAW;
 float wNTC,wR2,wEC;
 bool OtaStart = false;
 bool ECwork = false;
@@ -89,7 +89,9 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_CCS811 == 1
   #include "ccs811.h"  // CCS811 library
+  #include <spec/CCS811_FW_App_v2-0-0.h>
   CCS811 ccs811;
+  
 #endif
 
 #if c_MCP3421 == 1
