@@ -166,30 +166,30 @@ void TaskUS(void *parameters)
   for (;;)
   {
     if (OtaStart == true)
-    {
       vTaskDelete(NULL);
-    }
+
     else
     {
-      float us = distanceSensor.measureDistanceCm(25);
-      if (us != -1)
+      unsigned long  t_Dst0 = millis();
+      unsigned long UScnt = 0;
+      float dst0 = 0;
+
+      for (long i = 0; millis() - t_Dst0 < 180000; i++)
       {
-        float dst0 = 0;
-        long dcnt = 0;
-        for (long i = 0; i < US_MiddleCount; i++)
+
+        float us = distanceSensor.measureDistanceCm(25);
+        
+        if (us != -1)
         {
-          us = distanceSensor.measureDistanceCm(25);
-          if (us != -1)
-          {
-            dst0 = dst0 + us;
-            dcnt++;
-          }
-          vTaskDelay(50 / portTICK_PERIOD_MS);
+          UScnt++;
+          dst0 = dst0 + us;
         }
-        Dist = dst0 / dcnt;
+        
+        vTaskDelay(4 / portTICK_PERIOD_MS);
       }
+      Dist = dst0 / UScnt;
+      //vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -222,38 +222,43 @@ void TaskCPUtemp(void * parameters) {
 }
 #endif //c_CPUTEMP
 
-
 #if c_AHT10 == 1
-  void TaskAHT10(void * parameters) {
-  for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
-   readStatus = myAHT10.readRawData();
-  
-  if (readStatus != AHT10_ERROR)
+void TaskAHT10(void *parameters)
+{
+  for (;;)
   {
-   float AirTemp0=myAHT10.readTemperature();
-   float AirHum0=myAHT10.readHumidity();
-   if (AirTemp0 != 255 ) AirTemp=AirTemp0;
-   if (AirHum0 != 255 ) AirHum=AirHum0;
-  }
-  else
-  {
-    myAHT10.softReset();
-    delay(50);
-    myAHT10.begin();
-    myAHT10.setNormalMode();
-  }
-
-   vTaskDelay(2000 / portTICK_PERIOD_MS);
-    
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    else
+    {
+      readStatus = myAHT10.readRawData();
+      if (readStatus != AHT10_ERROR)
+      {
+        float AirTemp0 = myAHT10.readTemperature();
+        float AirHum0 = myAHT10.readHumidity();
+        if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
+        {
+          AirTemp = AirTemp0;
+          AirHum = AirHum0;
+        }
+      }
+      else
+      {
+        myAHT10.softReset();
+        delay(50);
+        myAHT10.begin();
+        //myAHT10.setNormalMode();
+        myAHT10.setCycleMode();
+      }
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
   }
 }
-#endif // c_AHT10    
-    
+#endif // c_AHT10
 
-  #if c_CCS811 == 1
-    void TaskCCS811(void * parameters) {
+#if c_CCS811 == 1
+void TaskCCS811(void *parameters)
+{
   for(;;){
     vTaskDelay(10000 / portTICK_PERIOD_MS);
       // Read
@@ -271,37 +276,36 @@ void TaskCPUtemp(void * parameters) {
 } 
   #endif
 
+#if c_MCP3421 == 1
+void TaskMCP3421(void *parameters)
+{
+  for (;;)
+  {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    else
+    {
+      //
+      //long pht = millis();
+      long pH_MiddleCount=500;
+      long pHraw0=0;
+      long value;
+      for (long i = 0; i < pH_MiddleCount and OtaStart != true; i++){
 
-
-    #if c_MCP3421 == 1
-void TaskMCP3421(void * parameters) {
-  for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
-    vTaskDelay(100 / portTICK_PERIOD_MS);
-
-    long value = 0;
-    MCP342x::Config status;
-    // Initiate a conversion; convertAndRead() will wait until it can be read
-    uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
-    if (err) {
-      Serial.print("Convert error: ");
-      Serial.println(err);
-    }
-    else {
-      pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
-      if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
-        PhGAB.setParameters(10,10,10);
-        PhGAB.filtered(pHraw);
-        //pHmV=4096/pow(2,18)*pHraw/1;
-      }else{
-        PhGAB.setParameters(0.001, 200, 1);
-        pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
+         MCP342x::Config status;
+         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
+         //if (!err) pHraw0 = PhMediana.filtered(value)+pHraw0;    
+         if (!err) pHraw0 = value+pHraw0;
       }
+      pHraw=pHraw0/pH_MiddleCount;
+      pHmV = 4096 / pow(2, 18) * pHraw / 4;
     }
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
   }
 }
-}
-  #endif // c_MCP3421
+
+
+#endif // c_MCP3421
 
 #if c_DS18B20 == 1
 void TaskDS18B20(void *parameters)
@@ -314,9 +318,9 @@ void TaskDS18B20(void *parameters)
     }
     else
     {
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      //vTaskDelay(2000 / portTICK_PERIOD_MS);
       sens18b20.begin();
-      vTaskDelay(300 / portTICK_PERIOD_MS);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
       if (ds0 != -127 and ds0 != 85)

@@ -86,7 +86,8 @@ void setup() {
    myAHT10.softReset();
    delay(50);
     myAHT10.begin();
-    myAHT10.setNormalMode();
+    //myAHT10.setNormalMode();
+    myAHT10.setCycleMode();
   #endif
 
   #if c_AM2320 == 1

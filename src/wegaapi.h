@@ -26,13 +26,13 @@ void TaskWegaApi(void * parameters){
     if(AirPress) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
     if(CPUTemp) httpstr +=  "&" + db_CPUTemp + "=" +fFTS(CPUTemp, 3);
 
-    if(t_EC) httpstr +=  "&t_EC=" +fFTS(t_EC, 3);
-    if(f_EC) httpstr +=  "&f_EC=" +fFTS(f_EC, 3);
+    // if(t_EC) httpstr +=  "&t_EC=" +fFTS(t_EC, 3);
+    // if(f_EC) httpstr +=  "&f_EC=" +fFTS(f_EC, 3);
 
-    if(wNTC >0) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
-    if(wR2 >0) httpstr +=  "&wR2=" +fFTS(wR2, 3);
-    if(wEC >0) httpstr +=  "&wEC=" +fFTS(wEC, 3);
-    if(eRAW >0) httpstr +=  "&eRAW=" +fFTS(eRAW, 3);
+    if(wNTC) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
+    if(wR2) httpstr +=  "&wR2=" +fFTS(wR2, 3);
+    if(wEC) httpstr +=  "&wEC=" +fFTS(wEC, 3);
+    if(eRAW) httpstr +=  "&eRAW=" +fFTS(eRAW, 3);
 
 
     
@@ -72,11 +72,11 @@ Rx1=doc["EC_Rx1"];
 Rx2=doc["EC_Rx2"];
 Dr=doc["Dr"];
 
-//if (A1 and A2){
+if (A1 and A2 and A1<4095 and A2>0){
 R2p=(((-A2*R1-A2*Rx1+R1*Dr+Rx1*Dr)/A2));
 R2n=(-(-A1*R1-A1*Rx2+Rx2*Dr)/(-A1+Dr));
 wR2=(R2p+R2n)/2;
-//}
+
 // Расчет функции калибровки
 if (wR2>0){
 
@@ -90,6 +90,7 @@ float eb=(-log10(ec1/ec2))/(log10(ex2/ex1));
 float ea=pow(ex1,(-eb))*ec1;
 float ec=ea*pow(wR2,eb);
 wEC=ec/(1+kt*(wNTC-25))+eckorr;
+}
 }
 }
 
