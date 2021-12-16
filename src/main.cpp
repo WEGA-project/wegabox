@@ -17,7 +17,11 @@ WebServer server(80);
 #include <ArduinoJson.h>
 #include "GyverFilters.h"
 GMedian<17, int> PhMediana;
-GMedian<7, long> DstMediana;    
+GMedian<7, long> DstMediana;  
+GMedian<7, float> AirTempMediana;  
+GMedian<7, float> AirHumMediana;
+GMedian<7, float> RootTempMediana;
+GMedian<60, float> PRMediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
@@ -136,8 +140,8 @@ TaskHandle_t TaskAHT10Handler;
 #endif // c_MCP23017
 
 #if c_PR == 1
- #define PR_AnalogPort 35
- #define PR_MiddleCount 1000
+ #define PR_AnalogPort ADC1_CHANNEL_7 // gpio35
+ #define PR_MiddleCount 10000
 #endif // c_PR
 
 #if c_BME280 == 1

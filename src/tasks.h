@@ -8,27 +8,43 @@ void TaskOTA(void * parameters){
   }
 }
 
-
 // Измерение фоторезистора
 #if c_PR == 1
-void TaskPR(void * parameters){
+void TaskPR(void *parameters)
+{
   pinMode(PR_AnalogPort, INPUT);
-  float PR0;
-
-  for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
-   
-   
-    PR0=PRGAB.filtered (analogRead(PR_AnalogPort));
-   
   
-   vTaskDelay(100 / portTICK_PERIOD_MS);
-   if (millis()>60000){
-     PRGAB.setParameters(0.0001,1,1);
-     PR=PR0; 
-     }
+  adc1_config_width(ADC_WIDTH_BIT_12);
+  adc1_config_channel_atten(PR_AnalogPort, ADC_ATTEN_DB_11);
+
+  for (;;)
+  {
+    if (OtaStart == true)
+    {
+      vTaskDelete(NULL);
+    }
+    else
+    {
+      //unsigned long PR0=0;
+      //unsigned long prt=millis();
+
+      // for (long i = 0; i < PR_MiddleCount and OtaStart != true; i++)
+      // {
+        //PR0 = adc1_get_raw(PR_AnalogPort) + PR0;
+          PR = PRMediana.filtered ( adc1_get_raw(PR_AnalogPort));
+
+        // if (millis() - prt > 1000)
+        // {
+        //   vTaskDelay(100 / portTICK_PERIOD_MS);
+        //   prt = millis();
+        // }
+
+      //}
+      //PR = PRMediana.filtered (PR0 / PR_MiddleCount);
+      //PR = float(PR0) / PR_MiddleCount;
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
   }
-}
 }
 #endif //  c_PR
 
@@ -238,19 +254,21 @@ void TaskAHT10(void *parameters)
         float AirHum0 = myAHT10.readHumidity();
         if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
         {
-          AirTemp = AirTemp0;
-          AirHum = AirHum0;
+          AirTemp = AirTempMediana.filtered(AirTemp0);
+          AirHum = AirHumMediana.filtered(AirHum0);
+          vTaskDelay(2000 / portTICK_PERIOD_MS);
         }
       }
       else
       {
         myAHT10.softReset();
-        delay(50);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
         myAHT10.begin();
         //myAHT10.setNormalMode();
         myAHT10.setCycleMode();
+        
       }
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      vTaskDelay(10 / portTICK_PERIOD_MS);
     }
   }
 }
@@ -293,7 +311,8 @@ void TaskMCP3421(void *parameters)
       for (long i = 0; i < pH_MiddleCount and OtaStart != true; i++){
 
          MCP342x::Config status;
-         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
+         //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
+         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
          //if (!err) pHraw0 = PhMediana.filtered(value)+pHraw0;    
          if (!err) pHraw0 = value+pHraw0;
       }
@@ -319,12 +338,15 @@ void TaskDS18B20(void *parameters)
     else
     {
       //vTaskDelay(2000 / portTICK_PERIOD_MS);
-      sens18b20.begin();
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      //sens18b20.begin();
+      
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
-      if (ds0 != -127 and ds0 != 85)
-        RootTemp = ds0;
+      if (ds0 != -127 and ds0 != 85)        {
+        RootTemp = RootTempMediana.filtered(ds0);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+      } else sens18b20.begin();
+    vTaskDelay(20 / portTICK_PERIOD_MS);
     }
   }
 }
