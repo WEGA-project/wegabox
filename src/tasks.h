@@ -186,24 +186,32 @@ void TaskUS(void *parameters)
 
     else
     {
-      unsigned long  t_Dst0 = millis();
-      unsigned long UScnt = 0;
-      float dst0 = 0;
+      // unsigned long  t_Dst0 = millis();
+      // unsigned long UScnt = 0;
+      // float dst0 = 0;
 
-      for (long i = 0; millis() - t_Dst0 < 180000; i++)
-      {
+      // for (long i = 0; millis() - t_Dst0 < 180000; i++)
+      // {
+        // float us=-1;
+        // while ( us == -1 ){
+        // float us = distanceSensor.measureDistanceCm(25);
+        // vTaskDelay(40 / portTICK_PERIOD_MS); 
+        // }
 
+        //Dist=DstMediana.filtered(us);
         float us = distanceSensor.measureDistanceCm(25);
+        if (us > 1) Dist= DstMediana.filtered (us);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        // if (us != -1)
+        // {
+        //   UScnt++;
+        //   dst0 = dst0 + us;
+        // }
         
-        if (us != -1)
-        {
-          UScnt++;
-          dst0 = dst0 + us;
-        }
-        
-        vTaskDelay(4 / portTICK_PERIOD_MS);
-      }
-      Dist = dst0 / UScnt;
+       // vTaskDelay(4 / portTICK_PERIOD_MS);
+      //}
+     // Dist = dst0 / UScnt;
       //vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
   }
@@ -264,8 +272,8 @@ void TaskAHT10(void *parameters)
         myAHT10.softReset();
         vTaskDelay(200 / portTICK_PERIOD_MS);
         myAHT10.begin();
-        //myAHT10.setNormalMode();
-        myAHT10.setCycleMode();
+        myAHT10.setNormalMode();
+        //myAHT10.setCycleMode();
         
       }
       vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -297,6 +305,11 @@ void TaskCCS811(void *parameters)
 #if c_MCP3421 == 1
 void TaskMCP3421(void *parameters)
 {
+
+    //uint8_t err;
+    
+    long adcvalue;
+
   for (;;)
   {
     if (OtaStart == true)
@@ -305,24 +318,36 @@ void TaskMCP3421(void *parameters)
     {
       //
       //long pht = millis();
-      long pH_MiddleCount=500;
-      long pHraw0=0;
-      long value;
-      for (long i = 0; i < pH_MiddleCount and OtaStart != true; i++){
 
-         MCP342x::Config status;
+      
+MCP342x::Config status;
+      
+      //long pHraw0=0;
+      // long i=0;
+      // long pH_MiddleCount=50;
+     // while (i < pH_MiddleCount and OtaStart != true){
+         
+        //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, adcvalue, status);  
          //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
-         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
-         //if (!err) pHraw0 = PhMediana.filtered(value)+pHraw0;    
-         if (!err) pHraw0 = value+pHraw0;
-      }
-      pHraw=pHraw0/pH_MiddleCount;
-      pHmV = 4096 / pow(2, 18) * pHraw / 4;
+          // while (adc.convertAndRead(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18, MCP342x::gain4, 500000, adcvalue, status))
+          //  vTaskDelay(5 / portTICK_PERIOD_MS);
+          // pHraw0 = adcvalue;
+        //  if (!err) { pHraw0 = adcvalue + pHraw0;
+        //  i++;}
+         
+         //vTaskDelay(1 / portTICK_PERIOD_MS);
+    //  }
+   //   pHraw=pHraw0/pH_MiddleCount;
+        long phvalue;
+        uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
+      if (!err){
+        pHraw= phvalue ;
+      pHmV =  PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4) ;
     }
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
-
+}
 
 #endif // c_MCP3421
 
@@ -350,7 +375,7 @@ void TaskDS18B20(void *parameters)
     }
   }
 }
-#endif
+#endif //c_DS18B20
 
 #if c_ADS1115 == 1
   void TaskADS1115(void * parameters) {

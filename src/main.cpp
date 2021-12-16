@@ -16,12 +16,14 @@ WebServer server(80);
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include "GyverFilters.h"
-GMedian<17, int> PhMediana;
-GMedian<7, long> DstMediana;  
-GMedian<7, float> AirTempMediana;  
-GMedian<7, float> AirHumMediana;
-GMedian<7, float> RootTempMediana;
+
+
+GMedian<30, float> AirTempMediana;  
+GMedian<30, float> AirHumMediana;
+GMedian<30, float> RootTempMediana;
 GMedian<60, float> PRMediana;
+GMedian<90, float> PhMediana;
+GMedian<60, float> DstMediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
