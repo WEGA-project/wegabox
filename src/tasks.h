@@ -401,16 +401,16 @@ void TaskDS18B20(void *parameters)
 
 
 #if c_AM2320 == 1
-void TaskAHT10(void * parameters) {
+void TaskAM2320(void * parameters) {
 for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
-  vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
 int status = AM2320.read();
 switch (status)
 {
   case AM232X_OK:
-    AirHum=AM2320.getHumidity();
-    AirTemp=AM2320.getTemperature();
+    AirHum=AirHumMediana.filtered(AM2320.getHumidity());
+    AirTemp=AirTempMediana.filtered(AM2320.getTemperature());
     break;
   default:
     Serial.println(status);
@@ -419,7 +419,7 @@ switch (status)
   }
 }
 }
-#endif
+#endif //c_AM2320
 
 #if c_BME280 == 1
   void TaskBME280(void * parameters) {
