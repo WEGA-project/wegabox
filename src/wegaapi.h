@@ -29,10 +29,10 @@ void TaskWegaApi(void * parameters){
     // if(t_EC) httpstr +=  "&t_EC=" +fFTS(t_EC, 3);
     // if(f_EC) httpstr +=  "&f_EC=" +fFTS(f_EC, 3);
 
-    if(wNTC) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
-    if(wR2) httpstr +=  "&wR2=" +fFTS(wR2, 3);
-    if(wEC) httpstr +=  "&wEC=" +fFTS(wEC, 3);
-    if(eRAW) httpstr +=  "&eRAW=" +fFTS(eRAW, 3);
+    if(wNTC and !isnan(wNTC) and isinf(wNTC)) httpstr +=  "&wNTC=" +fFTS(wNTC, 3);
+    if(wR2 and !isnan(wR2) and isinf(wR2) ) httpstr +=  "&wR2=" +fFTS(wR2, 3);
+    if(wEC and !isnan(wEC) and isinf(wEC) ) httpstr +=  "&wEC=" +fFTS(wEC, 3);
+    if(eRAW and !isnan(eRAW) and isinf(eRAW) ) httpstr +=  "&eRAW=" +fFTS(eRAW, 3);
 
 
     

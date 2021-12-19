@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.3.171221"
+#define Firmware "beta-0.3.191221"
 
 
 #include <WiFi.h>
@@ -21,7 +21,7 @@ WebServer server(80);
 GMedian<30, float> AirTempMediana;  
 GMedian<30, float> AirHumMediana;
 GMedian<30, float> RootTempMediana;
-GMedian<60, float> PRMediana;
+GMedian<90, float> PRMediana;
 GMedian<90, float> PhMediana;
 GMedian<60, float> DstMediana;
 

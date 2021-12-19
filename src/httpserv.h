@@ -27,9 +27,9 @@ void handleRoot() {
        if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
        if(CPUTemp)   { httpstr +=  "CPUTemp=" +   fFTS(CPUTemp,3) + "<br>"; }
 
-        if(wNTC >0 )   { httpstr +=  "wNTC=" +   fFTS(wNTC,3) + "<br>"; }
-        if(wR2 >0 )   { httpstr +=  "wR2=" +   fFTS(wR2,3) + "<br>"; }
-        if(wEC >0 )   { httpstr +=  "wEC=" +   fFTS(wEC,3) + "<br>"; }
+        if(wNTC >0 )  { httpstr +=  "wNTC=" +  fFTS(wNTC,3) + "<br>"; }
+        if(wR2 >0 )   { httpstr +=  "wR2=" +   fFTS(wR2, 3) + "<br>"; }
+        if(wEC >0 )   { httpstr +=  "wEC=" +   fFTS(wEC, 3) + "<br>"; }
 
 
 
