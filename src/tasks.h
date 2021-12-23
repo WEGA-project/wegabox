@@ -435,10 +435,9 @@ void TaskAM2320(void *parameters)
   for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{  
     vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    bme.begin();
     AirTemp=bme.readTemperature();
     AirHum=bme.readHumidity();
-    AirPress=bme.readPressure();
+    AirPress=bme.readPressure()*0.00750062;
     }
   }
   }
