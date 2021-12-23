@@ -21,6 +21,7 @@ WebServer server(80);
 GMedian<30, float> AirTempMediana;  
 GMedian<30, float> AirHumMediana;
 GMedian<30, float> RootTempMediana;
+GMedian<300, float> NTCMediana;
 GMedian<90, float> PRMediana;
 GMedian<90, float> PhMediana;
 GMedian<60, float> DstMediana;
@@ -117,7 +118,7 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_NTC == 1
  #define NTC_port ADC1_CHANNEL_4 // gpio32
- #define NTC_MiddleCount 100000
+ #define NTC_MiddleCount 500000
 #endif
 
 #if c_EC == 1

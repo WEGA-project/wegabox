@@ -161,7 +161,7 @@ void TaskEC(void *parameters)
       {
         s++;
 
-        NTC0 = adc1_get_raw(NTC_port) + NTC0;
+        NTC0 = NTCMediana.filtered(adc1_get_raw(NTC_port)) + NTC0;
         //esp_task_wdt_reset();
       }
       rtc_wdt_protect_on();
@@ -169,8 +169,8 @@ void TaskEC(void *parameters)
       enableCore0WDT();
       enableLoopWDT();
 
-      NTC = float(NTC0) / s;
-      vTaskDelay(5000 / portTICK_PERIOD_MS);
+      NTC =  float(NTC0) / s;
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
 #endif // c_NTC
     }
   }
@@ -381,43 +381,52 @@ void TaskDS18B20(void *parameters)
   void TaskADS1115(void * parameters) {
     for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
-      vTaskDelay(10000 / portTICK_PERIOD_MS);
+      vTaskDelay(100 / portTICK_PERIOD_MS);
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
       long cont=0;
       double sensorValue=0;
       while ( cont < ADS1115_MiddleCount){
-        cont++;
+       cont++;
         sensorValue = adc.getResult_mV()+sensorValue;
       }
       pHmV=sensorValue/cont;
-
+      //pHmV=PhMediana.filtered(adc.getResult_mV());
     }
   }
 }
 #endif // c_ADS1115
 
-
-
 #if c_AM2320 == 1
-void TaskAM2320(void * parameters) {
-for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
-  vTaskDelay(2000 / portTICK_PERIOD_MS);
-int status = AM2320.read();
-switch (status)
+void TaskAM2320(void *parameters)
 {
-  case AM232X_OK:
-    AirHum=AirHumMediana.filtered(AM2320.getHumidity());
-    AirTemp=AirTempMediana.filtered(AM2320.getTemperature());
-    break;
-  default:
-    Serial.println(status);
-  break;
+  for (;;)
+  {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+
+    else
+    {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+      if (AM2320.begin())
+      {
+
+        int status = AM2320.read();
+        switch (status)
+        {
+        case AM232X_OK:
+          AirHum = AirHumMediana.filtered(AM2320.getHumidity());
+          AirTemp = AirTempMediana.filtered(AM2320.getTemperature());
+          break;
+        default:
+          Serial.println(status);
+          break;
+        }
+      }
     }
   }
-}
 }
 #endif //c_AM2320
 
