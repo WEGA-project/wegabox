@@ -154,22 +154,27 @@ void TaskEC(void *parameters)
 // Измерение термистора
 #if c_NTC == 1
       adc1_config_channel_atten(NTC_port, ADC_ATTEN_DB_11);
-
+      
       unsigned long NTC0 = 0;
       s = 0;
+      
       while (s < NTC_MiddleCount and OtaStart != true)
-      {
-        s++;
 
-        NTC0 = NTCMediana.filtered(adc1_get_raw(NTC_port)) + NTC0;
-        //esp_task_wdt_reset();
+      {
+        
+        float adc_ntc=adc1_get_raw(NTC_port);
+        NTC0 = adc_ntc + NTC0;
+        s++;
       }
       rtc_wdt_protect_on();
       rtc_wdt_enable();
       enableCore0WDT();
       enableLoopWDT();
 
-      NTC =  float(NTC0) / s;
+      if (NTC) 
+        NTC =  (float(NTC0) / s + NTC )/2;
+      else 
+        NTC =  float(NTC0) / s;
       vTaskDelay(2000 / portTICK_PERIOD_MS);
 #endif // c_NTC
     }
@@ -389,9 +394,9 @@ void TaskDS18B20(void *parameters)
       double sensorValue=0;
       while ( cont < ADS1115_MiddleCount){
        cont++;
-        sensorValue = adc.getResult_mV()+sensorValue;
+        sensorValue =  adc.getResult_mV()+sensorValue;
       }
-      pHmV=sensorValue/cont;
+      pHmV=PhMediana.filtered(sensorValue/cont);
       //pHmV=PhMediana.filtered(adc.getResult_mV());
     }
   }

@@ -41,6 +41,8 @@ GMedian<254, long> AnMed;
 GMedian<254, long> NTCMed;
 
 
+
+
 #include <pre.h>
 #include <func>
 #include <driver/adc.h>
@@ -118,7 +120,7 @@ TaskHandle_t TaskAHT10Handler;
 
 #if c_NTC == 1
  #define NTC_port ADC1_CHANNEL_4 // gpio32
- #define NTC_MiddleCount 500000
+ #define NTC_MiddleCount 900000
 #endif
 
 #if c_EC == 1
