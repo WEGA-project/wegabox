@@ -386,7 +386,7 @@ void TaskDS18B20(void *parameters)
   void TaskADS1115(void * parameters) {
     for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
-      vTaskDelay(100 / portTICK_PERIOD_MS);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
