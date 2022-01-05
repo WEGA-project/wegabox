@@ -20,6 +20,7 @@ WebServer server(80);
 
 GMedian<30, float> AirTempMediana;  
 GMedian<30, float> AirHumMediana;
+GMedian<30, float> AirPressMediana;
 GMedian<30, float> RootTempMediana;
 GMedian<180, float> NTCMediana;
 GMedian<90, float> PRMediana;
