@@ -53,5 +53,3 @@ float us(int trg, int ech, float temp, long cnt) {
  //return (vSound/10000)*((float(SumMicros))/2);
 }
 
-
-

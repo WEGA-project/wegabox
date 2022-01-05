@@ -8,246 +8,288 @@ void TaskOTA(void * parameters){
   }
 }
 
-void TaskWegaApi(void * parameters){
-  for(;;){
-    // Sending to WEGA-API 
-    WiFiClient client;
-    HTTPClient http;
-
-    String httpstr=wegaapi;
-    httpstr +=  "?db=" + wegadb;
-    httpstr +=  "&auth=" + wegaauth;
-    httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
-    if(RootTemp) httpstr +=  "&" + db_RootTemp + "=" +fFTS(RootTemp,3);
-    if(AirTemp) httpstr +=  "&" + db_AirTemp + "=" +fFTS(AirTemp, 3);
-    if(AirHum) httpstr +=  "&" + db_AirHum + "=" +fFTS(AirHum, 3);
-    if(hall) httpstr +=  "&" + db_hall + "=" +fFTS(hall, 3);
-    if(pHmV) httpstr +=  "&" + db_pHmV + "=" +fFTS(pHmV, 4);
-    if(pHraw) httpstr +=  "&" + db_pHraw + "=" +fFTS(pHraw, 4);
-    if(CO2) httpstr +=  "&" + db_CO2 + "=" +fFTS(CO2, 0);
-    if(tVOC) httpstr +=  "&" + db_tVOC + "=" +fFTS(tVOC, 0);
-    if(NTC) httpstr +=  "&" + db_NTC + "=" +fFTS(NTC, 3);
-    if(Ap) httpstr +=  "&" + db_Ap + "=" +fFTS(Ap, 3);
-    if(An) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
-    if(Dist) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
-    if(PR) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
-    if(AirPress) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
-    if(CPUTemp) httpstr +=  "&" + db_CPUTemp + "=" +fFTS(CPUTemp, 3);
-
-    http.begin(client, httpstr);
-    http.GET();
-    http.end();
-
-      if (WiFi.status() != WL_CONNECTED) {
-        WiFi.disconnect(true);
-        WiFi.begin(ssid, password);  }
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    //delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
-
-  }
-}
-
-
 // Измерение фоторезистора
 #if c_PR == 1
-void TaskPR(void * parameters){
+void TaskPR(void *parameters)
+{
   pinMode(PR_AnalogPort, INPUT);
-  for(;;){
-   float PR0=0;
-   double prcount = 0;
-   while (prcount < PR_MiddleCount){
-    prcount++;
-    PR0=analogRead(PR_AnalogPort)+PR0;
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-   }
-   PR=PR0/PR_MiddleCount;
-   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
+  
+  adc1_config_width(ADC_WIDTH_BIT_12);
+  adc1_config_channel_atten(PR_AnalogPort, ADC_ATTEN_DB_11);
+
+  for (;;)
+  {
+    if (OtaStart == true)
+    {
+      vTaskDelete(NULL);
+    }
+    else
+    {
+      //unsigned long PR0=0;
+      //unsigned long prt=millis();
+
+      // for (long i = 0; i < PR_MiddleCount and OtaStart != true; i++)
+      // {
+        //PR0 = adc1_get_raw(PR_AnalogPort) + PR0;
+          PR = PRMediana.filtered ( adc1_get_raw(PR_AnalogPort));
+
+        // if (millis() - prt > 1000)
+        // {
+        //   vTaskDelay(100 / portTICK_PERIOD_MS);
+        //   prt = millis();
+        // }
+
+      //}
+      //PR = PRMediana.filtered (PR0 / PR_MiddleCount);
+      //PR = float(PR0) / PR_MiddleCount;
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
   }
 }
 #endif //  c_PR
 
-// Измерение термистора
-#if c_NTC == 1
-  void TaskNTC(void * parameters){
-    pinMode(NTC_port, INPUT);
-    for(;;){
-    float NTC0=0;
-    double ntccount = 0;
-    while (ntccount < NTC_MiddleCount){
-      ntccount++;
-      NTC0=analogRead(NTC_port)+NTC0;
-      vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-    NTC=NTC0/NTC_MiddleCount;
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    }
-  }
-#endif // c_NTC
+// Измерение ЕС и NTC
+void TaskEC(void *parameters)
+{
+  for (;;)
+  {
 
-// Измерение ЕС
+    if (OtaStart == true)
+    {
+      vTaskDelete(NULL);
+    }
+    else
+    {
+
 #if c_EC == 1
-void TaskEC(void * parameters){
-  for(;;){
+      long s;
+      unsigned long t_EC0;
 
-if ( USwork==false ){
+      //pinMode(EC_AnalogPort, INPUT);
+      unsigned long An0 = 0;
+      unsigned long Ap0 = 0;
 
-    ECwork=true;
-     float Ap0 = 0;
-    float An0 = 0;
-    double eccount = 0;
+      pinMode(EC_DigitalPort1, OUTPUT);
+      pinMode(EC_DigitalPort2, OUTPUT);
+      ECwork = true;
 
-    pinMode(EC_AnalogPort, INPUT);
+      adc1_config_width(ADC_WIDTH_BIT_12);
+      adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11);
 
-  while (eccount < EC_MiddleCount and OtaStart != true){
-    pinMode(EC_DigitalPort1, OUTPUT);
-    pinMode(EC_DigitalPort2, OUTPUT);
-    digitalWrite(EC_DigitalPort1, LOW);
-    digitalWrite(EC_DigitalPort2, LOW);
-
-    eccount++;
-      digitalWrite(EC_DigitalPort1, HIGH);
-      digitalWrite(EC_DigitalPort2, LOW);
-        Ap0 = analogRead(EC_AnalogPort) + Ap0;
-                
-      digitalWrite(EC_DigitalPort2, HIGH);
+      t_EC0 = micros();
       digitalWrite(EC_DigitalPort1, LOW);
-        An0 = analogRead(EC_AnalogPort) + An0;
+      digitalWrite(EC_DigitalPort2, LOW);
+
+      // static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
+      rtc_wdt_protect_off();
+      rtc_wdt_disable();
+      disableCore0WDT();
+      disableLoopWDT();
+      // vPortCPUInitializeMutex(&my_mutex);
+      long ect = millis();
+      for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
+      {
+
+        pinMode(EC_DigitalPort1, OUTPUT);
+        pinMode(EC_DigitalPort2, OUTPUT);
+        digitalWrite(EC_DigitalPort1, LOW);
+        digitalWrite(EC_DigitalPort2, LOW);
+
+        //portENTER_CRITICAL(&my_mutex);
+        digitalWrite(EC_DigitalPort1, HIGH);
+        Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
+        digitalWrite(EC_DigitalPort1, LOW);
+          delayMicroseconds(1);
+          
+        digitalWrite(EC_DigitalPort2, HIGH);
+          delayMicroseconds(1);
+        digitalWrite(EC_DigitalPort2, LOW);
+          //delayMicroseconds(1);
+
+        digitalWrite(EC_DigitalPort1, HIGH);
+          delayMicroseconds(1);
+        digitalWrite(EC_DigitalPort1, LOW);
+          //delayMicroseconds(1);
+
+        digitalWrite(EC_DigitalPort2, HIGH);
+        An0 = adc1_get_raw(EC_AnalogPort) + An0;
+        digitalWrite(EC_DigitalPort2, LOW);
+          //delayMicroseconds(1);
+
+        //portEXIT_CRITICAL(&my_mutex);
+
+        if (millis() - ect > 1000)
+        {
+          pinMode(EC_DigitalPort1, INPUT);
+          pinMode(EC_DigitalPort2, INPUT);
+          vTaskDelay(300 / portTICK_PERIOD_MS);
+          ect = millis();
+        }
+
+
+      }
+
+      t_EC = micros() - t_EC0;
+      pinMode(EC_DigitalPort1, INPUT);
+      pinMode(EC_DigitalPort2, INPUT);
+
+      //esp_task_wdt_reset();
+
+      float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
+      float Mid_An0 = float(An0) / EC_MiddleCount;
+
+
+      ECwork = false;
+      f_EC = EC_MiddleCount / (float(t_EC) / 1000000);
+
+      if (Mid_Ap0 < 4095)
+        Ap = Mid_Ap0;
+      if (Mid_An0 > 0)
+        An = Mid_An0;
+
       
-      
-  
-    //vTaskDelay(1 / portTICK_PERIOD_MS); 
 
-    pinMode(EC_DigitalPort1, INPUT);
-    pinMode(EC_DigitalPort2, INPUT);
-
-  }
-    pinMode(EC_AnalogPort, INPUT);    
-
-
-    Ap = Ap0 / eccount;
-    An = An0 / eccount;
-    ECwork=false;
-
-}
-  vTaskDelay(5000 / portTICK_PERIOD_MS);
-  //server.handleClient();
-
-  }
-}
 #endif // c_EC
 
-#if c_US025 == 1
-void TaskUS(void * parameters) {
-  for(;;){
-    
-
-    //     float Dist0;
-    // Dist0=DstMediana.filtered(distanceSensor.measureDistanceCm(25)*100 );
-    // Dist=Dist0/100;
-    // vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-    // vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    // //Dist=us(US_ECHO,US_TRIG,25,US_MiddleCount);
-
-
-    //Dist=distanceSensor.measureDistanceCm(25);
-if (ECwork==false){
-  USwork=true;
-    long cont=0;
-    double sensorValue=0;
-
-    
+// Измерение термистора
+#if c_NTC == 1
+      adc1_config_channel_atten(NTC_port, ADC_ATTEN_DB_11);
       
-    while ( cont < US_MiddleCount){
+      unsigned long NTC0 = 0;
+      s = 0;
       
-      float dist0=distanceSensor.measureDistanceCm(25);
-      if(dist0 != -1 ) {
-        sensorValue=dist0+sensorValue;
-        cont++;  
-        delay (5); 
-         }
-    } 
-    
-    
-    Dist=sensorValue/cont;
+      while (s < NTC_MiddleCount and OtaStart != true)
 
-    USwork=false;
+      {
+        
+        float adc_ntc=adc1_get_raw(NTC_port);
+        NTC0 = adc_ntc + NTC0;
+        s++;
+      }
+      rtc_wdt_protect_on();
+      rtc_wdt_enable();
+      enableCore0WDT();
+      enableLoopWDT();
+
+      if (NTC) 
+        NTC =  (float(NTC0) / s + NTC )/2;
+      else 
+        NTC =  float(NTC0) / s;
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+#endif // c_NTC
     }
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-
-
-    // //Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    // // if(millis()<60000){
-    // //   //Dstkalman.setParameters(1,1);
-    // //   us(US_ECHO,US_TRIG,25,US_MiddleCount);
-    // //   }
-    // // else{
-    // //   //Dstkalman.setParameters(1,0.01);
-    // //   Dist=Dstkalman.filtered( us(US_ECHO,US_TRIG,25,US_MiddleCount) );
-    // //   }
   }
 }
+
+#if c_US025 == 1
+void TaskUS(void *parameters)
+{
+  for (;;)
+  {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+
+    else
+    {
+      // unsigned long  t_Dst0 = millis();
+      // unsigned long UScnt = 0;
+      // float dst0 = 0;
+
+      // for (long i = 0; millis() - t_Dst0 < 180000; i++)
+      // {
+        // float us=-1;
+        // while ( us == -1 ){
+        // float us = distanceSensor.measureDistanceCm(25);
+        // vTaskDelay(40 / portTICK_PERIOD_MS); 
+        // }
+
+        //Dist=DstMediana.filtered(us);
+        float us = distanceSensor.measureDistanceCm(25);
+        if (us > 1) Dist= DstMediana.filtered (us);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        // if (us != -1)
+        // {
+        //   UScnt++;
+        //   dst0 = dst0 + us;
+        // }
+        
+       // vTaskDelay(4 / portTICK_PERIOD_MS);
+      //}
+     // Dist = dst0 / UScnt;
+      //vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
+  }
+}
+
 #endif // c_US025
 
 #if c_hall == 1
 void TaskHall(void * parameters) {
   for(;;){
-    long n=0;
-    double sensorValue=0;
-    while ( n < 100){
-      n++;
-      sensorValue = hallRead()+sensorValue;
-      }
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    
-    hall=sensorValue/n;
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
+
+    hall=HallGAB.filtered( hallRead() );
+    vTaskDelay(300 / portTICK_PERIOD_MS);
   }
+}
 }
 #endif //c_hall
 
 #if c_CPUTEMP == 1
 void TaskCPUtemp(void * parameters) {
   for(;;){
-    //CPUTemp=CpuTempKalman.filtered( ( temprature_sens_read()-32) * (5/9) );
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
+    
      int CPUTemp0 = temprature_sens_read();
-     //if (CPUTemp0 != 128 ) CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
+     
      CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
     vTaskDelay(100 / portTICK_PERIOD_MS);
-    rtc_wdt_feed();
+    
   }
+}
 }
 #endif //c_CPUTEMP
 
-
 #if c_AHT10 == 1
-  void TaskAHT10(void * parameters) {
-  for(;;){
-   readStatus = myAHT10.readRawData();
-  
-  if (readStatus != AHT10_ERROR)
+void TaskAHT10(void *parameters)
+{
+  for (;;)
   {
-   float AirTemp0=myAHT10.readTemperature();
-   float AirHum0=myAHT10.readHumidity();
-   if (AirTemp0 != 255 ) AirTemp=AirTemp0;
-   if (AirHum0 != 255 ) AirHum=AirHum0;
-  }
-  else
-  {
-    myAHT10.softReset();
-    delay(50);
-    myAHT10.begin();
-    myAHT10.setNormalMode();
-  }
-
-   vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    else
+    {
+      readStatus = myAHT10.readRawData();
+      if (readStatus != AHT10_ERROR)
+      {
+        float AirTemp0 = myAHT10.readTemperature();
+        float AirHum0 = myAHT10.readHumidity();
+        if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
+        {
+          AirTemp = AirTempMediana.filtered(AirTemp0);
+          AirHum = AirHumMediana.filtered(AirHum0);
+          vTaskDelay(2000 / portTICK_PERIOD_MS);
+        }
+      }
+      else
+      {
+        myAHT10.softReset();
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        myAHT10.begin();
+        myAHT10.setNormalMode();
+        //myAHT10.setCycleMode();
+        
+      }
+      vTaskDelay(10 / portTICK_PERIOD_MS);
     }
   }
-#endif // c_AHT10    
-    
+}
+#endif // c_AHT10
 
-  #if c_CCS811 == 1
-    void TaskCCS811(void * parameters) {
+#if c_CCS811 == 1
+void TaskCCS811(void *parameters)
+{
   for(;;){
     vTaskDelay(10000 / portTICK_PERIOD_MS);
       // Read
@@ -259,102 +301,149 @@ void TaskCPUtemp(void * parameters) {
     if( errstat==CCS811_ERRSTAT_OK ) { 
       CO2=eco2;
       tVOC=etvoc;
+      eRAW=raw;
     }
   }
 } 
   #endif
 
+#if c_MCP3421 == 1
+void TaskMCP3421(void *parameters)
+{
 
+    //uint8_t err;
+    
+    long adcvalue;
 
-    #if c_MCP3421 == 1
-void TaskMCP3421(void * parameters) {
-  for(;;){
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+  for (;;)
+  {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    else
+    {
+      //
+      //long pht = millis();
 
-    long value = 0;
-    MCP342x::Config status;
-    // Initiate a conversion; convertAndRead() will wait until it can be read
-    uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot,MCP342x::resolution18, MCP342x::gain4,1000000, value, status);
-    if (err) {
-      Serial.print("Convert error: ");
-      Serial.println(err);
+      
+MCP342x::Config status;
+      
+      //long pHraw0=0;
+      // long i=0;
+      // long pH_MiddleCount=50;
+     // while (i < pH_MiddleCount and OtaStart != true){
+         
+        //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, adcvalue, status);  
+         //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
+          // while (adc.convertAndRead(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18, MCP342x::gain4, 500000, adcvalue, status))
+          //  vTaskDelay(5 / portTICK_PERIOD_MS);
+          // pHraw0 = adcvalue;
+        //  if (!err) { pHraw0 = adcvalue + pHraw0;
+        //  i++;}
+         
+         //vTaskDelay(1 / portTICK_PERIOD_MS);
+    //  }
+   //   pHraw=pHraw0/pH_MiddleCount;
+        long phvalue;
+        uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
+      if (!err){
+        pHraw= phvalue ;
+      pHmV =  PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4) ;
     }
-    else {
-      pHraw=PhMediana.filtered(value);  // Медианная фильтрация удаляет резкие выбросы показаний
-      if (millis() < 60000){            // Игнорит ошибку фильтра на старте системы первые 60 сек. 
-        PhGAB.setParameters(10,10,10);
-        PhGAB.filtered(pHraw);
-        //pHmV=4096/pow(2,18)*pHraw/1;
-      }else{
-        PhGAB.setParameters(0.001, 200, 1);
-        pHmV=4096/pow(2,18)*PhGAB.filtered(pHraw)/4;
-      }
-    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
-  #endif // c_MCP3421
+}
 
-
+#endif // c_MCP3421
 
 #if c_DS18B20 == 1
-void TaskDS18B20(void * parameters) {
-  for(;;){
-    vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-sens18b20.begin();
-sens18b20.requestTemperatures();
-float ds0=sens18b20.getTempCByIndex(0);
-if(ds0 != -127 and ds0 !=85) RootTemp=ds0; 
+void TaskDS18B20(void *parameters)
+{
+  for (;;)
+  {
+    if (OtaStart == true)
+    {
+      vTaskDelete(NULL);
+    }
+    else
+    {
+      //vTaskDelay(2000 / portTICK_PERIOD_MS);
+      //sens18b20.begin();
+      
+      sens18b20.requestTemperatures();
+      float ds0 = sens18b20.getTempCByIndex(0);
+      if (ds0 != -127 and ds0 != 85)        {
+        RootTemp = RootTempMediana.filtered(ds0);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+      } else sens18b20.begin();
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+    }
   }
 }
-#endif
+#endif //c_DS18B20
 
 #if c_ADS1115 == 1
   void TaskADS1115(void * parameters) {
     for(;;){
-      vTaskDelay(10000 / portTICK_PERIOD_MS);
+    if (OtaStart == true) {vTaskDelete( NULL );}else{
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
       adc.setCompareChannels(ADS1115_COMP_0_3);
+      adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
       long cont=0;
       double sensorValue=0;
       while ( cont < ADS1115_MiddleCount){
-        cont++;
-        sensorValue = adc.getResult_mV()+sensorValue;
+       cont++;
+        sensorValue =  adc.getResult_mV()+sensorValue;
       }
-      pHmV=sensorValue/cont;
-
-    }
-  }
-#endif // c_ADS1115
-
-
-
-#if c_AM2320 == 1
-void TaskAHT10(void * parameters) {
-for(;;){
-  vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-int status = AM2320.read();
-switch (status)
-{
-  case AM232X_OK:
-    AirHum=AM2320.getHumidity();
-    AirTemp=AM2320.getTemperature();
-    break;
-  default:
-    Serial.println(status);
-  break;
+      pHmV=PhMediana.filtered(sensorValue/cont);
+      //pHmV=PhMediana.filtered(adc.getResult_mV());
     }
   }
 }
-#endif
+#endif // c_ADS1115
+
+#if c_AM2320 == 1
+void TaskAM2320(void *parameters)
+{
+  for (;;)
+  {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+
+    else
+    {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+      if (AM2320.begin())
+      {
+
+        int status = AM2320.read();
+        switch (status)
+        {
+        case AM232X_OK:
+          AirHum = AirHumMediana.filtered(AM2320.getHumidity());
+          AirTemp = AirTempMediana.filtered(AM2320.getTemperature());
+          break;
+        default:
+          Serial.println(status);
+          break;
+        }
+      }
+    }
+  }
+}
+#endif //c_AM2320
 
 #if c_BME280 == 1
   void TaskBME280(void * parameters) {
-  for(;;){  
+  for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{  
     vTaskDelay(freqdb*1000 / portTICK_PERIOD_MS);
-    bme.begin();
     AirTemp=bme.readTemperature();
     AirHum=bme.readHumidity();
-    AirPress=bme.readPressure();
+    AirPress=bme.readPressure()*0.00750062;
     }
+  }
   }
 #endif 
