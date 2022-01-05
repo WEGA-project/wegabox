@@ -387,6 +387,8 @@ void TaskDS18B20(void *parameters)
     for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
       vTaskDelay(1000 / portTICK_PERIOD_MS);
+            if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
+
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
@@ -398,6 +400,7 @@ void TaskDS18B20(void *parameters)
       }
       pHmV=PhMediana.filtered(sensorValue/cont);
       //pHmV=PhMediana.filtered(adc.getResult_mV());
+      xSemaphoreGive( xI2CSemaphore );      }
     }
   }
 }
@@ -446,4 +449,52 @@ void TaskAM2320(void *parameters)
     }
   }
   }
-#endif 
+#endif //c_BME280
+
+#if c_BMP280 == 1
+  void TaskBMP280(void * parameters) {
+  for(;;){
+    if (OtaStart == true) {vTaskDelete( NULL );}else{  
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+      if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )
+      {
+
+
+    
+    //  AirTemp=bmp.readTemperature();
+    //  AirPress=bmp.readPressure()*0.00750062;
+      if (!bmx280.measure())
+        {
+          Serial.println("could not start measurement, is a measurement already running?");
+          return;
+        }
+
+        //wait for the measurement to finish
+        do
+        {
+          delay(100);
+        } while (!bmx280.hasValue());
+
+        //Serial.print("Pressure: "); Serial.println(bmx280.getPressure());
+        //Serial.print("Pressure (64 bit): "); Serial.println(bmx280.getPressure64());
+        //Serial.print("Temperature: "); Serial.println(bmx280.getTemperature());
+        AirTemp=bmx280.getTemperature();        
+        AirPress=bmx280.getPressure64()*0.00750062;
+
+
+        //important: measurement data is read from the sensor in function hasValue() only. 
+        //make sure to call get*() functions only after hasValue() has returned true. 
+        if (bmx280.isBME280())
+        {
+          //Serial.print("Humidity: "); 
+          //Serial.println(bmx280.getHumidity());
+          AirHum=bmx280.getHumidity();
+        }
+
+        xSemaphoreGive( xI2CSemaphore );      }
+     
+    }
+  }
+  }
+#endif //c_BMP280

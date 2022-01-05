@@ -2,6 +2,20 @@
 
 
 void setup() {
+
+   if ( xI2CSemaphore == NULL )
+   {
+      // Создание мьютексного семафора, который мы будем использовать
+      // для обслуживания доступа к порту I2C:
+      xI2CSemaphore = xSemaphoreCreateMutex();
+      if ( ( xI2CSemaphore ) != NULL )
+      {
+         // Если семафор создан, то делаем его доступным (Give)
+         // для использования при доступе к порту I2C:
+         xSemaphoreGive( ( xI2CSemaphore ) );
+      }
+   }
+
   #if c_EC == 1
       pinMode(EC_DigitalPort1, INPUT);
       pinMode(EC_DigitalPort2, INPUT);
@@ -151,7 +165,33 @@ ccs811.start(CCS811_MODE_1SEC);
     //bme.begin();
   #endif //c_BME280
 
+  #if c_BMP280 == 1
+      if (!bmx280.begin())
+        {
+          Serial.println("begin() failed. check your BMx280 Interface and I2C Address.");
+          while (1);
+        }
 
+        if (bmx280.isBME280())
+          Serial.println("sensor is a BME280");
+        else
+          Serial.println("sensor is a BMP280");
+
+        //reset sensor to default parameters.
+        bmx280.resetToDefaults();
+
+        //by default sensing is disabled and must be enabled by setting a non-zero
+        //oversampling setting.
+        //set an oversampling setting for pressure and temperature measurements. 
+        bmx280.writeOversamplingPressure(BMx280MI::OSRS_P_x16);
+        bmx280.writeOversamplingTemperature(BMx280MI::OSRS_T_x16);
+
+        //if sensor is a BME280, set an oversampling setting for humidity measurements.
+        if (bmx280.isBME280())
+          bmx280.writeOversamplingHumidity(BMx280MI::OSRS_H_x16);
+
+  xTaskCreate(TaskBMP280,"BMP280",10000,NULL,0,NULL);  
+  #endif //c_BMP280
 
   //xTaskCreate(TaskECclean,"TaskECclean",10000,NULL,3,NULL);
 

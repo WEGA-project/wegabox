@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.3.271221"
+#define Firmware "beta-0.4.050122"
 
 
 #include <WiFi.h>
@@ -70,6 +70,8 @@ float EC_R1, EC_R2_p1, EC_R2_p2;
 
 
 TaskHandle_t TaskAHT10Handler;
+
+SemaphoreHandle_t xI2CSemaphore;
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
 #include <Wire.h>          // Шина I2C
@@ -156,11 +158,41 @@ TaskHandle_t TaskAHT10Handler;
 Adafruit_BME280 bme; // I2C
 #endif //c_BME280
 
+#if c_BMP280 == 1
+// Arduino - BMP280 / BME280
+// 3.3V ---- VCC
+// GND ----- GND
+// SDA ----- SDA
+// SCL ----- SCL
+// some BMP280/BME280 modules break out the CSB and SDO pins as well: 
+// 5V ------ CSB (enables the I2C interface)
+// GND ----- SDO (I2C Address 0x76)
+// 5V ------ SDO (I2C Address 0x77)
+// other pins can be left unconnected.
+
+#include <Arduino.h>
+#include <Wire.h>
+
+#include <BMx280I2C.h>
+
+//#define I2C_ADDRESS 0x76
+
+//create a BMx280I2C object using the I2C interface with I2C Address 0x76
+BMx280I2C bmx280(0x76);
+
+#endif //c_BMP280
+
+
+
 #if c_CPUTEMP == 1
   extern "C" {      
     uint8_t temprature_sens_read(); 
   }
 #endif //c_CPUTEMP
+
+
+
+
 
 #include <tasks.h>
 #include <httpserv.h>
