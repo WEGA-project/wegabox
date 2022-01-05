@@ -460,10 +460,6 @@ void TaskAM2320(void *parameters)
       if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )
       {
 
-
-    
-    //  AirTemp=bmp.readTemperature();
-    //  AirPress=bmp.readPressure()*0.00750062;
       if (!bmx280.measure())
         {
           Serial.println("could not start measurement, is a measurement already running?");
@@ -476,20 +472,12 @@ void TaskAM2320(void *parameters)
           delay(100);
         } while (!bmx280.hasValue());
 
-        //Serial.print("Pressure: "); Serial.println(bmx280.getPressure());
-        //Serial.print("Pressure (64 bit): "); Serial.println(bmx280.getPressure64());
-        //Serial.print("Temperature: "); Serial.println(bmx280.getTemperature());
-        AirTemp=bmx280.getTemperature();        
-        AirPress=bmx280.getPressure64()*0.00750062;
+        AirTemp=AirTempMediana.filtered(bmx280.getTemperature());        
+        AirPress=AirPressMediana.filtered(bmx280.getPressure64()*0.00750063755419211);
 
-
-        //important: measurement data is read from the sensor in function hasValue() only. 
-        //make sure to call get*() functions only after hasValue() has returned true. 
-        if (bmx280.isBME280())
+        if (bmx280.isBME280()) // Если датчик BME280 еще и влажность определить
         {
-          //Serial.print("Humidity: "); 
-          //Serial.println(bmx280.getHumidity());
-          AirHum=bmx280.getHumidity();
+          AirHum=AirHumMediana.filtered( bmx280.getHumidity() );
         }
 
         xSemaphoreGive( xI2CSemaphore );      }
