@@ -260,28 +260,30 @@ void TaskAHT10(void *parameters)
       vTaskDelete(NULL);
     else
     {
-      readStatus = myAHT10.readRawData();
-      if (readStatus != AHT10_ERROR)
+      if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
       {
-        float AirTemp0 = myAHT10.readTemperature();
-        float AirHum0 = myAHT10.readHumidity();
-        if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
+        readStatus = myAHT10.readRawData();
+        if (readStatus != AHT10_ERROR)
         {
-          AirTemp = AirTempMediana.filtered(AirTemp0);
-          AirHum = AirHumMediana.filtered(AirHum0);
-          vTaskDelay(2000 / portTICK_PERIOD_MS);
+          float AirTemp0 = myAHT10.readTemperature();
+          float AirHum0 = myAHT10.readHumidity();
+          if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
+          {
+            AirTemp = AirTempMediana.filtered(AirTemp0);
+            AirHum = AirHumMediana.filtered(AirHum0);
+          }
         }
+        else
+        {
+          myAHT10.softReset();
+          vTaskDelay(200 / portTICK_PERIOD_MS);
+          myAHT10.begin();
+          myAHT10.setNormalMode();
+          //myAHT10.setCycleMode();
+        }
+        xSemaphoreGive(xI2CSemaphore);
       }
-      else
-      {
-        myAHT10.softReset();
-        vTaskDelay(200 / portTICK_PERIOD_MS);
-        myAHT10.begin();
-        myAHT10.setNormalMode();
-        //myAHT10.setCycleMode();
-        
-      }
-      vTaskDelay(10 / portTICK_PERIOD_MS);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
   }
 }
@@ -290,70 +292,56 @@ void TaskAHT10(void *parameters)
 #if c_CCS811 == 1
 void TaskCCS811(void *parameters)
 {
-  for(;;){
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+  for (;;)
+  {
+    if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
+    {
       // Read
-    ccs811.set_envdata_Celsius_percRH(AirTemp,AirHum);
-    uint16_t eco2, etvoc, errstat, raw;
-    ccs811.read(&eco2,&etvoc,&errstat,&raw); 
-    
-    // Print measurement results based on status
-    if( errstat==CCS811_ERRSTAT_OK ) { 
-      CO2=eco2;
-      tVOC=etvoc;
-      eRAW=raw;
+      ccs811.set_envdata_Celsius_percRH(AirTemp, AirHum);
+      uint16_t eco2, etvoc, errstat, raw;
+      ccs811.read(&eco2, &etvoc, &errstat, &raw);
+
+      // Print measurement results based on status
+      if (errstat == CCS811_ERRSTAT_OK)
+      {
+        CO2 = eco2;
+        tVOC = etvoc;
+        eRAW = raw;
+      }
+      
+      xSemaphoreGive(xI2CSemaphore);
     }
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
-} 
-  #endif
+}
+#endif
 
 #if c_MCP3421 == 1
 void TaskMCP3421(void *parameters)
 {
-
-    //uint8_t err;
-    
-    long adcvalue;
-
+  long adcvalue;
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
     else
     {
-      //
-      //long pht = millis();
-
-      
-MCP342x::Config status;
-      
-      //long pHraw0=0;
-      // long i=0;
-      // long pH_MiddleCount=50;
-     // while (i < pH_MiddleCount and OtaStart != true){
-         
-        //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, adcvalue, status);  
-         //uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, value, status);
-          // while (adc.convertAndRead(MCP342x::channel1, MCP342x::continous, MCP342x::resolution18, MCP342x::gain4, 500000, adcvalue, status))
-          //  vTaskDelay(5 / portTICK_PERIOD_MS);
-          // pHraw0 = adcvalue;
-        //  if (!err) { pHraw0 = adcvalue + pHraw0;
-        //  i++;}
-         
-         //vTaskDelay(1 / portTICK_PERIOD_MS);
-    //  }
-   //   pHraw=pHraw0/pH_MiddleCount;
+      if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
+      {
+        MCP342x::Config status;
         long phvalue;
         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
-      if (!err){
-        pHraw= phvalue ;
-      pHmV =  PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4) ;
+        if (!err)
+        {
+          pHraw = phvalue;
+          pHmV = PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4);
+        }
+        xSemaphoreGive(xI2CSemaphore);
+      }
+    vTaskDelay(2000 / portTICK_PERIOD_MS);  
     }
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
-}
-
 #endif // c_MCP3421
 
 #if c_DS18B20 == 1
@@ -386,7 +374,7 @@ void TaskDS18B20(void *parameters)
   void TaskADS1115(void * parameters) {
     for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      
             if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
 
       adc.setCompareChannels(ADS1115_COMP_0_3);
@@ -402,6 +390,7 @@ void TaskDS18B20(void *parameters)
       //pHmV=PhMediana.filtered(adc.getResult_mV());
       xSemaphoreGive( xI2CSemaphore );      }
     }
+  vTaskDelay(5000 / portTICK_PERIOD_MS);  
   }
 }
 #endif // c_ADS1115
@@ -452,37 +441,44 @@ void TaskAM2320(void *parameters)
 #endif //c_BME280
 
 #if c_BMP280 == 1
-  void TaskBMP280(void * parameters) {
-  for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{  
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-      if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )
+  void TaskBMP280(void *parameters)
+  {
+    for (;;)
+    {
+      if (OtaStart == true)
+      {
+        vTaskDelete(NULL);
+      }
+      else
       {
 
-      if (!bmx280.measure())
+        if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
         {
-          Serial.println("could not start measurement, is a measurement already running?");
-          return;
+
+          if (!bmx280.measure())
+          {
+            Serial.println("could not start measurement, is a measurement already running?");
+            return;
+          }
+
+          //wait for the measurement to finish
+          do
+          {
+            delay(100);
+          } while (!bmx280.hasValue());
+
+          AirTemp = AirTempMediana.filtered(bmx280.getTemperature());
+          AirPress = AirPressMediana.filtered(bmx280.getPressure64() * 0.00750063755419211);
+
+          if (bmx280.isBME280()) // Если датчик BME280 еще и влажность определить
+          {
+            AirHum = AirHumMediana.filtered(bmx280.getHumidity());
+          }
+
+          xSemaphoreGive(xI2CSemaphore);
         }
-
-        //wait for the measurement to finish
-        do
-        {
-          delay(100);
-        } while (!bmx280.hasValue());
-
-        AirTemp=AirTempMediana.filtered(bmx280.getTemperature());        
-        AirPress=AirPressMediana.filtered(bmx280.getPressure64()*0.00750063755419211);
-
-        if (bmx280.isBME280()) // Если датчик BME280 еще и влажность определить
-        {
-          AirHum=AirHumMediana.filtered( bmx280.getHumidity() );
-        }
-
-        xSemaphoreGive( xI2CSemaphore );      }
-     
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+      }
     }
-  }
   }
 #endif //c_BMP280
