@@ -24,15 +24,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: copy
     steps:
-      - name: Chekout
-        uses: actions/checkout@v2
-        with:
-          submodules: "recursive"
-      - name: Create pre.h file
-        uses: canastro/copy-file-action@master
-        with:
-          source: "src/pre.h.rename"
-          target: "src/pre.h"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
