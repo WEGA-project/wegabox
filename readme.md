@@ -86,6 +86,7 @@ Web Electronic Garden Automatic on ESP32.
  Здесь вы найдете лист компонентов, которые уже заказывались ни раз, но смотрите на цены, они иногда сильно меняются.
 
 [Лист компонентов](https://my.aliexpress.com/wishlist/shared.htm?groupId=1000000009461501)
+<a href="img/wish_list.png"><img src="img/wish_list.png" width="250"></a>
 
 ---
 ## Скачать проект WEGABOX <a name="wegabox_download"></a>
