@@ -6,6 +6,10 @@ jobs:
   copy_file:
     runs-on: ubuntu-latest
     steps:
+      - name: Chekout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
       - name: Create pre.h file
         uses: canastro/copy-file-action@master
         with:
@@ -19,10 +23,6 @@ jobs:
         python-version: [3.7]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Chekout
-        uses: actions/checkout@v2
-        with:
-          submodules: "recursive"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
