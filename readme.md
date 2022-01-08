@@ -12,7 +12,7 @@ Web Electronic Garden Automatic on ESP32.
 * [PCB плата WEGABOX](#pbc)
 * [Распиновка jack разъемов для датчиков](#jack)
 * [Компоненты для заказа](#what_to_buy)
-    * [Лист компонентов](#whish_list)
+    * [Лист компонентов](#wish_list)
 * [Скачать проект WEGABOX](#wegabox_download)
 * [Установка Visual Studio Code (vscode) и прошивка](#install)
 * [Где искать помощь](#help)
@@ -67,7 +67,7 @@ Web Electronic Garden Automatic on ESP32.
 
 <a href="img/2d_model.png"><img src="img/2d_model.png" width="250"></a><a href="img/3d_model.png"><img src="img/3d_model.png" width="250"></a>
 
-### Распиновка Jack для датчиков
+### Распиновка Jack для датчиков <a name="jack"></a>
 <a href="img/jack_connections.png"><img src="img/jack_connections.png" width="250"></a>
 
 ---
