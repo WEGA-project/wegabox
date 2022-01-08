@@ -3,13 +3,26 @@ name: Check build
 on: [push, pull_request]
 
 jobs:
+  copy:
+    steps:
+    runs-on: ubuntu-latest
+      - name: Chekout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Create pre.h file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "src/pre.h.rename"
+          target: "src/pre.h"
   build:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-18.04, ubuntu-20.04, windows-latest, macos-latest]
         python-version: [3.7]
     runs-on: ${{ matrix.os }}
+    needs: copy
     steps:
       - name: Chekout
         uses: actions/checkout@v2
