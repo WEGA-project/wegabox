@@ -86,6 +86,7 @@ Web Electronic Garden Automatic on ESP32.
  Здесь вы найдете лист компонентов, которые уже заказывались ни раз, но смотрите на цены, они иногда сильно меняются.
 
 [Лист компонентов](https://my.aliexpress.com/wishlist/shared.htm?groupId=1000000009461501)
+
 ---
 ## Скачать проект WEGABOX <a name="wegabox_download"></a>
 Скачать проект можно несколькими путями, самый просто это скачать архив текущего [репозитория](https://github.com/WEGA-project/wegabox/archive/refs/heads/main.zip) или со страницы [релизов](https://github.com/WEGA-project/wegabox/releases). Последний стабильный релиз можно найти [здесь](https://github.com/WEGA-project/WEGA-Mixer/releases).
