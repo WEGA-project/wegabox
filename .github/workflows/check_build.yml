@@ -11,9 +11,15 @@ jobs:
         python-version: [3.7]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Chekout
+        uses: actions/checkout@v2
         with:
           submodules: "recursive"
+      - name: Create pre.h file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "./pre.h.rename"
+          target: "./pre.h"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
