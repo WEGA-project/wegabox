@@ -25,23 +25,7 @@ void TaskPR(void *parameters)
     }
     else
     {
-      //unsigned long PR0=0;
-      //unsigned long prt=millis();
-
-      // for (long i = 0; i < PR_MiddleCount and OtaStart != true; i++)
-      // {
-        //PR0 = adc1_get_raw(PR_AnalogPort) + PR0;
           PR = PRMediana.filtered ( adc1_get_raw(PR_AnalogPort));
-
-        // if (millis() - prt > 1000)
-        // {
-        //   vTaskDelay(100 / portTICK_PERIOD_MS);
-        //   prt = millis();
-        // }
-
-      //}
-      //PR = PRMediana.filtered (PR0 / PR_MiddleCount);
-      //PR = float(PR0) / PR_MiddleCount;
       vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
   }
@@ -171,10 +155,9 @@ void TaskEC(void *parameters)
       enableCore0WDT();
       enableLoopWDT();
 
-      if (NTC) 
-        NTC =  (float(NTC0) / s + NTC )/2;
-      else 
-        NTC =  float(NTC0) / s;
+          NTCRM.add(NTC0/s);
+          NTC=NTCRM.getAverage();
+
       vTaskDelay(2000 / portTICK_PERIOD_MS);
 #endif // c_NTC
     }
@@ -191,37 +174,12 @@ void TaskUS(void *parameters)
 
     else
     {
-      // unsigned long  t_Dst0 = millis();
-      // unsigned long UScnt = 0;
-      // float dst0 = 0;
-
-      // for (long i = 0; millis() - t_Dst0 < 180000; i++)
-      // {
-        // float us=-1;
-        // while ( us == -1 ){
-        // float us = distanceSensor.measureDistanceCm(25);
-        // vTaskDelay(40 / portTICK_PERIOD_MS); 
-        // }
-
-        //Dist=DstMediana.filtered(us);
         float us = distanceSensor.measureDistanceCm(25);
         if (us > 1) Dist= DstMediana.filtered (us);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-        // if (us != -1)
-        // {
-        //   UScnt++;
-        //   dst0 = dst0 + us;
-        // }
-        
-       // vTaskDelay(4 / portTICK_PERIOD_MS);
-      //}
-     // Dist = dst0 / UScnt;
-      //vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
   }
 }
-
 #endif // c_US025
 
 #if c_hall == 1
@@ -304,14 +262,14 @@ void TaskCCS811(void *parameters)
       // Print measurement results based on status
       if (errstat == CCS811_ERRSTAT_OK)
       {
-        CO2 = eco2;
+        CO2 = CO2Mediana.filtered(eco2);
         tVOC = etvoc;
         eRAW = raw;
       }
       
       xSemaphoreGive(xI2CSemaphore);
     }
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
 #endif
@@ -333,8 +291,12 @@ void TaskMCP3421(void *parameters)
         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
         if (!err)
         {
+
+          //pHraw = phvalue;
+          //pHmV = PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4);
           pHraw = phvalue;
-          pHmV = PhMediana.filtered(4096 / pow(2, 18) * pHraw / 4);
+          PhRM.add(phvalue);
+          pHmV=(4096 / pow(2, 18) *PhRM.getMedian()/ 4);
         }
         xSemaphoreGive(xI2CSemaphore);
       }
@@ -386,8 +348,12 @@ void TaskDS18B20(void *parameters)
        cont++;
         sensorValue =  adc.getResult_mV()+sensorValue;
       }
-      pHmV=PhMediana.filtered(sensorValue/cont);
+      //pHmV=PhMediana.filtered(sensorValue/cont);
       //pHmV=PhMediana.filtered(adc.getResult_mV());
+      
+      PhRM.add(sensorValue/cont);
+      pHmV=PhRM.getAverage();
+      pHraw=adc.getRawResult();
       xSemaphoreGive( xI2CSemaphore );      }
     }
   vTaskDelay(5000 / portTICK_PERIOD_MS);  
@@ -482,3 +448,45 @@ void TaskAM2320(void *parameters)
     }
   }
 #endif //c_BMP280
+
+#if c_HX710B == 1
+  void TaskHX710B(void *parameters)
+  {
+    for (;;)
+    {
+      if (OtaStart == true)
+      {
+        vTaskDelete(NULL);
+      }
+      else
+      {
+            uint32_t data_raw = 0;
+            if ( air_press.read(&data_raw, 1000UL) == HX710B_OK )
+            {
+              Serial.print(F("Data raw of ADC is : "));
+              Serial.println((unsigned long) data_raw);
+              //Dist=DstMediana.filtered(data_raw);
+              DstRM.add(data_raw);
+              Dist=DstRM.getMedian();
+              Serial.println(Dist);
+            }
+      
+       
+      //  unsigned long cont=0;
+      //  uint32_t data_raw = 0;
+      //  long Dist0=0;
+      //  while ( cont < 100){
+      //    if ( air_press.read(&data_raw, 1000UL) == HX710B_OK ){
+      //  cont++;
+      //  Dist0=data_raw+Dist0;
+      //  }
+      // }
+      // Dist=float(Dist0/cont);
+      // Serial.print(F("Data raw of ADC is : "));
+      // Serial.println(Dist);
+       }
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+  }
+
+#endif //c_HX710B

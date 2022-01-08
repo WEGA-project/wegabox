@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.4.050122"
+#define Firmware "beta-0.4.080122"
 
 
 #include <WiFi.h>
@@ -22,10 +22,11 @@ GMedian<30, float> AirTempMediana;
 GMedian<30, float> AirHumMediana;
 GMedian<30, float> AirPressMediana;
 GMedian<30, float> RootTempMediana;
-GMedian<180, float> NTCMediana;
+GMedian<10, float> NTCMediana;
 GMedian<90, float> PRMediana;
 GMedian<90, float> PhMediana;
 GMedian<60, float> DstMediana;
+GMedian<30, float> CO2Mediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
@@ -42,7 +43,10 @@ GMedian<254, long> AnMed;
 GMedian<254, long> NTCMed;
 
 
-
+#include <RunningMedian.h>
+RunningMedian DstRM = RunningMedian(60);
+RunningMedian PhRM = RunningMedian(90);
+RunningMedian NTCRM = RunningMedian(10);
 
 #include <pre.h>
 #include <func>
@@ -70,15 +74,13 @@ float EC_R1, EC_R2_p1, EC_R2_p2;
 
 
 
-TaskHandle_t TaskAHT10Handler;
-
-SemaphoreHandle_t xI2CSemaphore;
+//TaskHandle_t TaskAHT10Handler;
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
 #include <Wire.h>          // Шина I2C
 #define I2C_SDA 21         // SDA
 #define I2C_SCL 22         // SCL
-
+SemaphoreHandle_t xI2CSemaphore;
 
 #if c_DS18B20 == 1
   #include <OneWire.h>
@@ -192,7 +194,14 @@ BMx280I2C bmx280(0x76);
 #endif //c_CPUTEMP
 
 
+#if c_HX710B == 1
+  #include "HX710B.h"
+  #define SCK_PIN 14
+  #define SDI_PIN 13
 
+  HX710B air_press(SCK_PIN, SDI_PIN);
+  uint32_t time_update = 0;
+#endif //c_HX710B
 
 
 #include <tasks.h>
