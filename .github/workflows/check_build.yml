@@ -5,11 +5,12 @@ on: [push, pull_request]
 jobs:
   copy_file:
     runs-on: ubuntu-latest
-    - name: Create pre.h file
-      uses: canastro/copy-file-action@master
-      with:
-        source: "src/pre.h.rename"
-        target: "src/pre.h"
+    steps:
+      - name: Create pre.h file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "src/pre.h.rename"
+          target: "src/pre.h"
   build:
     strategy:
       fail-fast: false
