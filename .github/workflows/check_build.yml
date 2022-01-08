@@ -4,8 +4,8 @@ on: [push, pull_request]
 
 jobs:
   copy:
-    steps:
     runs-on: ubuntu-latest
+    steps:
       - name: Chekout
         uses: actions/checkout@v2
         with:
