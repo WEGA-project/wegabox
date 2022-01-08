@@ -18,8 +18,8 @@ jobs:
       - name: Create pre.h file
         uses: canastro/copy-file-action@master
         with:
-          source: "./pre.h.rename"
-          target: "./pre.h"
+          source: "src/pre.h.rename"
+          target: "src/pre.h"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
