@@ -3,6 +3,13 @@ name: Check build
 on: [push, pull_request]
 
 jobs:
+  copy_file:
+    runs-on: ubuntu-latest
+    - name: Create pre.h file
+      uses: canastro/copy-file-action@master
+      with:
+        source: "src/pre.h.rename"
+        target: "src/pre.h"
   build:
     strategy:
       fail-fast: false
@@ -15,11 +22,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: "recursive"
-      - name: Create pre.h file
-        uses: canastro/copy-file-action@master
-        with:
-          source: "src/pre.h.rename"
-          target: "src/pre.h"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
