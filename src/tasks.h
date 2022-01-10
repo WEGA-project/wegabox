@@ -46,9 +46,10 @@ void TaskEC(void *parameters)
     {
 
 #if c_EC == 1
+
       long s;
       unsigned long t_EC0;
-
+if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
       //pinMode(EC_AnalogPort, INPUT);
       unsigned long An0 = 0;
       unsigned long Ap0 = 0;
@@ -131,7 +132,8 @@ void TaskEC(void *parameters)
       if (Mid_An0 > 0)
         An = Mid_An0;
 
-      
+  xSemaphoreGive(xI2CSemaphore);}
+  vTaskDelay(5000 / portTICK_PERIOD_MS);    
 
 #endif // c_EC
 
