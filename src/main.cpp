@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.4.080122"
+#define Firmware "beta-0.4.100122"
 
 
 #include <WiFi.h>
@@ -80,6 +80,8 @@ float EC_R1, EC_R2_p1, EC_R2_p2;
 #include <Wire.h>          // Шина I2C
 #define I2C_SDA 21         // SDA
 #define I2C_SCL 22         // SCL
+#include "I2CScanner.h"
+
 SemaphoreHandle_t xI2CSemaphore;
 
 #if c_DS18B20 == 1
@@ -203,6 +205,15 @@ BMx280I2C bmx280(0x76);
   uint32_t time_update = 0;
 #endif //c_HX710B
 
+#if c_MCP23017 == 1
+  #define PWD1 16
+  #define PWD2 17
+  #define DRV1_A 0
+  #define DRV1_B 1
+  #define DRV1_C 2
+  #define DRV1_D 3
+
+#endif // c_MCP23017
 
 #include <tasks.h>
 #include <httpserv.h>
