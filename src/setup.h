@@ -80,8 +80,15 @@ void setup() {
 
   ArduinoOTA.begin();
   while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
-  
-  
+
+// Сканирование устройств на шине i2c  
+     I2CScanner scanner;
+     scanner.Init();
+     scanner.Scan();
+
+
+
+
   MDNS.begin( HOSTNAME );
   MDNS.addService("http", "tcp", 80);
   server.on("/",handleRoot);
@@ -273,7 +280,16 @@ xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,NULL);
 xTaskCreate(TaskBME280,"BME280",10000,NULL,0,NULL);
 #endif // c_BME280
 
+#if c_MCP23017 == 1
+// задаём свойства ШИМ-сигнала
+const int freq = 5000;
+const int ledChannel = 0;
+const int resolution = 8;
+ledcSetup(ledChannel, 150000, resolution);
+ledcAttachPin(PWD1, ledChannel);
 
+xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
+#endif // c_MCP23017
 
 
 }
