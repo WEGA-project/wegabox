@@ -133,7 +133,7 @@ if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
         An = Mid_An0;
 
   xSemaphoreGive(xI2CSemaphore);}
-  vTaskDelay(5000 / portTICK_PERIOD_MS);    
+  vTaskDelay(1000 / portTICK_PERIOD_MS);    
 
 #endif // c_EC
 
@@ -160,7 +160,7 @@ if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
           NTCRM.add(NTC0/s);
           NTC=NTCRM.getAverage();
 
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
 #endif // c_NTC
     }
   }
@@ -330,14 +330,15 @@ void TaskDS18B20(void *parameters)
     {
       //vTaskDelay(2000 / portTICK_PERIOD_MS);
       //sens18b20.begin();
-      
+    if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {  
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
       if (ds0 != -127 and ds0 != 85)        {
         RootTemp = RootTempMediana.filtered(ds0);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
       } else sens18b20.begin();
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+      xSemaphoreGive(xI2CSemaphore);}
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
   }
 }
@@ -352,7 +353,7 @@ void TaskDS18B20(void *parameters)
       //adc.reset();   
       //delay(100);
         adc.init();
-        delay(500);
+        vTaskDelay(500 / portTICK_PERIOD_MS); 
       
       //adc.setConvRate(ADS1115_16_SPS);
       //adc.setVoltageRange_mV(ADS1115_RANGE_4096);
@@ -375,7 +376,7 @@ void TaskDS18B20(void *parameters)
       pHraw=adc.getRawResult();
       xSemaphoreGive( xI2CSemaphore );      }
     }
-  vTaskDelay(5000 / portTICK_PERIOD_MS);  
+  vTaskDelay(1000 / portTICK_PERIOD_MS);  
   }
 }
 #endif // c_ADS1115
