@@ -27,7 +27,7 @@ void setup() {
   #endif // c_NTC  
 
   Serial.begin(9600);
-  Wire.begin(I2C_SDA, I2C_SCL);
+  
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -79,9 +79,12 @@ void setup() {
 
 
   ArduinoOTA.begin();
+  
   while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
 
 // Сканирование устройств на шине i2c  
+    Wire.begin(I2C_SDA, I2C_SCL);
+
      I2CScanner scanner;
      scanner.Init();
      scanner.Scan();
@@ -152,12 +155,12 @@ ccs811.start(CCS811_MODE_1SEC);
 
 #endif
 
-#if c_ADS1115 == 1
-  Wire.begin(I2C_SDA, I2C_SCL);
+#if c_ADS1115 == 1  
+  //adc.reset();
   adc.init();
-  adc.setConvRate(ADS1115_16_SPS);
-  adc.setVoltageRange_mV(ADS1115_RANGE_4096);
-  adc.setMeasureMode(ADS1115_CONTINUOUS);
+  //adc.setConvRate(ADS1115_16_SPS);
+  //adc.setVoltageRange_mV(ADS1115_RANGE_4096);
+  //adc.setMeasureMode(ADS1115_CONTINUOUS);
 #endif // c_ADS1115
 
 #if c_MCP23017 == 1

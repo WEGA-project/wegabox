@@ -25,9 +25,11 @@ void TaskPR(void *parameters)
     }
     else
     {
-          PR = PRMediana.filtered ( adc1_get_raw(PR_AnalogPort));
+          PRRM.add ( adc1_get_raw(PR_AnalogPort));
+          PR = PRRM.getMedian();
       vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    
   }
 }
 #endif //  c_PR
@@ -179,8 +181,9 @@ void TaskUS(void *parameters)
         float us = distanceSensor.measureDistanceCm(25);
         
         if (us > 1) {
-        Dist= DstMediana.filtered (us);
+        DstRM.add (us);
         Serial.println(us);
+        Dist= DstRM.getMedian();
         }
         else  {
           Serial.print("US-025 Error us=");
@@ -198,7 +201,9 @@ void TaskHall(void * parameters) {
   for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
 
-    hall=HallGAB.filtered( hallRead() );
+    //hall=HallGAB.filtered( hallRead() );
+    HallRM.add(hallRead());
+    hall=HallRM.getMedian();
     vTaskDelay(300 / portTICK_PERIOD_MS);
   }
 }
@@ -210,9 +215,9 @@ void TaskCPUtemp(void * parameters) {
   for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
     
-     int CPUTemp0 = temprature_sens_read();
-     
-     CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
+     CpuTempRM.add( (temprature_sens_read()- 32)/1.8);
+     CPUTemp=CpuTempRM.getMedian();
+     //CPUTemp=CpuTempKalman.filtered( ( CPUTemp0 - 32 )/1.8 );
     vTaskDelay(100 / portTICK_PERIOD_MS);
     
   }
@@ -238,9 +243,16 @@ void TaskAHT10(void *parameters)
           float AirHum0 = myAHT10.readHumidity();
           if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
           {
-            AirTemp = AirTempMediana.filtered(AirTemp0);
-            AirHum = AirHumMediana.filtered(AirHum0);
+            //AirTemp = AirTempMediana.filtered(AirTemp0);
+            AirTempRM.add(AirTemp0);
+            AirTemp = AirTempRM.getMedian();
+            //AirHum = AirHumMediana.filtered(AirHum0);
+            AirHumRM.add(AirHum0);
+            AirHum = AirHumRM.getMedian();
           }
+          
+          
+
         }
         else
         {
@@ -273,7 +285,7 @@ void TaskCCS811(void *parameters)
       // Print measurement results based on status
       if (errstat == CCS811_ERRSTAT_OK)
       {
-        CO2 = CO2Mediana.filtered(eco2);
+        CO2 = eco2;
         tVOC = etvoc;
         eRAW = raw;
       }
@@ -336,7 +348,7 @@ void TaskDS18B20(void *parameters)
       if (ds0 != -127 and ds0 != 85)        {
         RootTempRM.add(ds0);
         //RootTemp = RootTempMediana.filtered(ds0);
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        //vTaskDelay(2000 / portTICK_PERIOD_MS);
       } else sens18b20.begin();
       xSemaphoreGive(xI2CSemaphore);}
       RootTemp = RootTempRM.getMedian();
@@ -355,8 +367,8 @@ void TaskDS18B20(void *parameters)
             
       //adc.reset();   
       //delay(100);
-        adc.init();
-        delay(100);
+      //  adc.init();
+      //  delay(100);
         //while (adc.isBusy());
 
   
@@ -365,10 +377,10 @@ void TaskDS18B20(void *parameters)
       adc.setMeasureMode(ADS1115_CONTINUOUS); 
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
-      adc.setConvRate(ADS1115_860_SPS);
+      adc.setConvRate(ADS1115_8_SPS);
       
 if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
-      delay (10000); 
+      vTaskDelay(2000 / portTICK_PERIOD_MS);   
       pHraw=adc.getRawResult();
 
       long cont=0;
@@ -410,8 +422,8 @@ void TaskAM2320(void *parameters)
         switch (status)
         {
         case AM232X_OK:
-          AirHum = AirHumMediana.filtered(AM2320.getHumidity());
-          AirTemp = AirTempMediana.filtered(AM2320.getTemperature());
+          AirHum = AM2320.getHumidity();
+          AirTemp = AM2320.getTemperature();
           break;
         default:
           Serial.println(status);
@@ -463,12 +475,12 @@ void TaskAM2320(void *parameters)
             delay(100);
           } while (!bmx280.hasValue());
 
-          AirTemp = AirTempMediana.filtered(bmx280.getTemperature());
-          AirPress = AirPressMediana.filtered(bmx280.getPressure64() * 0.00750063755419211);
+          AirTemp = bmx280.getTemperature();
+          AirPress = bmx280.getPressure64() * 0.00750063755419211;
 
           if (bmx280.isBME280()) // Если датчик BME280 еще и влажность определить
           {
-            AirHum = AirHumMediana.filtered(bmx280.getHumidity());
+            AirHum = bmx280.getHumidity();
           }
 
           xSemaphoreGive(xI2CSemaphore);

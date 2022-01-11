@@ -15,20 +15,20 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include "GyverFilters.h"
+//#include "GyverFilters.h"
 
 
-GMedian<30, float> AirTempMediana;  
-GMedian<30, float> AirHumMediana;
-GMedian<30, float> AirPressMediana;
+// GMedian<30, float> AirTempMediana;  
+// GMedian<30, float> AirHumMediana;
+// GMedian<30, float> AirPressMediana;
 
-GMedian<90, float> PRMediana;
-GMedian<60, float> DstMediana;
-GMedian<30, float> CO2Mediana;
+//GMedian<90, float> PRMediana;
+//GMedian<60, float> DstMediana;
+//GMedian<30, float> CO2Mediana;
 
-GKalman CpuTempKalman(1, 0.0001);
+//GKalman CpuTempKalman(1, 0.0001);
 
-GABfilter HallGAB(0.001, 1, 1);
+//GABfilter HallGAB(0.001, 1, 1);
 
 
 
@@ -37,6 +37,16 @@ RunningMedian DstRM = RunningMedian(60);
 RunningMedian PhRM = RunningMedian(90);
 RunningMedian NTCRM = RunningMedian(10);
 RunningMedian RootTempRM = RunningMedian(10);
+
+RunningMedian AirTempRM = RunningMedian(30);
+RunningMedian AirHumRM = RunningMedian(30);
+RunningMedian AirPressRM = RunningMedian(30);
+
+RunningMedian PRRM = RunningMedian(30);
+
+RunningMedian HallRM = RunningMedian(10);
+RunningMedian CpuTempRM = RunningMedian(10);
+
 
 #include <pre.h>
 #include <func>
@@ -112,7 +122,7 @@ SemaphoreHandle_t xI2CSemaphore;
   #include<ADS1115_WE.h> 
   #define I2C_ADDRESS 0x48
   ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
-  #define ADS1115_MiddleCount 5000
+  #define ADS1115_MiddleCount 250
 #endif
 
 #if c_NTC == 1
