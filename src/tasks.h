@@ -131,7 +131,7 @@ if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
         Ap = Mid_Ap0;
       if (Mid_An0 > 0)
         An = Mid_An0;
-
+  delay (5000);
   xSemaphoreGive(xI2CSemaphore);}
   vTaskDelay(1000 / portTICK_PERIOD_MS);    
 
@@ -352,11 +352,15 @@ void TaskDS18B20(void *parameters)
     for(;;){
     if (OtaStart == true) {vTaskDelete( NULL );}else{
       
-            if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
+            
       //adc.reset();   
       //delay(100);
         adc.init();
-        vTaskDelay(500 / portTICK_PERIOD_MS); 
+        delay(100);
+        //while (adc.isBusy());
+
+if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {      
+        //vTaskDelay(500 / portTICK_PERIOD_MS); 
       adc.setMeasureMode(ADS1115_CONTINUOUS); 
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
@@ -366,13 +370,16 @@ void TaskDS18B20(void *parameters)
       double sensorValue=0;
       while ( cont < ADS1115_MiddleCount and OtaStart != true){
        cont++;
+       
         sensorValue =  adc.getResult_mV()+sensorValue;
       }
       
       PhRM.add(sensorValue/cont);
       pHmV=PhRM.getMedian();
       pHraw=adc.getRawResult();
+   
       xSemaphoreGive( xI2CSemaphore );      }
+      
     }
   vTaskDelay(1000 / portTICK_PERIOD_MS);  
   }
