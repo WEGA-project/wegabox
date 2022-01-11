@@ -21,26 +21,15 @@ WebServer server(80);
 GMedian<30, float> AirTempMediana;  
 GMedian<30, float> AirHumMediana;
 GMedian<30, float> AirPressMediana;
-//GMedian<30, float> RootTempMediana;
-//GMedian<10, float> NTCMediana;
+
 GMedian<90, float> PRMediana;
-//GMedian<90, float> PhMediana;
 GMedian<60, float> DstMediana;
 GMedian<30, float> CO2Mediana;
 
 GKalman CpuTempKalman(1, 0.0001);
 
-//GABfilter ApGAB(10, 1, 1);
-// GABfilter AnGAB(10, 1, 1);
-// GABfilter NTCGAB(10, 1, 1);
-// GABfilter PRGAB(1, 1, 1);
-// GABfilter DstGAB(1, 1, 1);
- GABfilter HallGAB(0.001, 1, 1);
-// GABfilter PhGAB(0.001, 150, 1);
+GABfilter HallGAB(0.001, 1, 1);
 
-//GMedian<254, long> ApMed;
-//GMedian<254, long> AnMed;
-//GMedian<254, long> NTCMed;
 
 
 #include <RunningMedian.h>

@@ -9,7 +9,7 @@ void TaskWegaApi(void * parameters){
     httpstr +=  "?db=" + wegadb;
     httpstr +=  "&auth=" + wegaauth;
     httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
-    if(RootTemp) httpstr +=  "&" + db_RootTemp + "=" +fFTS(RootTemp,3);
+    if(RootTemp and !isnan(RootTemp) and isinf(RootTemp)) httpstr +=  "&" + db_RootTemp + "=" +fFTS(RootTemp,3);
     if(AirTemp) httpstr +=  "&" + db_AirTemp + "=" +fFTS(AirTemp, 3);
     if(AirHum) httpstr +=  "&" + db_AirHum + "=" +fFTS(AirHum, 3);
     if(hall) httpstr +=  "&" + db_hall + "=" +fFTS(hall, 3);
