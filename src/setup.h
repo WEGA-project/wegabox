@@ -272,7 +272,7 @@ xTaskCreate(TaskDS18B20,"TaskDS18B20",10000,NULL,0,NULL);
 #endif // c_DS18B20
 
 #if c_ADS1115 == 1
-xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,0,NULL);
+xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,2,NULL);
 #endif // c_ADS1115
 
 #if c_AM2320 == 1
