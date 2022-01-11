@@ -334,10 +334,13 @@ void TaskDS18B20(void *parameters)
       sens18b20.requestTemperatures();
       float ds0 = sens18b20.getTempCByIndex(0);
       if (ds0 != -127 and ds0 != 85)        {
-        RootTemp = RootTempMediana.filtered(ds0);
+        RootTempRM.add(ds0);
+        //RootTemp = RootTempMediana.filtered(ds0);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
       } else sens18b20.begin();
       xSemaphoreGive(xI2CSemaphore);}
+      RootTemp = RootTempRM.getMedian();
+      
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
   }
@@ -354,25 +357,20 @@ void TaskDS18B20(void *parameters)
       //delay(100);
         adc.init();
         vTaskDelay(500 / portTICK_PERIOD_MS); 
-      
-      //adc.setConvRate(ADS1115_16_SPS);
-      //adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setMeasureMode(ADS1115_CONTINUOUS); 
-      //    adc.setMeasureMode(ADS1115_SINGLE);
       adc.setCompareChannels(ADS1115_COMP_0_3);
       adc.setVoltageRange_mV(ADS1115_RANGE_4096);
       adc.setConvRate(ADS1115_860_SPS);
+
       long cont=0;
       double sensorValue=0;
-      while ( cont < ADS1115_MiddleCount){
+      while ( cont < ADS1115_MiddleCount and OtaStart != true){
        cont++;
         sensorValue =  adc.getResult_mV()+sensorValue;
       }
-      //pHmV=PhMediana.filtered(sensorValue/cont);
-      //pHmV=PhMediana.filtered(adc.getResult_mV());
       
       PhRM.add(sensorValue/cont);
-      pHmV=PhRM.getAverage();
+      pHmV=PhRM.getMedian();
       pHraw=adc.getRawResult();
       xSemaphoreGive( xI2CSemaphore );      }
     }
