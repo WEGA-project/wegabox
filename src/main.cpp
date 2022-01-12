@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.4.110122"
+#define Firmware "beta-0.4.120122"
 
 
 #include <WiFi.h>
@@ -15,21 +15,6 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-//#include "GyverFilters.h"
-
-
-// GMedian<30, float> AirTempMediana;  
-// GMedian<30, float> AirHumMediana;
-// GMedian<30, float> AirPressMediana;
-
-//GMedian<90, float> PRMediana;
-//GMedian<60, float> DstMediana;
-//GMedian<30, float> CO2Mediana;
-
-//GKalman CpuTempKalman(1, 0.0001);
-
-//GABfilter HallGAB(0.001, 1, 1);
-
 
 
 #include <RunningMedian.h>
@@ -84,20 +69,12 @@ float EC_R1, EC_R2_p1, EC_R2_p2;
 
 SemaphoreHandle_t xI2CSemaphore;
 
-#if c_DS18B20 == 1
-  #include <OneWire.h>
-  #include <DallasTemperature.h>
-  OneWire oneWire(ONE_WIRE_BUS);
-  DallasTemperature sens18b20(&oneWire);
-  String st_DS18B20;
-#endif
-
-#if c_AHT10 == 1
-  #include <AHT10.h>
-  uint8_t readStatus = 0;
-  AHT10 myAHT10(AHT10_ADDRESS_0X38);
-  String st_AHT10;
-#endif
+#include <dev/ds18b20/main.cpp>
+#include <dev/aht10/main.cpp>
+#include <dev/ads1115/main.cpp>
+#include <dev/ec/main.cpp>
+#include <dev/pr/main.cpp>
+#include <dev/us025/main.cpp>
 
 #if c_AM2320 == 1
   #include <AM232X.h>
@@ -118,43 +95,10 @@ SemaphoreHandle_t xI2CSemaphore;
   MCP342x adc = MCP342x(address);
 #endif
 
-#if c_ADS1115 == 1
-  #include<ADS1115_WE.h> 
-  #define I2C_ADDRESS 0x48
-  ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
-  #define ADS1115_MiddleCount 250
-#endif
-
-#if c_NTC == 1
- #define NTC_port ADC1_CHANNEL_4 // gpio32
- #define NTC_MiddleCount 900000
-#endif
-
-#if c_EC == 1
-  #define EC_DigitalPort1 18
-  #define EC_DigitalPort2 19
-  #define EC_AnalogPort ADC1_CHANNEL_5 // gpio33
-  #define EC_MiddleCount 500000  // 12000 в секунду
-#endif
-
-#if c_US025 == 1
-  #define US_ECHO 13
-  #define US_TRIG 14
-  #include <HCSR04.h>
-  UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
-  #define US_MiddleCount 6000
-
-#endif // c_US025
-
 #if c_MCP23017 == 1
   #include <Adafruit_MCP23X17.h>
   Adafruit_MCP23X17 mcp;
 #endif // c_MCP23017
-
-#if c_PR == 1
- #define PR_AnalogPort ADC1_CHANNEL_7 // gpio35
- #define PR_MiddleCount 10000
-#endif // c_PR
 
 #if c_BME280 == 1
 #include <Adafruit_Sensor.h>

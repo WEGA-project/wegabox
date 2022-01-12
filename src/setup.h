@@ -52,6 +52,7 @@ void setup() {
         pinMode(NTC_port, INPUT);
       #endif // c_NTC  
 
+      
     
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
@@ -100,19 +101,12 @@ void setup() {
   server.begin();
 
 
-
-#if c_DS18B20 == 1
-    sens18b20.begin();
-    sens18b20.setResolution(12);
-#endif
-
-#if c_AHT10 == 1
-  myAHT10.softReset();
-  delay(50);
-  myAHT10.begin();
-  myAHT10.setNormalMode();
-  //myAHT10.setCycleMode();
-#endif
+#include <dev/ds18b20/setup.h>
+#include <dev/aht10/setup.h>
+#include <dev/ads1115/setup.h>
+#include <dev/ec/setup.h>
+#include <dev/pr/setup.h>
+#include <dev/us025/setup.h>
 
 #if c_AM2320 == 1
   if (! AM2320.begin() )
@@ -155,13 +149,7 @@ ccs811.start(CCS811_MODE_1SEC);
 
 #endif
 
-#if c_ADS1115 == 1  
-  //adc.reset();
-  adc.init();
-  //adc.setConvRate(ADS1115_16_SPS);
-  //adc.setVoltageRange_mV(ADS1115_RANGE_4096);
-  //adc.setMeasureMode(ADS1115_CONTINUOUS);
-#endif // c_ADS1115
+
 
 #if c_MCP23017 == 1
   if (!mcp.begin_I2C()) {
@@ -212,24 +200,14 @@ xTaskCreate(TaskHX710B,"HX710B",10000,NULL,0,NULL);
 #endif //c_HX710B
 
 
-//xTaskCreate(TaskECclean,"TaskECclean",10000,NULL,3,NULL);
 
-xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,2,NULL);
+xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,0,NULL);
+xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);
 
-
-xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,NULL);
-
-// rtc_wdt_protect_off();
-// rtc_wdt_disable();
-// disableCore0WDT();
-// disableCore1WDT();
-// disableLoopWDT();
 
 
 #if c_EC == 1
-//xTaskCreatePinnedToCore(TaskEC,"TaskEC",10000,NULL,3,NULL,0);
-//mutex_v = xSemaphoreCreateMutex();
-xTaskCreate(TaskEC,"TaskEC",10000,NULL,3,NULL);
+xTaskCreate(TaskEC,"TaskEC",10000,NULL,2,NULL);
 #endif
 
 #if c_NTC == 1
@@ -255,9 +233,6 @@ xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
 #endif // c_CPUTEMP
 
 
-#if c_AHT10 == 1
-xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
-#endif // c_TaskAHT10
 
 #if c_MCP3421 == 1
 xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,0,NULL);
@@ -267,12 +242,9 @@ xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,0,NULL);
 xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,NULL);
 #endif // c_CCS811
 
-#if c_DS18B20 == 1
-xTaskCreate(TaskDS18B20,"TaskDS18B20",10000,NULL,0,NULL);
-#endif // c_DS18B20
 
 #if c_ADS1115 == 1
-xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,2,NULL);
+xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,0,NULL);
 #endif // c_ADS1115
 
 #if c_AM2320 == 1
@@ -294,5 +266,10 @@ ledcAttachPin(PWD1, ledChannel);
 xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
 #endif // c_MCP23017
 
+#if c_AHT10 == 1
+xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
+#endif // c_TaskAHT10
+
 
 }
+

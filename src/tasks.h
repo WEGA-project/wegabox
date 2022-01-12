@@ -8,194 +8,6 @@ void TaskOTA(void * parameters){
   }
 }
 
-// Измерение фоторезистора
-#if c_PR == 1
-void TaskPR(void *parameters)
-{
-  pinMode(PR_AnalogPort, INPUT);
-  
-  adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(PR_AnalogPort, ADC_ATTEN_DB_11);
-
-  for (;;)
-  {
-    if (OtaStart == true)
-    {
-      vTaskDelete(NULL);
-    }
-    else
-    {
-          PRRM.add ( adc1_get_raw(PR_AnalogPort));
-          PR = PRRM.getMedian();
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    
-  }
-}
-#endif //  c_PR
-
-// Измерение ЕС и NTC
-void TaskEC(void *parameters)
-{
-  for (;;)
-  {
-
-    if (OtaStart == true)
-    {
-      vTaskDelete(NULL);
-    }
-    else
-    {
-
-#if c_EC == 1
-
-      long s;
-      unsigned long t_EC0;
-if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
-      //pinMode(EC_AnalogPort, INPUT);
-      unsigned long An0 = 0;
-      unsigned long Ap0 = 0;
-
-      pinMode(EC_DigitalPort1, OUTPUT);
-      pinMode(EC_DigitalPort2, OUTPUT);
-      ECwork = true;
-
-      adc1_config_width(ADC_WIDTH_BIT_12);
-      adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11);
-
-      t_EC0 = micros();
-      digitalWrite(EC_DigitalPort1, LOW);
-      digitalWrite(EC_DigitalPort2, LOW);
-
-      // static portMUX_TYPE my_mutex = portMUX_INITIALIZER_UNLOCKED;
-      rtc_wdt_protect_off();
-      rtc_wdt_disable();
-      disableCore0WDT();
-      disableLoopWDT();
-      // vPortCPUInitializeMutex(&my_mutex);
-      long ect = millis();
-      for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
-      {
-
-        pinMode(EC_DigitalPort1, OUTPUT);
-        pinMode(EC_DigitalPort2, OUTPUT);
-        digitalWrite(EC_DigitalPort1, LOW);
-        digitalWrite(EC_DigitalPort2, LOW);
-
-        //portENTER_CRITICAL(&my_mutex);
-        digitalWrite(EC_DigitalPort1, HIGH);
-        Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
-        digitalWrite(EC_DigitalPort1, LOW);
-          delayMicroseconds(1);
-          
-        digitalWrite(EC_DigitalPort2, HIGH);
-          delayMicroseconds(1);
-        digitalWrite(EC_DigitalPort2, LOW);
-          //delayMicroseconds(1);
-
-        digitalWrite(EC_DigitalPort1, HIGH);
-          delayMicroseconds(1);
-        digitalWrite(EC_DigitalPort1, LOW);
-          //delayMicroseconds(1);
-
-        digitalWrite(EC_DigitalPort2, HIGH);
-        An0 = adc1_get_raw(EC_AnalogPort) + An0;
-        digitalWrite(EC_DigitalPort2, LOW);
-          //delayMicroseconds(1);
-
-        //portEXIT_CRITICAL(&my_mutex);
-
-        if (millis() - ect > 1000)
-        {
-          pinMode(EC_DigitalPort1, INPUT);
-          pinMode(EC_DigitalPort2, INPUT);
-          vTaskDelay(300 / portTICK_PERIOD_MS);
-          ect = millis();
-        }
-
-
-      }
-
-      t_EC = micros() - t_EC0;
-      pinMode(EC_DigitalPort1, INPUT);
-      pinMode(EC_DigitalPort2, INPUT);
-
-      //esp_task_wdt_reset();
-
-      float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
-      float Mid_An0 = float(An0) / EC_MiddleCount;
-
-
-      ECwork = false;
-      f_EC = EC_MiddleCount / (float(t_EC) / 1000000);
-
-      if (Mid_Ap0 < 4095)
-        Ap = Mid_Ap0;
-      if (Mid_An0 > 0)
-        An = Mid_An0;
-  
-  xSemaphoreGive(xI2CSemaphore);}
-  vTaskDelay(1000 / portTICK_PERIOD_MS);    
-
-#endif // c_EC
-
-// Измерение термистора
-#if c_NTC == 1
-      adc1_config_channel_atten(NTC_port, ADC_ATTEN_DB_11);
-      
-      unsigned long NTC0 = 0;
-      s = 0;
-      
-      while (s < NTC_MiddleCount and OtaStart != true)
-
-      {
-        
-        float adc_ntc=adc1_get_raw(NTC_port);
-        NTC0 = adc_ntc + NTC0;
-        s++;
-      }
-      rtc_wdt_protect_on();
-      rtc_wdt_enable();
-      enableCore0WDT();
-      enableLoopWDT();
-
-          NTCRM.add(NTC0/s);
-          NTC=NTCRM.getAverage();
-
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-#endif // c_NTC
-    }
-  }
-}
-
-#if c_US025 == 1
-void TaskUS(void *parameters)
-{
-  for (;;)
-  {
-    if (OtaStart == true)
-      vTaskDelete(NULL);
-
-    else
-    {
-        float us = distanceSensor.measureDistanceCm(25);
-        
-        if (us > 1) {
-        DstRM.add (us);
-        Serial.println(us);
-        Dist= DstRM.getMedian();
-        }
-        else  {
-          Serial.print("US-025 Error us=");
-          Serial.println(us);
-          }
-              
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-  }
-}
-#endif // c_US025
-
 #if c_hall == 1
 void TaskHall(void * parameters) {
   for(;;){
@@ -225,50 +37,7 @@ void TaskCPUtemp(void * parameters) {
 }
 #endif //c_CPUTEMP
 
-#if c_AHT10 == 1
-void TaskAHT10(void *parameters)
-{
-  for (;;)
-  {
-    if (OtaStart == true)
-      vTaskDelete(NULL);
-    else
-    {
-      if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
-      {
-        readStatus = myAHT10.readRawData();
-        if (readStatus != AHT10_ERROR)
-        {
-          float AirTemp0 = myAHT10.readTemperature();
-          float AirHum0 = myAHT10.readHumidity();
-          if (AirTemp0 != 255 and AirHum0 != 255 and AirTemp0 != -50)
-          {
-            //AirTemp = AirTempMediana.filtered(AirTemp0);
-            AirTempRM.add(AirTemp0);
-            AirTemp = AirTempRM.getMedian();
-            //AirHum = AirHumMediana.filtered(AirHum0);
-            AirHumRM.add(AirHum0);
-            AirHum = AirHumRM.getMedian();
-          }
-          
-          
 
-        }
-        else
-        {
-          myAHT10.softReset();
-          vTaskDelay(200 / portTICK_PERIOD_MS);
-          myAHT10.begin();
-          myAHT10.setNormalMode();
-          //myAHT10.setCycleMode();
-        }
-        xSemaphoreGive(xI2CSemaphore);
-      }
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
-  }
-}
-#endif // c_AHT10
 
 #if c_CCS811 == 1
 void TaskCCS811(void *parameters)
@@ -329,79 +98,8 @@ void TaskMCP3421(void *parameters)
 }
 #endif // c_MCP3421
 
-#if c_DS18B20 == 1
-void TaskDS18B20(void *parameters)
-{
-  for (;;)
-  {
-    if (OtaStart == true)
-    {
-      vTaskDelete(NULL);
-    }
-    else
-    {
-      //vTaskDelay(2000 / portTICK_PERIOD_MS);
-      //sens18b20.begin();
-    if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {  
-      sens18b20.requestTemperatures();
-      float ds0 = sens18b20.getTempCByIndex(0);
-      if (ds0 != -127 and ds0 != 85)        {
-        RootTempRM.add(ds0);
-        //RootTemp = RootTempMediana.filtered(ds0);
-        //vTaskDelay(2000 / portTICK_PERIOD_MS);
-      } else sens18b20.begin();
-      xSemaphoreGive(xI2CSemaphore);}
-      RootTemp = RootTempRM.getMedian();
-      
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-  }
-}
-#endif //c_DS18B20
 
-#if c_ADS1115 == 1
-  void TaskADS1115(void * parameters) {
-    for(;;){
-    if (OtaStart == true) {vTaskDelete( NULL );}else{
-        
-            
-      //adc.reset();   
-      //delay(100);
-      //  adc.init();
-      //  delay(100);
-        //while (adc.isBusy());
 
-  
-       
-        //vTaskDelay(500 / portTICK_PERIOD_MS); 
-      adc.setMeasureMode(ADS1115_CONTINUOUS); 
-      adc.setCompareChannels(ADS1115_COMP_0_3);
-      adc.setVoltageRange_mV(ADS1115_RANGE_4096);
-      adc.setConvRate(ADS1115_8_SPS);
-      
-if ( xSemaphoreTake( xI2CSemaphore, ( TickType_t ) 5 ) == pdTRUE )      {
-      vTaskDelay(2000 / portTICK_PERIOD_MS);   
-      pHraw=adc.getRawResult();
-
-      long cont=0;
-      double sensorValue=0;
-      while ( cont < ADS1115_MiddleCount and OtaStart != true){
-       cont++;
-       
-        sensorValue =  adc.getResult_mV()+sensorValue;
-      }
-      
-      PhRM.add(sensorValue/cont);
-      pHmV=PhRM.getMedian();
-      
-   
-      xSemaphoreGive( xI2CSemaphore );      }
-      
-    }
-  vTaskDelay(1000 / portTICK_PERIOD_MS);  
-  }
-}
-#endif // c_ADS1115
 
 #if c_AM2320 == 1
 void TaskAM2320(void *parameters)
@@ -621,3 +319,11 @@ void TaskAM2320(void *parameters)
   }
 
 #endif // c_MCP23017
+
+
+#include <dev/ds18b20/tasks.h>
+#include <dev/aht10/tasks.h>
+#include <dev/ads1115/tasks.h>
+#include <dev/ec/tasks.h>
+#include <dev/pr/tasks.h>
+#include <dev/us025/tasks.h>
