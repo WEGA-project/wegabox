@@ -5,5 +5,6 @@
   myAHT10.setNormalMode();
   //myAHT10.setCycleMode();
 
-//xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
+
+xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
 #endif // c_TaskAHT10

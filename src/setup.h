@@ -41,7 +41,9 @@ void setup() {
   ArduinoOTA
     .onStart([]() {
       OtaStart = true;
-      
+      for (uint8_t i = 0; i < appTaskCount; ++i) {
+        vTaskDelete(appTasks[i]);
+      }
       #if c_EC == 1
           pinMode(EC_DigitalPort1, INPUT);
           pinMode(EC_DigitalPort2, INPUT);
@@ -52,8 +54,6 @@ void setup() {
         pinMode(NTC_port, INPUT);
       #endif // c_NTC  
 
-      
-    
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
         type = "sketch";
@@ -90,9 +90,6 @@ void setup() {
      scanner.Init();
      scanner.Scan();
 
-
-
-
   MDNS.begin( HOSTNAME );
   MDNS.addService("http", "tcp", 80);
   server.on("/",handleRoot);
@@ -101,11 +98,13 @@ void setup() {
   server.begin();
 
 
+xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,0,NULL);
+xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,&appTasks[appTaskCount++]);
+
+xSemaphore = xSemaphoreCreateMutex();
+
 #include <dev/ds18b20/setup.h>
 #include <dev/aht10/setup.h>
-#include <dev/ads1115/setup.h>
-#include <dev/ec/setup.h>
-#include <dev/pr/setup.h>
 #include <dev/us025/setup.h>
 #include <dev/ccs811/setup.h>
 #include <dev/am2320/setup.h>
@@ -113,72 +112,18 @@ void setup() {
 #include <dev/bmp280/setup.h>
 #include <dev/mcp23017/setup.h>
 #include <dev/hx710b/setup.h>
-
-
-
-
-
-
-
-xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,0,NULL);
-xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,NULL);
-
-
-
-#if c_EC == 1
-xTaskCreate(TaskEC,"TaskEC",10000,NULL,2,NULL);
-#endif
-
-#if c_NTC == 1
-//xTaskCreate(TaskNTC,"TaskNTC",10000,NULL,1,NULL);
-#endif
-
-
-#if c_PR == 1
-xTaskCreate(TaskPR,"TaskPR",10000,NULL,0,NULL);
-#endif // c_PR
-
-
-#if c_US025 == 1
-xTaskCreate(TaskUS,"TaskUS",10000,NULL,0,NULL);
-#endif // c_PR
+#include <dev/ads1115/setup.h>
+#include <dev/pr/setup.h>
+#include <dev/ntc/setup.h>
+#include <dev/ec/setup.h>
 
 #if c_hall == 1
-xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);
+xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_hall
 
 #if c_CPUTEMP == 1
-xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
+xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_CPUTEMP
-
-
-
-#if c_MCP3421 == 1
-xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,0,NULL);
-#endif // c_MCP3421
-
-#if c_CCS811 == 1
-xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,NULL);
-#endif // c_CCS811
-
-
-#if c_ADS1115 == 1
-xTaskCreate(TaskADS1115,"ADS1115",10000,NULL,0,NULL);
-#endif // c_ADS1115
-
-#if c_AM2320 == 1
-xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,NULL);
-#endif // c_AM2320
-
-#if c_BME280 == 1
-xTaskCreate(TaskBME280,"BME280",10000,NULL,0,NULL);
-#endif // c_BME280
-
-
-
-#if c_AHT10 == 1
-xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
-#endif // c_TaskAHT10
 
 
 }

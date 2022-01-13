@@ -11,5 +11,5 @@ const int resolution = 8;
 ledcSetup(ledChannel, 150000, resolution);
 ledcAttachPin(PWD1, ledChannel);
 
-xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
+xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_MCP23017

@@ -18,4 +18,6 @@ if( !ok ) Serial.println("setup: CCS811 flash FAILED");
 //Serial.println("");
 }
 ccs811.start(CCS811_MODE_1SEC);
-#endif
+
+xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,&appTasks[appTaskCount++]);
+#endif // c_CCS811

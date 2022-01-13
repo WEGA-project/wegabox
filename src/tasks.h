@@ -53,7 +53,6 @@ void TaskCPUtemp(void *parameters)
 #include <dev/ds18b20/tasks.h>
 #include <dev/aht10/tasks.h>
 #include <dev/ads1115/tasks.h>
-#include <dev/ec/tasks.h>
 #include <dev/pr/tasks.h>
 #include <dev/us025/tasks.h>
 #include <dev/ccs811/tasks.h>
@@ -62,3 +61,5 @@ void TaskCPUtemp(void *parameters)
 #include <dev/bmp280/tasks.h>
 #include <dev/mcp23017/tasks.h>
 #include <dev/hx710b/tasks.h>
+#include <dev/ec/tasks.h>
+#include <dev/ntc/tasks.h>

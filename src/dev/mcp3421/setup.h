@@ -8,4 +8,5 @@
     Serial.println(address, HEX);     
   }
 
-#endif
+xTaskCreate(TaskMCP3421,"TaskMCP3421",10000,NULL,0,NULL);
+#endif // c_MCP3421

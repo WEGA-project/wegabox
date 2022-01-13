@@ -3,4 +3,6 @@
   {
     Serial.println("AM2320 Sensor not found");      
   }
-#endif
+
+xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,&appTasks[appTaskCount++]);
+#endif // c_AM2320

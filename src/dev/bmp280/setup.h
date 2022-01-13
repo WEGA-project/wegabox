@@ -23,5 +23,6 @@
       if (bmx280.isBME280())
         bmx280.writeOversamplingHumidity(BMx280MI::OSRS_H_x16);
 
-xTaskCreate(TaskBMP280,"BMP280",10000,NULL,0,NULL);  
-#endif //c_BMP280
+
+xTaskCreate(TaskBME280,"BME280",10000,NULL,0,&appTasks[appTaskCount++]);
+#endif // c_BME280
