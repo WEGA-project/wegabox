@@ -6,7 +6,7 @@ void setup() {
    if ( xI2CSemaphore == NULL )
    {
       // Создание мьютексного семафора, который мы будем использовать
-      // для обслуживания доступа к порту I2C:
+      // для обслуживания доступа к I2C:
       xI2CSemaphore = xSemaphoreCreateMutex();
       if ( ( xI2CSemaphore ) != NULL )
       {
@@ -107,97 +107,16 @@ void setup() {
 #include <dev/ec/setup.h>
 #include <dev/pr/setup.h>
 #include <dev/us025/setup.h>
-
-#if c_AM2320 == 1
-  if (! AM2320.begin() )
-  {
-    Serial.println("AM2320 Sensor not found");      
-  }
-#endif
-
-#if c_CCS811 == 1
-  // Enable CCS811
-ccs811.set_i2cdelay(50); 
-bool ok= ccs811.begin();
-  
-
-// Check if flashing should be executed
-if( ccs811.application_version()==0x2000 ) { Serial.println("init: already has 2.0.0");} else
-{
-// Flash
-//Serial.print("setup: starting flash of '");
-//Serial.print(image_name);
-//Serial.println("' in 5 seconds");
-delay(5000);
-//Serial.println("");
-ok= ccs811.flash(image_data, sizeof(image_data));
-if( !ok ) Serial.println("setup: CCS811 flash FAILED");
-//Serial.println("");
-}
-ccs811.start(CCS811_MODE_1SEC);
-#endif
-
-#if c_MCP3421 == 1
-  MCP342x::generalCallReset();
-  delay(1); // MC342x needs 300us to settle
-    // Check device present
-  Wire.requestFrom(address, (uint8_t)1);
-  if (!Wire.available()) {
-    Serial.print("No device found at address ");
-    Serial.println(address, HEX);     
-  }
-
-#endif
+#include <dev/ccs811/setup.h>
+#include <dev/am2320/setup.h>
+#include <dev/mcp3421/setup.h>
+#include <dev/bmp280/setup.h>
+#include <dev/mcp23017/setup.h>
+#include <dev/hx710b/setup.h>
 
 
 
-#if c_MCP23017 == 1
-  if (!mcp.begin_I2C()) {
-    Serial.println("Error.");
-    while (1);
-  }
-#endif // c_MCP23017
 
-#if c_BME280 == 1
-  bme.begin(0x76, &Wire);
-  //bme.begin();
-#endif //c_BME280
-
-#if c_BMP280 == 1
-    if (!bmx280.begin())
-      {
-        Serial.println("begin() failed. check your BMx280 Interface and I2C Address.");
-        while (1);
-      }
-
-      if (bmx280.isBME280())
-        Serial.println("sensor is a BME280");
-      else
-        Serial.println("sensor is a BMP280");
-
-      //reset sensor to default parameters.
-      bmx280.resetToDefaults();
-
-      //by default sensing is disabled and must be enabled by setting a non-zero
-      //oversampling setting.
-      //set an oversampling setting for pressure and temperature measurements. 
-      bmx280.writeOversamplingPressure(BMx280MI::OSRS_P_x16);
-      bmx280.writeOversamplingTemperature(BMx280MI::OSRS_T_x16);
-
-      //if sensor is a BME280, set an oversampling setting for humidity measurements.
-      if (bmx280.isBME280())
-        bmx280.writeOversamplingHumidity(BMx280MI::OSRS_H_x16);
-
-xTaskCreate(TaskBMP280,"BMP280",10000,NULL,0,NULL);  
-#endif //c_BMP280
-
-#if c_HX710B == 1
-  if ( !air_press.init() )
-  { 
-    Serial.println(F("HX710B not Found !"));    
-  }
-xTaskCreate(TaskHX710B,"HX710B",10000,NULL,0,NULL);
-#endif //c_HX710B
 
 
 
@@ -255,16 +174,7 @@ xTaskCreate(TaskAM2320,"AM2320",10000,NULL,0,NULL);
 xTaskCreate(TaskBME280,"BME280",10000,NULL,0,NULL);
 #endif // c_BME280
 
-#if c_MCP23017 == 1
-// задаём свойства ШИМ-сигнала
-const int freq = 5000;
-const int ledChannel = 0;
-const int resolution = 8;
-ledcSetup(ledChannel, 150000, resolution);
-ledcAttachPin(PWD1, ledChannel);
 
-xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
-#endif // c_MCP23017
 
 #if c_AHT10 == 1
 xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);

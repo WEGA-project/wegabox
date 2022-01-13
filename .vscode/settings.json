@@ -10,5 +10,6 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "cmath": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
