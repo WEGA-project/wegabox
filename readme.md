@@ -79,8 +79,14 @@ Web Electronic Garden Automatic on ESP32.
  1. Стабилизатор для питания контроллера [mini560 5V](https://aliexpress.ru/wholesale?&SearchText=mini560+step+down+5V)
  1. Терморезистор 100кОм для компенсации ЕС [NTC-MF52-100K](https://www.aliexpress.com/wholesale?&SearchText=Thermistor+Resistor+NTC-MF52-100K). [Пример позиции](https://aliexpress.ru/item/32865194243.html)
  1. Водонепроницаемый [ds18b20](https://www.aliexpress.com/wholesale?&SearchText=ds18b20+waterproof) датчик температуры корней. [Пример позиции](https://aliexpress.ru/item/32832225749.html)
- 1. Набор резисторов [Resistor Assorted Kit Set 10 -1M ](https://www.aliexpress.com/wholesale?&SearchText=Resistor+Assorted+Kit+Set+10+-1M+). [Пример позиции](https://www.aliexpress.com/item/1005002275520555.html)
- 1. Провода ...
+ 1. LM336Z-2.5 [Пример позиции](https://www.aliexpress.com/item/1005002504291644.html)
+ 2. ISO1540DR [Пример позиции](https://www.aliexpress.com/item/33051586046.html)
+ 3. MCP602-I/P [Пример позиции](https://www.aliexpress.com/item/4000014843256.html)
+ 4. B1205S-2W [Пример позиции](https://www.aliexpress.com/item/4000561945094.html)
+ 5. BNC разъем [Пример позиции](https://www.aliexpress.com/item/4000663983757.html)
+ 6. Блок питания 12В 2А [Пример позиции](https://www.aliexpress.com/item/32961533195.html)
+ 7. Набор резисторов [Resistor Assorted Kit Set 10 -1M ](https://www.aliexpress.com/wholesale?&SearchText=Resistor+Assorted+Kit+Set+10+-1M+). [Пример позиции](https://www.aliexpress.com/item/1005002275520555.html)
+ 8. Провода ...
 
  ### Лист проверенных компонентов для заказа <a name="wish_list"></a>
  Здесь вы найдете лист компонентов, которые уже заказывались ни раз, но смотрите на цены, они иногда сильно меняются.
