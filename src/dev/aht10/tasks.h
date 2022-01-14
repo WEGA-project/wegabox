@@ -2,7 +2,7 @@
 void TaskAHT10(void *parameters)
 {
   for (;;)
-  {
+  {if (OtaStart == true) vTaskDelete(NULL);
     if (xSemaphore != NULL)
     {
       if (xSemaphoreTake(xSemaphore, (TickType_t)5) == pdTRUE)

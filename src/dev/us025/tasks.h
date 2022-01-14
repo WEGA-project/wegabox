@@ -3,6 +3,8 @@ void TaskUS(void *parameters)
 {
   for (;;)
   {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
     if (xSemaphore != NULL)
     {
       if (xSemaphoreTake(xSemaphore, (TickType_t)10) == pdTRUE)

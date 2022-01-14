@@ -3,8 +3,8 @@
 void TaskNTC(void *parameters)
 {
   for (;;)
-  {
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+  {if (OtaStart == true) vTaskDelete(NULL);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     if (xSemaphore != NULL)
     {
       // rtc_wdt_protect_on();
@@ -17,7 +17,7 @@ void TaskNTC(void *parameters)
         
         long ntct = millis();
         unsigned long NTC0 = 0;
-        for (long i = 0; i < NTC_MiddleCount; i++)
+        for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++)
         {
           NTC0 = NTC0 + adc1_get_raw(NTC_port);
 
@@ -27,9 +27,9 @@ void TaskNTC(void *parameters)
             ntct = millis();
           }
         }
-        
-        NTC = float(NTC0) / NTC_MiddleCount;
-
+        NTCRM.add(float(NTC0)/NTC_MiddleCount);
+        //NTC = float(NTC0) / NTC_MiddleCount;
+        NTC = NTCRM.getMedian();
         xSemaphoreGive(xSemaphore);
       }
 

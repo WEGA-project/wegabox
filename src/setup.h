@@ -41,9 +41,9 @@ void setup() {
   ArduinoOTA
     .onStart([]() {
       OtaStart = true;
-      for (uint8_t i = 0; i < appTaskCount; ++i) {
-        vTaskDelete(appTasks[i]);
-      }
+      // for (uint8_t i = 0; i < appTaskCount; ++i) {
+      //   vTaskDelete(appTasks[i]);
+      // }
       #if c_EC == 1
           pinMode(EC_DigitalPort1, INPUT);
           pinMode(EC_DigitalPort2, INPUT);

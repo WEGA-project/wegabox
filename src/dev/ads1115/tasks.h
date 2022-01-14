@@ -2,7 +2,7 @@
 void TaskADS1115(void *parameters)
 {
   for (;;)
-  {
+  {if (OtaStart == true) vTaskDelete(NULL);
 
     if (xSemaphore != NULL)
     {
