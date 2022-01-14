@@ -6,7 +6,7 @@ void TaskADS1115(void *parameters)
 
     if (xSemaphore != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)10) == pdTRUE)
+      if (xSemaphoreTake(xSemaphore, (TickType_t)5) == pdTRUE)
       {
         //vTaskDelay(2000 / portTICK_PERIOD_MS);
         pHraw = adc.getRawResult();
@@ -25,7 +25,7 @@ void TaskADS1115(void *parameters)
         xSemaphoreGive(xSemaphore);
       }
     }
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
   }
 }
 #endif // c_ADS1115

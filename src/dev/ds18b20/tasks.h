@@ -5,7 +5,7 @@ void TaskDS18B20(void *parameters)
   {
     if (xSemaphore != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)10) == pdTRUE)
+      if (xSemaphoreTake(xSemaphore, (TickType_t)5) == pdTRUE)
       {
 
         //vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -26,7 +26,7 @@ void TaskDS18B20(void *parameters)
         xSemaphoreGive(xSemaphore);
       }
     }
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
 #endif //c_DS18B20

@@ -10,21 +10,21 @@ void TaskWegaApi(void * parameters){
     httpstr +=  "&auth=" + wegaauth;
     httpstr +=  "&uptime=" +fFTS(millis()/1000, 0);
     if(RootTemp and !isnan(RootTemp)) httpstr +=  "&" + db_RootTemp + "=" +fFTS(RootTemp,3);
-    if(AirTemp) httpstr +=  "&" + db_AirTemp + "=" +fFTS(AirTemp, 3);
-    if(AirHum) httpstr +=  "&" + db_AirHum + "=" +fFTS(AirHum, 3);
-    if(hall) httpstr +=  "&" + db_hall + "=" +fFTS(hall, 3);
-    if(pHmV) httpstr +=  "&" + db_pHmV + "=" +fFTS(pHmV, 4);
-    if(pHraw) httpstr +=  "&" + db_pHraw + "=" +fFTS(pHraw, 4);
-    if(CO2) httpstr +=  "&" + db_CO2 + "=" +fFTS(CO2, 0);
-    if(tVOC) httpstr +=  "&" + db_tVOC + "=" +fFTS(tVOC, 0);
+    if(AirTemp and !isnan(AirTemp)) httpstr +=  "&" + db_AirTemp + "=" +fFTS(AirTemp, 3);
+    if(AirHum and !isnan(AirHum)) httpstr +=  "&" + db_AirHum + "=" +fFTS(AirHum, 3);
+    if(hall and !isnan(hall)) httpstr +=  "&" + db_hall + "=" +fFTS(hall, 3);
+    if(pHmV and !isnan(pHmV)) httpstr +=  "&" + db_pHmV + "=" +fFTS(pHmV, 4);
+    if(pHraw and !isnan(pHraw)) httpstr +=  "&" + db_pHraw + "=" +fFTS(pHraw, 4);
+    if(CO2 and !isnan(CO2)) httpstr +=  "&" + db_CO2 + "=" +fFTS(CO2, 0);
+    if(tVOC and !isnan(tVOC)) httpstr +=  "&" + db_tVOC + "=" +fFTS(tVOC, 0);
     
-    if(NTC) httpstr +=  "&" + db_NTC + "=" +fFTS(NTC, 3);
-    if(Ap) httpstr +=  "&" + db_Ap + "=" +fFTS(Ap, 3);
-    if(An) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
-    if(Dist) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
-    if(PR) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
-    if(AirPress) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
-    if(CPUTemp) httpstr +=  "&" + db_CPUTemp + "=" +fFTS(CPUTemp, 3);
+    if(NTC and !isnan(NTC)) httpstr +=  "&" + db_NTC + "=" +fFTS(NTC, 3);
+    if(Ap and !isnan(Ap)) httpstr +=  "&" + db_Ap + "=" +fFTS(Ap, 3);
+    if(An and !isnan(An)) httpstr +=  "&" + db_An + "=" +fFTS(An, 3);
+    if(Dist and !isnan(Dist)) httpstr +=  "&" + db_Dist + "=" +fFTS(Dist, 3);
+    if(PR and !isnan(PR)) httpstr +=  "&" + db_PR + "=" +fFTS(PR, 3);
+    if(AirPress and !isnan(AirPress)) httpstr +=  "&" + db_AirPress + "=" +fFTS(AirPress, 3);
+    if(CPUTemp and !isnan(CPUTemp)) httpstr +=  "&" + db_CPUTemp + "=" +fFTS(CPUTemp, 3);
 
     // if(t_EC) httpstr +=  "&t_EC=" +fFTS(t_EC, 3);
     // if(f_EC) httpstr +=  "&f_EC=" +fFTS(f_EC, 3);

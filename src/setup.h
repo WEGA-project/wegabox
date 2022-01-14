@@ -3,18 +3,7 @@
 
 void setup() {
 
-   if ( xI2CSemaphore == NULL )
-   {
-      // Создание мьютексного семафора, который мы будем использовать
-      // для обслуживания доступа к I2C:
-      xI2CSemaphore = xSemaphoreCreateMutex();
-      if ( ( xI2CSemaphore ) != NULL )
-      {
-         // Если семафор создан, то делаем его доступным (Give)
-         // для использования при доступе к порту I2C:
-         xSemaphoreGive( ( xI2CSemaphore ) );
-      }
-   }
+
 
   #if c_EC == 1
       pinMode(EC_DigitalPort1, INPUT);
@@ -42,7 +31,8 @@ void setup() {
     .onStart([]() {
       OtaStart = true;
       // for (uint8_t i = 0; i < appTaskCount; ++i) {
-      //   vTaskDelete(appTasks[i]);
+      //   //vTaskDelete(appTasks[i]);
+      //   vTaskDelay(appTasks[i]);
       // }
       #if c_EC == 1
           pinMode(EC_DigitalPort1, INPUT);
@@ -98,10 +88,14 @@ void setup() {
   server.begin();
 
 
-xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,0,NULL);
-xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,0,&appTasks[appTaskCount++]);
+xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
+xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
 
-xSemaphore = xSemaphoreCreateMutex();
+
+ 
+//xSemaphore = xSemaphoreCreateCounting();
+xSemaphore = xSemaphoreCreateCounting( 10, 0 );
+xSemaphoreGive(xSemaphore);
 
 #include <dev/ds18b20/setup.h>
 #include <dev/aht10/setup.h>

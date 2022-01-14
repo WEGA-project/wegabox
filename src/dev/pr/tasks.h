@@ -6,15 +6,15 @@ void TaskPR(void *parameters)
   {if (OtaStart == true) vTaskDelete(NULL);
     if (xSemaphore != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)10) == pdTRUE)
+      if (xSemaphoreTake(xSemaphore, (TickType_t)1) == pdTRUE)
       {
         PRRM.add(adc1_get_raw(PR_AnalogPort));
-        
+        PR = PRRM.getMedian();
         xSemaphoreGive(xSemaphore);
       }
     }
-    PR = PRRM.getMedian();
-    vTaskDelay(20000 / portTICK_PERIOD_MS);
+    
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 #endif //  c_PR
