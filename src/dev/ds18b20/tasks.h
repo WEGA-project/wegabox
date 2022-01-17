@@ -3,9 +3,9 @@ void TaskDS18B20(void *parameters)
 {
   for (;;)
   {
-    if (xSemaphore != NULL)
+    if (xSemaphoreX != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)5) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
 
         //vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -23,10 +23,10 @@ void TaskDS18B20(void *parameters)
           sens18b20.begin();
 
         RootTemp = RootTempRM.getMedian();
-        xSemaphoreGive(xSemaphore);
+        xSemaphoreGive(xSemaphoreX);
       }
     }
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 #endif //c_DS18B20

@@ -3,9 +3,9 @@ void TaskAHT10(void *parameters)
 {
   for (;;)
   {if (OtaStart == true) vTaskDelete(NULL);
-    if (xSemaphore != NULL)
+    if (xSemaphoreX != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)5) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
         readStatus = myAHT10.readRawData();
         if (readStatus != AHT10_ERROR)
@@ -30,10 +30,10 @@ void TaskAHT10(void *parameters)
         //   myAHT10.setNormalMode();
         //   myAHT10.setCycleMode();
         // }
-        xSemaphoreGive(xSemaphore);
+        xSemaphoreGive(xSemaphoreX);
       }
     }
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 

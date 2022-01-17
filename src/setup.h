@@ -31,9 +31,13 @@ void setup() {
     .onStart([]() {
       OtaStart = true;
       // for (uint8_t i = 0; i < appTaskCount; ++i) {
-      //   //vTaskDelete(appTasks[i]);
-      //   vTaskDelay(appTasks[i]);
+      //   vTaskDelete(appTasks[i]);
+      //   syslog.log(LOG_INFO, "appTask" + fFTS(i,0) + " sec OTA");
+      //   //vTaskDelay(appTasks[i]);
       // }
+
+      syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec OTA");
+      
       #if c_EC == 1
           pinMode(EC_DigitalPort1, INPUT);
           pinMode(EC_DigitalPort2, INPUT);
@@ -73,12 +77,15 @@ void setup() {
   
   while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
 
+
+
 // Сканирование устройств на шине i2c  
     Wire.begin(I2C_SDA, I2C_SCL);
 
      I2CScanner scanner;
      scanner.Init();
      scanner.Scan();
+     
 
   MDNS.begin( HOSTNAME );
   MDNS.addService("http", "tcp", 80);
@@ -94,9 +101,12 @@ xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
 
  
 //xSemaphore = xSemaphoreCreateCounting();
-xSemaphore = xSemaphoreCreateCounting( 10, 0 );
-xSemaphoreGive(xSemaphore);
+//xSemaphore = xSemaphoreCreateCounting( 1, 0 );
+//xSemaphoreGive(xSemaphore);
+//vSemaphoreCreateBinary( xSemaphore );
+xSemaphoreX = xSemaphoreCreateMutex();
 
+#include <dev/ntc/setup.h>
 #include <dev/ds18b20/setup.h>
 #include <dev/aht10/setup.h>
 #include <dev/us025/setup.h>
@@ -108,8 +118,9 @@ xSemaphoreGive(xSemaphore);
 #include <dev/hx710b/setup.h>
 #include <dev/ads1115/setup.h>
 #include <dev/pr/setup.h>
-#include <dev/ntc/setup.h>
 #include <dev/ec/setup.h>
+
+
 
 #if c_hall == 1
 xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,&appTasks[appTaskCount++]);
@@ -118,6 +129,8 @@ xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,&appTasks[appTaskCount++]);
 #if c_CPUTEMP == 1
 xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_CPUTEMP
+
+syslog.log(LOG_INFO, "WEGABOX Start");
 
 
 }

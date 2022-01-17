@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.5.140122"
+#define Firmware "beta-0.5.170122"
 
 
 #include <WiFi.h>
@@ -46,16 +46,14 @@ bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
 
-unsigned long t_EC=0;
-//,t_Dist,t_NTC,t_pH;
-float f_EC=0;
+
 String wegareply;
 String err_wegaapi_json;
 String dt;
 // Калибровочные значения для определения ЕС
 float EC_R1, EC_R2_p1, EC_R2_p2;
 
-SemaphoreHandle_t xSemaphore = NULL;
+
 
 TaskHandle_t appTasks[16];
 uint8_t appTaskCount = 0;
@@ -67,8 +65,18 @@ uint8_t appTaskCount = 0;
 #define I2C_SCL 22         // SCL
 #include "I2CScanner.h"
 
-SemaphoreHandle_t xI2CSemaphore;
 
+// syslog
+#include <Syslog.h>
+#define SYSLOG_SERVER "192.168.237.111"
+#define SYSLOG_PORT 514
+
+WiFiUDP udpClient;
+Syslog syslog(udpClient, SYSLOG_SERVER, SYSLOG_PORT, HOSTNAME, Firmware, LOG_KERN);
+
+
+SemaphoreHandle_t xI2CSemaphore;
+SemaphoreHandle_t xSemaphoreX = NULL;
 
 #include <dev/ds18b20/main.cpp>
 #include <dev/aht10/main.cpp>

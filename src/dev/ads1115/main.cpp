@@ -2,5 +2,7 @@
   #include<ADS1115_WE.h> 
   #define I2C_ADDRESS 0x48
   ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
-  #define ADS1115_MiddleCount 250
+  #define ADS1115_MiddleCount 2500
+   unsigned long ADS1115_old = millis();
+unsigned long ADS1115_Repeat = 30000;
 #endif

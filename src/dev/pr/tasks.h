@@ -4,13 +4,13 @@ void TaskPR(void *parameters)
 {
   for (;;)
   {if (OtaStart == true) vTaskDelete(NULL);
-    if (xSemaphore != NULL)
+    if (xSemaphoreX != NULL)
     {
-      if (xSemaphoreTake(xSemaphore, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
       {
         PRRM.add(adc1_get_raw(PR_AnalogPort));
         PR = PRRM.getMedian();
-        xSemaphoreGive(xSemaphore);
+        xSemaphoreGive(xSemaphoreX);
       }
     }
     
