@@ -11,7 +11,7 @@ void TaskNTC(void *parameters)
 
     if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat)
     {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
       {
         syslog_ng("NTC Start");
         syslog_ng("NTC Last time old " + fFTS(NTC_LastTime - NTC_Repeat,0));
@@ -43,7 +43,7 @@ void TaskNTC(void *parameters)
       }
     }
 
-        vTaskDelay(10);
+            vTaskDelay(1);
   }
 }
 #endif // c_NTC

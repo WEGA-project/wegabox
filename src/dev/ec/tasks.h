@@ -6,25 +6,22 @@ void TaskEC(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-
-      unsigned long EC_LastTime=millis() - EC_old;
+    
+    unsigned long EC_LastTime = millis() - EC_old;
 
     if (xSemaphoreX != NULL and EC_LastTime > EC_Repeat)
-    {
-      // if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
-      // {
+    { //syslog_ng("EC Semaphore");
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      {
         unsigned long EC_time = millis();
         syslog_ng("EC Start " + fFTS(EC_LastTime - EC_Repeat, 0) + "ms");
 
-        
-
         unsigned long An0 = 0;
         unsigned long Ap0 = 0;
-        
+
         pinMode(EC_DigitalPort1, OUTPUT);
         pinMode(EC_DigitalPort2, OUTPUT);
 
-        
         digitalWrite(EC_DigitalPort1, LOW);
         digitalWrite(EC_DigitalPort2, LOW);
 
@@ -63,8 +60,8 @@ void TaskEC(void *parameters)
           {
             pinMode(EC_DigitalPort1, INPUT);
             pinMode(EC_DigitalPort2, INPUT);
-            delay (300);
-            //vTaskDelay(300 / portTICK_PERIOD_MS);
+            //delay (300);
+            vTaskDelay(300 / portTICK_PERIOD_MS);
             ect = millis();
           }
         }
@@ -73,10 +70,10 @@ void TaskEC(void *parameters)
         rtc_wdt_enable();
         enableCore0WDT();
         enableLoopWDT();
-        
+
         pinMode(EC_DigitalPort1, INPUT);
         pinMode(EC_DigitalPort2, INPUT);
-        
+
         float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
         float Mid_An0 = float(An0) / EC_MiddleCount;
 
@@ -85,19 +82,18 @@ void TaskEC(void *parameters)
         if (Mid_An0 > 0)
           An = Mid_An0;
 
-
         EC_time = millis() - EC_time;
         syslog_ng("EC Ap:" + fFTS(Ap, 3));
         syslog_ng("EC An:" + fFTS(An, 3));
         syslog_ng("EC " + fFTS(EC_time, 0) + "ms end.");
         EC_old = millis();
-        //xSemaphoreGive(xSemaphoreX);
+        xSemaphoreGive(xSemaphoreX);
         //vTaskDelay(1000 / portTICK_PERIOD_MS);
       }
     }
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-  // }
-  
+    
+    delay(1);
+    vTaskDelay(1);
+  }
 }
 #endif // c_EC
