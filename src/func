@@ -5,6 +5,8 @@ String fFTS(float x, byte precision) {
   return String(tmp);
 }
 
+
+
 // Функция прямого опроса ультразвукового датчика
 float us(int trg, int ech, float temp, long cnt) {
   long count=0;

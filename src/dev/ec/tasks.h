@@ -1,36 +1,42 @@
+// Измерение термистора
 #if c_EC == 1
-// Измерение ЕС 
 void TaskEC(void *parameters)
 {
   for (;;)
   {
-    
+    if (OtaStart == true)
+      vTaskDelete(NULL);
 
-    if (xSemaphoreX != NULL and millis()-EC_old > EC_Repeat)
-    { 
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
-      { syslog.log(LOG_INFO, fFTS ( (millis()-EC_old), 0) + " EC REPEAT" );
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec Start EC");
+      unsigned long EC_LastTime=millis() - EC_old;
 
-        unsigned long t_EC0;
+    if (xSemaphoreX != NULL and EC_LastTime > EC_Repeat)
+    {
+      // if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
+      // {
+        unsigned long EC_time = millis();
+        syslog_ng("EC Start " + fFTS(EC_LastTime - EC_Repeat, 0) + "ms");
+
+        
 
         unsigned long An0 = 0;
         unsigned long Ap0 = 0;
-        ECwork = true;
-
-
+        
         pinMode(EC_DigitalPort1, OUTPUT);
         pinMode(EC_DigitalPort2, OUTPUT);
 
-        t_EC0 = micros();
+        
         digitalWrite(EC_DigitalPort1, LOW);
         digitalWrite(EC_DigitalPort2, LOW);
 
         long ect = millis();
+
+        rtc_wdt_protect_off();
+        rtc_wdt_disable();
         disableCore0WDT();
+        disableLoopWDT();
+
         for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
         {
-
           pinMode(EC_DigitalPort1, OUTPUT);
           pinMode(EC_DigitalPort2, OUTPUT);
           digitalWrite(EC_DigitalPort1, LOW);
@@ -57,16 +63,20 @@ void TaskEC(void *parameters)
           {
             pinMode(EC_DigitalPort1, INPUT);
             pinMode(EC_DigitalPort2, INPUT);
-            vTaskDelay(300 / portTICK_PERIOD_MS);
+            delay (300);
+            //vTaskDelay(300 / portTICK_PERIOD_MS);
             ect = millis();
           }
         }
-        
+
+        rtc_wdt_protect_on();
+        rtc_wdt_enable();
         enableCore0WDT();
-        t_EC = micros() - t_EC0;
+        enableLoopWDT();
+        
         pinMode(EC_DigitalPort1, INPUT);
         pinMode(EC_DigitalPort2, INPUT);
-        ECwork = false;
+        
         float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
         float Mid_An0 = float(An0) / EC_MiddleCount;
 
@@ -74,16 +84,20 @@ void TaskEC(void *parameters)
           Ap = Mid_Ap0;
         if (Mid_An0 > 0)
           An = Mid_An0;
-        
-        xSemaphoreGive(xSemaphoreX);
-        EC_old=millis();
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec end EC");
 
+
+        EC_time = millis() - EC_time;
+        syslog_ng("EC Ap:" + fFTS(Ap, 3));
+        syslog_ng("EC An:" + fFTS(An, 3));
+        syslog_ng("EC " + fFTS(EC_time, 0) + "ms end.");
+        EC_old = millis();
+        //xSemaphoreGive(xSemaphoreX);
+        //vTaskDelay(1000 / portTICK_PERIOD_MS);
       }
     }
-      
-      vTaskDelay(10000 / portTICK_PERIOD_MS);
 
-  }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+  // }
+  
 }
 #endif // c_EC

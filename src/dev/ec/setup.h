@@ -3,5 +3,6 @@
 
         adc1_config_width(ADC_WIDTH_BIT_12);
         adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11);
-xTaskCreate(TaskEC,"TaskEC",10000,NULL,2,&appTasks[appTaskCount++]);
+        xTaskCreate(TaskEC,"TaskEC",10000,NULL,0,&appTasks[appTaskCount++]);
+
 #endif

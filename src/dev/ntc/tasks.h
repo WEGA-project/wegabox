@@ -6,13 +6,15 @@ void TaskNTC(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-//if (xSemaphoreX != NULL and millis() - NTC_old > NTC_Repeat)
-    if (millis() - NTC_old > NTC_Repeat)
+
+      unsigned long NTC_LastTime=millis() - NTC_old;
+
+    if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat)
     {
       if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
       {
-        syslog.log(LOG_INFO, fFTS((millis() - NTC_old), 0) + " NTC REPEAT");
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec Start NTC");
+        syslog_ng("NTC Start");
+        syslog_ng("NTC Last time old " + fFTS(NTC_LastTime - NTC_Repeat,0));
 
         rtc_wdt_protect_off();
         rtc_wdt_disable();
@@ -36,13 +38,12 @@ void TaskNTC(void *parameters)
         xSemaphoreGive(xSemaphoreX);
         NTC_old = millis();
 
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec NTC " + fFTS(NTC, 3));
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec End NTC");
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        syslog_ng("NTC End");
+        //vTaskDelay(5000 / portTICK_PERIOD_MS);
       }
     }
 
-    delay (10);
+        vTaskDelay(10);
   }
 }
 #endif // c_NTC

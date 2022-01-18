@@ -50,6 +50,12 @@ void TaskCPUtemp(void *parameters)
 }
 #endif //c_CPUTEMP
 
+void syslog_ng(String x){
+syslog.log(LOG_INFO, fFTS(float(millis())/1000, 3) + "s " + x);
+
+}
+
+
 #include <dev/ds18b20/tasks.h>
 #include <dev/aht10/tasks.h>
 #include <dev/ads1115/tasks.h>
@@ -63,3 +69,4 @@ void TaskCPUtemp(void *parameters)
 #include <dev/hx710b/tasks.h>
 #include <dev/ec/tasks.h>
 #include <dev/ntc/tasks.h>
+

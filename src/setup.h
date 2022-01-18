@@ -35,8 +35,8 @@ void setup() {
       //   syslog.log(LOG_INFO, "appTask" + fFTS(i,0) + " sec OTA");
       //   //vTaskDelay(appTasks[i]);
       // }
-
-      syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec OTA");
+      
+      syslog_ng("OTA Start");
       
       #if c_EC == 1
           pinMode(EC_DigitalPort1, INPUT);
@@ -44,9 +44,6 @@ void setup() {
           pinMode(EC_AnalogPort, INPUT);      
       #endif // c_EC
 
-      #if c_NTC == 1
-        pinMode(NTC_port, INPUT);
-      #endif // c_NTC  
 
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
@@ -72,7 +69,7 @@ void setup() {
       else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
 
-
+  syslog_ng("WEGA Start");
   ArduinoOTA.begin();
   
   while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
@@ -80,11 +77,11 @@ void setup() {
 
 
 // Сканирование устройств на шине i2c  
-    Wire.begin(I2C_SDA, I2C_SCL);
+    // Wire.begin(I2C_SDA, I2C_SCL);
 
-     I2CScanner scanner;
-     scanner.Init();
-     scanner.Scan();
+    //  I2CScanner scanner;
+    //  scanner.Init();
+    //  scanner.Scan();
      
 
   MDNS.begin( HOSTNAME );
@@ -104,20 +101,36 @@ xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
 //xSemaphore = xSemaphoreCreateCounting( 1, 0 );
 //xSemaphoreGive(xSemaphore);
 //vSemaphoreCreateBinary( xSemaphore );
-xSemaphoreX = xSemaphoreCreateMutex();
 
+xSemaphoreX = xSemaphoreCreateMutex();
+//xSemaphoreX = xSemaphoreCreateBinary();
+
+delay (1000);
 #include <dev/ntc/setup.h>
+delay (1000);
 #include <dev/ds18b20/setup.h>
+delay (1000);
+
 #include <dev/aht10/setup.h>
+delay (1000);
 #include <dev/us025/setup.h>
+delay (1000);
 #include <dev/ccs811/setup.h>
+delay (1000);
 #include <dev/am2320/setup.h>
+delay (1000);
 #include <dev/mcp3421/setup.h>
+delay (1000);
 #include <dev/bmp280/setup.h>
+delay (1000);
 #include <dev/mcp23017/setup.h>
+delay (1000);
 #include <dev/hx710b/setup.h>
+delay (1000);
 #include <dev/ads1115/setup.h>
+delay (1000);
 #include <dev/pr/setup.h>
+delay (1000);
 #include <dev/ec/setup.h>
 
 
@@ -130,7 +143,7 @@ xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,&appTasks[appTaskCount++]);
 xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_CPUTEMP
 
-syslog.log(LOG_INFO, "WEGABOX Start");
+
 
 
 }

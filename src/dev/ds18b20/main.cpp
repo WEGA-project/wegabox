@@ -4,4 +4,6 @@
   OneWire oneWire(ONE_WIRE_BUS);
   DallasTemperature sens18b20(&oneWire);
   String st_DS18B20;
+  unsigned long DS18B20_old = millis();
+  unsigned long DS18B20_Repeat = 10000;
 #endif

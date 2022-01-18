@@ -3,18 +3,15 @@ void TaskADS1115(void *parameters)
 {
   for (;;)
   {
-
     if (OtaStart == true)
       vTaskDelete(NULL);
-
-    if (xSemaphoreX != NULL and millis() - ADS1115_old > ADS1115_Repeat)
+    unsigned long ADS1115_LastTime = millis() - ADS1115_old;
+    if (xSemaphoreX != NULL and ADS1115_LastTime > ADS1115_Repeat)
     {
-
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)10) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
-        syslog.log(LOG_INFO, fFTS((millis() - ADS1115_old), 0) + " ADS1115 REPEAT");
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec ADS1115 Start");
-        //vTaskDelay(2000 / portTICK_PERIOD_MS);
+        syslog_ng("ADS1115 Start");
+        syslog_ng("ADS1115 Last time old " + fFTS(ADS1115_LastTime - ADS1115_Repeat, 0));
         pHraw = adc.getRawResult();
 
         long cont = 0;
@@ -30,13 +27,11 @@ void TaskADS1115(void *parameters)
 
         xSemaphoreGive(xSemaphoreX);
         ADS1115_old = millis();
-
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec ADS1115 " + fFTS(pHmV, 3));
-        syslog.log(LOG_INFO, fFTS(millis() / 1000, 3) + " sec ADS1115 End");
+        syslog_ng("ADS1115 End");
       }
     }
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    vTaskDelay(10);
   }
 }
 #endif // c_ADS1115
