@@ -5,6 +5,8 @@ void TaskADS1115(void *parameters)
   { //
     if (OtaStart == true)
       vTaskDelete(NULL);
+    //syslog_ng("ADS1115 loop");  
+    vTaskDelay(1000);
 
     unsigned long ADS1115_LastTime = millis() - ADS1115_old;
 
@@ -15,39 +17,39 @@ void TaskADS1115(void *parameters)
         unsigned long ADS1115_time = millis();
         syslog_ng("ADS1115 Start " + fFTS(ADS1115_LastTime - ADS1115_Repeat, 0) + "ms");
 
-        // long cont = 0;
-        //     double sensorValue = 0;
 
-        rtc_wdt_protect_off();
-        rtc_wdt_disable();
-        disableCore0WDT();
-        disableLoopWDT();
-        // for (unsigned long cont=0;cont<ADS1115_MiddleCount and OtaStart != true;cont++){
-        //   sensorValue = adc.getResult_mV() + sensorValue;
+        // //while (adc.isBusy() == true)
+         
 
-        // }
-        while (adc.isBusy() == true)
-          vTaskDelay(1);
+        // pHraw = adc.getRawResult();
 
-        pHraw = adc.getRawResult();
-        rtc_wdt_protect_on();
-        rtc_wdt_enable();
-        enableCore0WDT();
-        enableLoopWDT();
 
-        //pHmV = sensorValue / ADS1115_MiddleCount;
-        //PhRM.add(sensorValue / cont);
-        //pHmV = PhRM.getMedian();
+        // //pHmV = sensorValue / ADS1115_MiddleCount;
+        // //PhRM.add(sensorValue / cont);
+        // //pHmV = PhRM.getMedian();
+
+      
+      // adc.setCompareChannels(ADS1115_COMP_0_3);
+      // adc.setVoltageRange_mV(ADS1115_RANGE_4096);
+      // adc.setConvRate(ADS1115_860_SPS);
+      long cont=0;
+      double sensorValue=0;
+      while ( cont < ADS1115_MiddleCount){
+       cont++;
+        sensorValue =  adc.getResult_mV()+sensorValue;
+      }
+      pHmV=sensorValue/cont;
+
+
+
 
         ADS1115_time = millis() - ADS1115_time;
-        syslog_ng("ADS1115 pHraw:" + fFTS(pHraw, 3));
+        syslog_ng("ADS1115 pHmV:" + fFTS(pHmV, 3));
         syslog_ng("ADS1115 " + fFTS(ADS1115_time, 0) + "ms end.");
         ADS1115_old = millis();
         xSemaphoreGive(xSemaphoreX);
       }
     }
-
-    vTaskDelay(1);
   }
 }
 #endif // c_ADS1115

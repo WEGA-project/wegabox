@@ -77,7 +77,8 @@ void setup() {
 
 
 // Сканирование устройств на шине i2c  
-    // Wire.begin(I2C_SDA, I2C_SCL);
+    Wire.begin(I2C_SDA, I2C_SCL);
+
 
     //  I2CScanner scanner;
     //  scanner.Init();
@@ -90,6 +91,7 @@ void setup() {
   server.on("/reset",handleReset);
   server.on("/status",handleStatus);
   server.begin();
+
 
 
 xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
@@ -105,32 +107,32 @@ xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
 xSemaphoreX = xSemaphoreCreateMutex();
 //xSemaphoreX = xSemaphoreCreateBinary();
 
-delay (1000);
+
 #include <dev/ntc/setup.h>
-delay (1000);
+
 #include <dev/ds18b20/setup.h>
-delay (1000);
+
 
 #include <dev/aht10/setup.h>
-delay (1000);
+
 #include <dev/us025/setup.h>
-delay (1000);
+
 #include <dev/ccs811/setup.h>
-delay (1000);
+
 #include <dev/am2320/setup.h>
-delay (1000);
+
 #include <dev/mcp3421/setup.h>
-delay (1000);
+
 #include <dev/bmp280/setup.h>
-delay (1000);
+
 #include <dev/mcp23017/setup.h>
-delay (1000);
+
 #include <dev/hx710b/setup.h>
-delay (1000);
+
 #include <dev/ads1115/setup.h>
-delay (1000);
+
 #include <dev/pr/setup.h>
-delay (1000);
+
 #include <dev/ec/setup.h>
 
 

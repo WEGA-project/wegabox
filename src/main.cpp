@@ -16,7 +16,9 @@ WebServer server(80);
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-
+    WiFiClient client;
+    HTTPClient http;
+    
 
 #include <RunningMedian.h>
 RunningMedian DstRM = RunningMedian(60);
@@ -35,9 +37,9 @@ RunningMedian CpuTempRM = RunningMedian(10);
 #include <func>
 #include <driver/adc.h>
 
-#include "soc/rtc_wdt.h"
-#include "esp_int_wdt.h"
-#include "esp_task_wdt.h"
+// #include "soc/rtc_wdt.h"
+// #include "esp_int_wdt.h"
+// #include "esp_task_wdt.h"
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp,CO2, tVOC, eRAW;

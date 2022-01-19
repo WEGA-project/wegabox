@@ -6,11 +6,15 @@ void TaskEC(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    
+    vTaskDelay(1000);
+    //syslog_ng("EC loop");
+
     unsigned long EC_LastTime = millis() - EC_old;
 
     if (xSemaphoreX != NULL and EC_LastTime > EC_Repeat)
     { //syslog_ng("EC Semaphore");
+      vTaskDelay(1);
+
       if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
       {
         unsigned long EC_time = millis();
@@ -27,10 +31,10 @@ void TaskEC(void *parameters)
 
         long ect = millis();
 
-        rtc_wdt_protect_off();
-        rtc_wdt_disable();
-        disableCore0WDT();
-        disableLoopWDT();
+        // rtc_wdt_protect_off();
+        // rtc_wdt_disable();
+        // disableCore0WDT();
+        // disableLoopWDT();
 
         for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
         {
@@ -66,10 +70,10 @@ void TaskEC(void *parameters)
           }
         }
 
-        rtc_wdt_protect_on();
-        rtc_wdt_enable();
-        enableCore0WDT();
-        enableLoopWDT();
+        // rtc_wdt_protect_on();
+        // rtc_wdt_enable();
+        // enableCore0WDT();
+        // enableLoopWDT();
 
         pinMode(EC_DigitalPort1, INPUT);
         pinMode(EC_DigitalPort2, INPUT);
@@ -91,9 +95,6 @@ void TaskEC(void *parameters)
         //vTaskDelay(1000 / portTICK_PERIOD_MS);
       }
     }
-    
-    delay(1);
-    vTaskDelay(1);
   }
 }
 #endif // c_EC
