@@ -3,5 +3,5 @@
  #define PR_MiddleCount 1000
 
 unsigned long PR_old = millis();
-unsigned long PR_Repeat = 10000;
+unsigned long PR_Repeat = 60000;
 #endif // c_PR

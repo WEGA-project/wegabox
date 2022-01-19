@@ -1,8 +1,11 @@
 
 #if c_EC == 1
+//long EC_TaskErr = -1;
 
-        adc1_config_width(ADC_WIDTH_BIT_12);
-        adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11);        
-        xTaskCreate(TaskEC,"TaskEC",10000,NULL,1,&appTasks[appTaskCount++]);
+// while (EC_TaskErr == -1)
+// {
+   long  EC_TaskErr =  xTaskCreate(TaskEC, "TaskEC", 5000, NULL, 2,NULL);
+//}
 
+syslog_ng("EC add Task:" + fFTS(EC_TaskErr, 0));
 #endif

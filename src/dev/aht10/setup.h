@@ -5,6 +5,7 @@
   myAHT10.setNormalMode();
   //myAHT10.setCycleMode();
 
-
-xTaskCreate(TaskAHT10,"TaskAHT10",10000,NULL,0,NULL);
+delay (100);
+xTaskCreate(TaskAHT10,"TaskAHT10",15000,NULL,0,NULL);
+syslog_ng("AHT10 add Task");
 #endif // c_TaskAHT10

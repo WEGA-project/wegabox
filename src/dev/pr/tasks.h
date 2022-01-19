@@ -2,6 +2,8 @@
 #if c_PR == 1
 void TaskPR(void *parameters)
 {
+  adc1_config_width(ADC_WIDTH_BIT_12);
+  adc1_config_channel_atten(PR_AnalogPort, ADC_ATTEN_DB_11);
   for (;;)
   {
     if (OtaStart == true)
@@ -18,11 +20,13 @@ void TaskPR(void *parameters)
         syslog_ng("PR Start " + fFTS(PR_LastTime - PR_Repeat, 0) + "ms");
 
         long PR0=adc1_get_raw(PR_AnalogPort);
-        PRRM.add(PR0);
+
+        //if(PR0) PR=PR0; else PR=-1;
+        //PRRM.add(PR0);
 
         syslog_ng("PR:" + fFTS(PR0, 3));
 
-        PR = PRRM.getMedian();
+        //PR = PRRM.getMedian();
 
 
         PR_time = millis() - PR_time;
@@ -31,10 +35,10 @@ void TaskPR(void *parameters)
         syslog_ng("PR " + fFTS(PR_time, 0) + "ms end.");
         PR_old = millis();
         xSemaphoreGive(xSemaphoreX);
-         syslog_ng("PR Semaphore Give");
+         //syslog_ng("PR Semaphore Give");
       }
     }
-           
+         
   }
 }
 #endif //  c_PR

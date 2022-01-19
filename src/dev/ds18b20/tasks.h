@@ -24,15 +24,22 @@ void TaskDS18B20(void *parameters)
         //   ;
 
         sens18b20.requestTemperatures();
-        float ds0 = sens18b20.getTempCByIndex(0);
-        syslog_ng("DS18B20:" + fFTS(ds0, 3));
-
-        if (ds0 != -127 and ds0 != 85)
-        {
-          RootTempRM.add(ds0);
+        
+        
+        unsigned long cont;
+        float ds0=-127;
+        for (cont=0; ds0 == -127 or ds0 == 85  or cont > 100;cont++ ){
+          ds0 = sens18b20.getTempCByIndex(0);
         }
+        if (ds0 !=-127 and ds0 !=85 ) RootTemp = ds0;
+        syslog_ng("DS18B20:" + fFTS(ds0, 3));
+        if(cont > 1) syslog_ng("DS18B20 Error cont:" + fFTS(cont-1, 0));
+        // while (ds0 == -127 and ds0 == 85)
+        // {
+        //   RootTempRM.add(ds0);
+        // }
 
-        RootTemp = RootTempRM.getMedian();
+        // RootTemp = RootTempRM.getMedian();
 
 
         DS18B20_time = millis() - DS18B20_time;

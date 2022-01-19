@@ -55,10 +55,13 @@ String dt;
 // Калибровочные значения для определения ЕС
 float EC_R1, EC_R2_p1, EC_R2_p2;
 
+//#define SPIRAM_MALLOC_RESERVE_INTERNAL 0;
 
 
-TaskHandle_t appTasks[16];
+TaskHandle_t appTasks[48];
 uint8_t appTaskCount = 0;
+
+
 
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire

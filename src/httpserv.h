@@ -1,14 +1,17 @@
 
 // страница перезагрузки устройства http://[ip]/reset
 void handleReset(){
+  syslog_ng("WEB /reset");
   server.send(200, "text/plain",  "restart");
-  delay(5000);
+  delay(1000);
   ESP.restart();
+  
   
 }
 
 // Основная страница http://[ip]
 void handleRoot() {
+  syslog_ng("WEB /root");
   String httpstr="<meta http-equiv='refresh' content='10'>";
        httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
        httpstr += "Firmware=" + String(Firmware) + "<br>";
@@ -41,7 +44,7 @@ void handleRoot() {
 // Страница статуса http://[ip]/status
 void handleStatus()
 {
-
+  syslog_ng("WEB /status");
   String statusstr = "status ok \n";
 
   statusstr += "Uptime=" + fFTS(millis() / 1000, 0) + "\n";

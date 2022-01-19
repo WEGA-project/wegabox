@@ -2,11 +2,14 @@
 #if c_EC == 1
 void TaskEC(void *parameters)
 {
+        syslog_ng("EC Task Start");
+        adc1_config_width(ADC_WIDTH_BIT_12);
+        adc1_config_channel_atten(EC_AnalogPort, ADC_ATTEN_DB_11); 
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    vTaskDelay(1000);
+    vTaskDelay(100);
     //syslog_ng("EC loop");
 
     unsigned long EC_LastTime = millis() - EC_old;
@@ -15,7 +18,7 @@ void TaskEC(void *parameters)
     { //syslog_ng("EC Semaphore");
       vTaskDelay(1);
 
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)2) == pdTRUE)
       {
         unsigned long EC_time = millis();
         syslog_ng("EC Start " + fFTS(EC_LastTime - EC_Repeat, 0) + "ms");

@@ -2,6 +2,9 @@
 #if c_NTC == 1
 void TaskNTC(void *parameters)
 {
+
+adc1_config_width(ADC_WIDTH_BIT_12);
+adc1_config_channel_atten(NTC_port, ADC_ATTEN_DB_11);
   for (;;)
   {
     if (OtaStart == true)
@@ -14,7 +17,7 @@ void TaskNTC(void *parameters)
     if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat)
     { 
       if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
-      {
+      { vTaskDelay(2000);
         unsigned long NTC_time = millis();
         syslog_ng("NTC Start " + fFTS(NTC_LastTime - NTC_Repeat, 0) + "ms");
 

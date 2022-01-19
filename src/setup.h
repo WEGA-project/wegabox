@@ -93,9 +93,8 @@ void setup() {
   server.begin();
 
 
-
-xTaskCreate(TaskOTA,"TaskOTA",10000,NULL,3,NULL);
-xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
+xTaskCreate(TaskOTA,"TaskOTA",5000,NULL,3,NULL);
+xTaskCreate(TaskWegaApi,"TaskWegaApi",5000,NULL,1,&appTasks[appTaskCount++]);
 
 
  
@@ -106,6 +105,8 @@ xTaskCreate(TaskWegaApi,"TaskWegaApi",10000,NULL,1,&appTasks[appTaskCount++]);
 
 xSemaphoreX = xSemaphoreCreateMutex();
 //xSemaphoreX = xSemaphoreCreateBinary();
+
+adc1_config_width(ADC_WIDTH_BIT_12);
 
 
 #include <dev/ntc/setup.h>
@@ -138,11 +139,11 @@ xSemaphoreX = xSemaphoreCreateMutex();
 
 
 #if c_hall == 1
-xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,&appTasks[appTaskCount++]);
+xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);
 #endif // c_hall
 
 #if c_CPUTEMP == 1
-xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,&appTasks[appTaskCount++]);
+xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
 #endif // c_CPUTEMP
 
 
