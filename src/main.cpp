@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.5.180122"
+#define Firmware "beta-0.5.200122"
 
 
 #include <WiFi.h>
@@ -21,9 +21,9 @@ WebServer server(80);
     
 
 #include <RunningMedian.h>
-RunningMedian DstRM = RunningMedian(60);
+
 RunningMedian PhRM = RunningMedian(90);
-RunningMedian NTCRM = RunningMedian(90);
+
 RunningMedian RootTempRM = RunningMedian(10);
 RunningMedian AirTempRM = RunningMedian(30);
 RunningMedian AirHumRM = RunningMedian(30);

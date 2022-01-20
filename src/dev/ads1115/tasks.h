@@ -21,7 +21,7 @@ void TaskADS1115(void *parameters)
         // //while (adc.isBusy() == true)
          
 
-        // pHraw = adc.getRawResult();
+        pHraw = adc.getRawResult();
 
 
         // //pHmV = sensorValue / ADS1115_MiddleCount;
@@ -39,9 +39,6 @@ void TaskADS1115(void *parameters)
         sensorValue =  adc.getResult_mV()+sensorValue;
       }
       pHmV=sensorValue/cont;
-
-
-
 
         ADS1115_time = millis() - ADS1115_time;
         syslog_ng("ADS1115 pHmV:" + fFTS(pHmV, 3));

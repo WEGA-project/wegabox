@@ -19,12 +19,17 @@ void TaskPR(void *parameters)
         unsigned long PR_time = millis();
         syslog_ng("PR Start " + fFTS(PR_LastTime - PR_Repeat, 0) + "ms");
 
-        long PR0=adc1_get_raw(PR_AnalogPort);
+       
 
         //if(PR0) PR=PR0; else PR=-1;
         //PRRM.add(PR0);
-
-        syslog_ng("PR:" + fFTS(PR0, 3));
+        long cont;
+        long PR0=0;
+      for (cont=0;cont<PR_MiddleCount;cont++){
+      PR0=adc1_get_raw(PR_AnalogPort)+PR0;        
+      }
+      PR=float(PR0)/cont;
+syslog_ng("PR:" + fFTS(PR, 3));
 
         //PR = PRRM.getMedian();
 
