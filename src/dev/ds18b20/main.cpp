@@ -6,4 +6,5 @@
   String st_DS18B20;
   unsigned long DS18B20_old = millis();
   unsigned long DS18B20_Repeat = 20000;
+  RunningMedian RootTempRM = RunningMedian(10);
 #endif

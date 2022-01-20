@@ -24,7 +24,7 @@ WebServer server(80);
 
 RunningMedian PhRM = RunningMedian(90);
 
-RunningMedian RootTempRM = RunningMedian(10);
+
 RunningMedian AirTempRM = RunningMedian(30);
 RunningMedian AirHumRM = RunningMedian(30);
 RunningMedian AirPressRM = RunningMedian(30);
