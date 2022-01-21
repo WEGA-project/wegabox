@@ -10,6 +10,9 @@ void TaskOTA(void *parameters)
   }
 }
 
+#include <etc/syslog/func.h>
+
+
 #if c_hall == 1
 void TaskHall(void *parameters)
 {
@@ -50,11 +53,7 @@ void TaskCPUtemp(void *parameters)
 }
 #endif //c_CPUTEMP
 
-void syslog_ng(String x){
-syslog.log(LOG_INFO, fFTS(float(millis())/1000, 3) + "s " + x);
-vTaskDelay(10);
 
-}
 
 
 #include <dev/ds18b20/tasks.h>

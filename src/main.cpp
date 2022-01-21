@@ -72,12 +72,9 @@ uint8_t appTaskCount = 0;
 
 
 // syslog
-#include <Syslog.h>
-#define SYSLOG_SERVER "192.168.237.111"
-#define SYSLOG_PORT 514
+#include <etc/syslog/main.cpp>
 
-WiFiUDP udpClient;
-Syslog syslog(udpClient, SYSLOG_SERVER, SYSLOG_PORT, HOSTNAME, Firmware, LOG_KERN);
+
 
 
 SemaphoreHandle_t xI2CSemaphore;
