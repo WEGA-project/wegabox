@@ -97,14 +97,10 @@ xTaskCreate(TaskOTA,"TaskOTA",5000,NULL,3,NULL);
 xTaskCreate(TaskWegaApi,"TaskWegaApi",5000,NULL,1,&appTasks[appTaskCount++]);
 
 
- 
-//xSemaphore = xSemaphoreCreateCounting();
-//xSemaphore = xSemaphoreCreateCounting( 1, 0 );
-//xSemaphoreGive(xSemaphore);
-//vSemaphoreCreateBinary( xSemaphore );
+
 
 xSemaphoreX = xSemaphoreCreateMutex();
-//xSemaphoreX = xSemaphoreCreateBinary();
+
 
 adc1_config_width(ADC_WIDTH_BIT_12);
 
