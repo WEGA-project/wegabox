@@ -3,8 +3,18 @@ void TaskCCS811(void *parameters)
 {
   for (;;)
   {
-    if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    vTaskDelay(1000);
+
+    unsigned long CCS811_LastTime = millis() - CCS811_old;
+
+    if (xSemaphoreX != NULL and CCS811_LastTime > CCS811_Repeat)
     {
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      {
+        unsigned long CCS811_time = millis();
+        syslog_ng("CCS811 Start " + fFTS(CCS811_LastTime - CCS811_Repeat, 0) + "ms");
       // Read
       ccs811.set_envdata_Celsius_percRH(AirTemp, AirHum);
       uint16_t eco2, etvoc, errstat, raw;
@@ -18,9 +28,17 @@ void TaskCCS811(void *parameters)
         eRAW = raw;
       }
       
-      xSemaphoreGive(xI2CSemaphore);
+        syslog_ng("CCS811 CO2:" + fFTS(eco2, 3));
+        syslog_ng("CCS811 tVOC:" + fFTS(etvoc, 3));
+        syslog_ng("CCS811 raw:" + fFTS(raw, 3));
+
+        CCS811_time = millis() - CCS811_time;
+
+        syslog_ng("CCS811 " + fFTS(CCS811_time, 0) + "ms end.");
+        CCS811_old = millis();
+        xSemaphoreGive(xSemaphoreX);
+      }
     }
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
 #endif

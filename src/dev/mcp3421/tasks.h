@@ -1,15 +1,20 @@
 #if c_MCP3421 == 1
 void TaskMCP3421(void *parameters)
 {
-  long adcvalue;
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    else
+    vTaskDelay(1000);
+
+    unsigned long MCP3421_LastTime = millis() - MCP3421_old;
+
+    if (xSemaphoreX != NULL and MCP3421_LastTime > MCP3421_Repeat)
     {
-      if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
       {
+        unsigned long MCP3421_time = millis();
+        syslog_ng("MCP3421 Start " + fFTS(MCP3421_LastTime - MCP3421_Repeat, 0) + "ms");
         MCP342x::Config status;
         long phvalue;
         uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
@@ -22,9 +27,15 @@ void TaskMCP3421(void *parameters)
           PhRM.add(phvalue);
           pHmV=(4096 / pow(2, 18) *PhRM.getMedian()/ 4);
         }
-        xSemaphoreGive(xI2CSemaphore);
+        syslog_ng("MCP3421 RAW:" + fFTS(pHraw, 3));
+        syslog_ng("MCP3421 pHmV:" + fFTS(pHmV, 3));
+
+        MCP3421_time = millis() - MCP3421_time;
+
+        syslog_ng("MCP3421 " + fFTS(MCP3421_time, 0) + "ms end.");
+        MCP3421_old = millis();
+        xSemaphoreGive(xSemaphoreX);
       }
-    vTaskDelay(2000 / portTICK_PERIOD_MS);  
     }
   }
 }
