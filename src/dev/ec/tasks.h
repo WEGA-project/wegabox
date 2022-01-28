@@ -83,11 +83,14 @@ void TaskEC(void *parameters)
 
         float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
         float Mid_An0 = float(An0) / EC_MiddleCount;
-
+        ApRM.add(Mid_Ap0);
+        AnRM.add(Mid_An0);
         if (Mid_Ap0 < 4095)
-          Ap = Mid_Ap0;
+          //Ap = Mid_Ap0;
+          Ap = ApRM.getAverage();
         if (Mid_An0 > 0)
-          An = Mid_An0;
+          //An = Mid_An0;
+          An = AnRM.getAverage();
 
         EC_time = millis() - EC_time;
         syslog_ng("EC Ap:" + fFTS(Ap, 3));

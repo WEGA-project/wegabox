@@ -10,14 +10,17 @@
 // 5V ------ SDO (I2C Address 0x77)
 // other pins can be left unconnected.
 
-#include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
+//#include <Arduino.h>
+//#include <Wire.h>
+//#include <Adafruit_Sensor.h>
 #include <BMx280I2C.h>
 
 //#define I2C_ADDRESS 0x76
 
 //create a BMx280I2C object using the I2C interface with I2C Address 0x76
 BMx280I2C bmx280(0x76);
+
+unsigned long BMP280_old = millis();
+unsigned long BMP280_Repeat = 10000;
 
 #endif //c_BMP280

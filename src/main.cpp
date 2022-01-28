@@ -21,9 +21,7 @@ WebServer server(80);
     
 
 #include <RunningMedian.h>
-
 RunningMedian PhRM = RunningMedian(90);
-
 
 RunningMedian AirTempRM = RunningMedian(30);
 RunningMedian AirHumRM = RunningMedian(30);

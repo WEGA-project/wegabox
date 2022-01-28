@@ -7,4 +7,7 @@
 
 unsigned long EC_old = millis();
 unsigned long EC_Repeat=20000;
+
+RunningMedian ApRM = RunningMedian(10);
+RunningMedian AnRM = RunningMedian(10);
 #endif

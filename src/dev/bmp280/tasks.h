@@ -1,17 +1,21 @@
 #if c_BMP280 == 1
-  void TaskBMP280(void *parameters)
-  {
-    for (;;)
-    {
-      if (OtaStart == true)
-      {
-        vTaskDelete(NULL);
-      }
-      else
-      {
+void TaskBMP280(void *parameters)
+{
+  for (;;)
+  { //
+    if (OtaStart == true)
+      vTaskDelete(NULL);
+    //syslog_ng("BMP280 loop");  
+    vTaskDelay(1000);
 
-        if (xSemaphoreTake(xI2CSemaphore, (TickType_t)5) == pdTRUE)
-        {
+    unsigned long BMP280_LastTime = millis() - BMP280_old;
+
+    if (xSemaphoreX != NULL and BMP280_LastTime > BMP280_Repeat)
+    {
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      {
+        unsigned long BMP280_time = millis();
+        syslog_ng("BMP280 Start " + fFTS(BMP280_LastTime - BMP280_Repeat, 0) + "ms");
 
           if (!bmx280.measure())
           {
@@ -32,11 +36,16 @@
           {
             AirHum = bmx280.getHumidity();
           }
-
-          xSemaphoreGive(xI2CSemaphore);
-        }
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        BMP280_time = millis() - BMP280_time;
+        syslog_ng("BMP280 AirTemp:" + fFTS(AirTemp, 3));
+        if (bmx280.isBME280()) syslog_ng("BMP280 AirHum:" + fFTS(AirHum, 3));
+        syslog_ng("BMP280 AirPress:" + fFTS(AirPress, 3));        
+        syslog_ng("BMP280 " + fFTS(BMP280_time, 0) + "ms end.");
+        BMP280_old = millis();
+        xSemaphoreGive(xSemaphoreX);
       }
     }
   }
+}
+
 #endif //c_BMP280
