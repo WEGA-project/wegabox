@@ -132,6 +132,7 @@ adc1_config_width(ADC_WIDTH_BIT_12);
 
 #include <dev/ec/setup.h>
 
+#include <dev/DualBMx/setup.h>
 
 
 #if c_hall == 1
