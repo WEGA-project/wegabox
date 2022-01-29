@@ -25,10 +25,10 @@ void TaskDualBMx(void *parameters)
         press_1 = bmx280_1.getPressure64();
         if (bmx280_2.hasValue() == true){
           press_2 = bmx280_2.getPressure64();
-          Dist=(press_1-press_2)*0.101972;
+          DstRM.add((press_1-press_2)*0.101972);          
         }
       }
-
+        Dist=DstRM.getMedian();
         DualBMx_time = millis() - DualBMx_time;
 
         syslog_ng("bmx280_1 AirPress (Pa):" + fFTS(press_1, 3));   

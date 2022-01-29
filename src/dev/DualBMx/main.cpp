@@ -17,5 +17,6 @@ BMx280I2C bmx280_2(0x77);
 
 unsigned long DualBMx_old = millis();
 unsigned long DualBMx_Repeat = 10000;
+RunningMedian DstRM = RunningMedian(10);
 
 #endif //c_DualBMx
