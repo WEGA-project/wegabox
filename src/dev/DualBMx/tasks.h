@@ -20,13 +20,14 @@ void TaskDualBMx(void *parameters)
         bmx280_1.measure();
         bmx280_2.measure();
         delay(100);
-
-        bmx280_1.hasValue();
-        bmx280_2.hasValue();
-
-        float press_1 = bmx280_1.getPressure64();
-        float press_2 = bmx280_2.getPressure64();
-        Dist=(press_1-press_2)*0.101972;
+      float press_1, press_2;
+      if (bmx280_1.hasValue() == true){
+        press_1 = bmx280_1.getPressure64();
+        if (bmx280_2.hasValue() == true){
+          press_2 = bmx280_2.getPressure64();
+          Dist=(press_1-press_2)*0.101972;
+        }
+      }
 
         DualBMx_time = millis() - DualBMx_time;
 
