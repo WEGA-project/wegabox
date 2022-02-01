@@ -23,4 +23,9 @@ BMx280I2C bmx280(0x76);
 unsigned long BMP280_old = millis();
 unsigned long BMP280_Repeat = 10000;
 
+RunningMedian BMP280_AirTempRM = RunningMedian(30);
+RunningMedian BMP280_AirHumRM = RunningMedian(30);
+RunningMedian BMP280_AirPressRM = RunningMedian(30);
+
+float BMP280_Temp, BMP280_Hum, BMP280_Press;
 #endif //c_BMP280
