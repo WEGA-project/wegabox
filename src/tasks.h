@@ -70,3 +70,4 @@ void TaskCPUtemp(void *parameters)
 #include <dev/ec/tasks.h>
 #include <dev/ntc/tasks.h>
 #include <dev/DualBMx/tasks.h>
+#include <dev/sdc30/tasks.h>

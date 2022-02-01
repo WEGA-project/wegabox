@@ -134,6 +134,9 @@ adc1_config_width(ADC_WIDTH_BIT_12);
 
 #include <dev/DualBMx/setup.h>
 
+#include <dev/sdc30/setup.h>
+
+
 
 #if c_hall == 1
 xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);

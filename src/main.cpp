@@ -92,6 +92,8 @@ SemaphoreHandle_t xSemaphoreX = NULL;
 #include <dev/ec/main.cpp>
 #include <dev/ntc/main.cpp>
 #include <dev/DualBMx/main.cpp>
+#include <dev/sdc30/main.cpp>
+
 
 #if c_CPUTEMP == 1
   extern "C" {     
