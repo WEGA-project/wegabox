@@ -15,6 +15,7 @@ void setup() {
     pinMode(NTC_port, INPUT);
   #endif // c_NTC  
 
+
   Serial.begin(9600);
   
 
@@ -44,7 +45,6 @@ void setup() {
           pinMode(EC_AnalogPort, INPUT);      
       #endif // c_EC
 
-
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
         type = "sketch";
@@ -70,19 +70,20 @@ void setup() {
     });
 
   syslog_ng("WEGA Start");
+
+  #include <dev/lcd/setup.h>
   ArduinoOTA.begin();
   
   while (millis() < 30000)  ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
-
 
 
 // Сканирование устройств на шине i2c  
     Wire.begin(I2C_SDA, I2C_SCL);
 
 
-    //  I2CScanner scanner;
-    //  scanner.Init();
-    //  scanner.Scan();
+     I2CScanner scanner;
+     scanner.Init();
+     scanner.Scan();
      
 
   MDNS.begin( HOSTNAME );
@@ -146,6 +147,13 @@ xTaskCreate(TaskHall,"TaskHall",10000,NULL,0,NULL);
 xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
 #endif // c_CPUTEMP
 
+      #if c_LCD == 1
+       oled.clear();
+          oled.update();
+
+      xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
+
+      #endif // c_LCD
 
 
 
