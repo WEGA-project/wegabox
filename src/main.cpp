@@ -40,7 +40,7 @@ RunningMedian CpuTempRM = RunningMedian(10);
 // #include "esp_task_wdt.h"
 
 // Переменные
-float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp,CO2, tVOC, eRAW;
+float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,PR,CPUTemp,CO2, tVOC, eRAW;
 float wNTC,wR2,wEC;
 bool OtaStart = false;
 bool ECwork = false;

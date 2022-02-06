@@ -6,7 +6,6 @@
 
   HX710B HX710B_Press(SCK_PIN, SDI_PIN);
   uint32_t time_update = 0;
-float DstRAW;
 unsigned long HX710B_old = millis();
 unsigned long HX710B_Repeat = 10000;
 
