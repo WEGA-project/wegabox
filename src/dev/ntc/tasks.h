@@ -13,9 +13,10 @@ void TaskNTC(void *parameters)
     unsigned long NTC_LastTime = millis() - NTC_old;
 
     if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat)
-    { 
+    {
       if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
-      { vTaskDelay(2000);
+      {
+        vTaskDelay(2000);
         unsigned long NTC_time = millis();
         syslog_ng("NTC Start " + fFTS(NTC_LastTime - NTC_Repeat, 0) + "ms");
 
@@ -26,9 +27,10 @@ void TaskNTC(void *parameters)
 
         //unsigned long NTC0 = 0;
         float NTC0 = 0;
-        for (long i = 0; i < NTC_MiddleCount and OtaStart != true ; i++)
+        for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++)
         {
           NTC0 = NTC0 + adc1_get_raw(NTC_port);
+          vTaskDelay(1);
         }
 
         // rtc_wdt_protect_on();
@@ -45,10 +47,9 @@ void TaskNTC(void *parameters)
         syslog_ng("NTC " + fFTS(NTC_time, 0) + "ms end.");
         NTC_old = millis();
         xSemaphoreGive(xSemaphoreX);
-         syslog_ng("NTC Semaphore Give");
+        syslog_ng("NTC Semaphore Give");
       }
     }
-           
   }
 }
 #endif // c_NTC

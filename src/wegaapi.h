@@ -56,6 +56,10 @@ void TaskWegaApi(void *parameters)
       httpstr += "&wR2=" + fFTS(wR2, 3);
     if (wEC and !isnan(wEC) and isinf(wEC))
       httpstr += "&wEC=" + fFTS(wEC, 3);
+    if (wpH and !isnan(wpH) and isinf(wpH))
+      httpstr += "&wpH=" + fFTS(wpH, 3);
+
+
     if (eRAW and !isnan(eRAW) and isinf(eRAW))
       httpstr += "&eRAW=" + fFTS(eRAW, 3);
 
@@ -120,6 +124,29 @@ void TaskWegaApi(void *parameters)
           wEC = ec / (1 + kt * (wNTC - 25)) + eckorr;
         }
       }
+    }
+
+    // Расчет pH
+    if (pHmV)
+    {
+
+     float py1 = doc["pH_val_p1"];
+     float py2 = doc["pH_val_p2"];
+     float py3 = doc["pH_val_p3"];
+
+     float px1 = doc["pH_raw_p1"];
+     float px2 = doc["pH_raw_p2"];
+     float px3 = doc["pH_raw_p3"];
+
+     float pH_lkorr = doc["pH_lkorr"];
+     
+    float pa=-(-px1*py3+px1*py2-px3*py2+py3*px2+py1*px3-py1*px2)/(-pow(px1,2)*px3+pow(px1,2)*px2-px1*pow(px2,2)+px1*pow(px3,2)-pow(px3,2)*px2+px3*pow(px2,2) ); 
+    float pb=(py3*pow(px2,2)-pow(px2,2)*py1+pow(px3,2)*py1+py2*pow(px1,2)-py3*pow(px1,2)-py2*pow(px3,2))/((-px3+px2)*(px2*px3-px2*px1+pow(px1,2)-px3*px1));
+    float pc=(py3*pow(px1,2)*px2-py2*pow(px1,2)*px3-pow(px2,2)*px1*py3+pow(px3,2)*px1*py2+pow(px2,2)*py1*px3-pow(px3,2)*py1*px2 )/((-px3+px2)*(px2*px3-px2*px1+pow(px1,2)-px3*px1));
+
+    wpH=pa*pow(pHmV,2) + pb* pHmV + pc+pH_lkorr;
+
+
     }
 
     http.end();

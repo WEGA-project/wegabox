@@ -10,7 +10,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "cmath": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "bitset": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

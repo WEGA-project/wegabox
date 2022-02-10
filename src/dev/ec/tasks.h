@@ -97,6 +97,7 @@ void TaskEC(void *parameters)
         syslog_ng("EC An:" + fFTS(An, 3));
         syslog_ng("EC " + fFTS(EC_time, 0) + "ms end.");
         EC_old = millis();
+        
         xSemaphoreGive(xSemaphoreX);
         //vTaskDelay(1000 / portTICK_PERIOD_MS);
       }

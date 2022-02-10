@@ -149,9 +149,11 @@ xTaskCreate(TaskCPUtemp,"TaskCPUtemp",10000,NULL,0,NULL);
 
       #if c_LCD == 1
        oled.clear();
+        //  oled.autoPrintln(true);
+        //  oled.setScale(1);
           oled.update();
 
-      xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
+      //xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
 
       #endif // c_LCD
 
