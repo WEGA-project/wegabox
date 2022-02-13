@@ -1,88 +1,46 @@
 #if c_MCP23017 == 1
 
-  void TaskMCP23017(void *parameters)
+void TaskMCP23017(void *parameters)
+{
+  for (;;)
   {
-    for (;;)
-    {
-      if (OtaStart == true)
-      {
-        vTaskDelete(NULL);
-      }
-      else
-      {
+    if (OtaStart == true)
+      vTaskDelete(NULL);
 
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
 
-      //pinMode(PWD1, OUTPUT);
+    // Включаем насос циркуляции если свет горит и выключаем если нет
+    // задаём свойства ШИМ-сигнала
+    //const int freq = 300000;
+    // if (PR > 1)
+    // {
 
+    //   if (pwd != 117)
+    //   {
+    //     mcp.pinMode(DRV1_A, OUTPUT);
+    //     mcp.digitalWrite(DRV1_A, HIGH);
+    //     pwd = 117;
+    //     syslog_ng("PWD set:" + fFTS(pwd, 0));
 
-      digitalWrite(PWD1, HIGH);
+    //     int freq = 300000;
+    //     syslog_ng("PWD freq set:" + fFTS(freq, 0));
 
-      //pinMode(PWD2, OUTPUT);
-      //digitalWrite(PWD2, HIGH);
-
-      mcp.pinMode(DRV1_A, OUTPUT);
-      //mcp.pinMode(DRV1_B, OUTPUT);
-      //mcp.pinMode(DRV1_C, OUTPUT);
-      //mcp.pinMode(DRV1_D, OUTPUT);
-
-      mcp.digitalWrite(DRV1_A, HIGH);
-      //Serial.println("DRV1_A START");
-      long pw=255;
-      Serial.println(pw);
-      ledcWrite(0, pw);
-        delay (500);
-
-      // pw=2;
-      // Serial.println(pw);
-      // ledcWrite(0, pw);
-      //   delay (10000);
-     for (int pw=3;pw<200;pw++){
-         Serial.println(pw);
-       ledcWrite(0, pw);
-       delay (1000);
-      }
-
-      // pw=20;
-      // Serial.println(pw);
-      // ledcWrite(0, pw);
-      //   delay (5000);
-
-      // pw=50;
-      // Serial.println(pw);
-      // ledcWrite(0, pw);
-      //   delay (5000);
-
-      // pw=100;
-      // Serial.println(pw);
-      // ledcWrite(0, pw);
-      //   delay (5000);
-
-      // pw=200;
-      // Serial.println(pw);
-      // ledcWrite(0, pw);
-      //   delay (5000);
-
-      pw=254;
-      Serial.println(pw);
-      ledcWrite(0, pw);
-        delay (5000);
-        
-      // for (int pw=10;pw<254;pw++){
-      //   Serial.println(pw);
-      // ledcWrite(0, pw);
-      // delay (50);
-      //  }
-      // Serial.println("DRV1_A STOP"); 
-      // for (int pw=254;pw>10;pw--){
-      //   Serial.println(pw);
-      // ledcWrite(0, pw);
-      // delay (50);
-      
-      }
-
-
-      vTaskDelay(10000 / portTICK_PERIOD_MS);
-    }
+    //     // задаём свойства ШИМ-сигнала
+    //     //const int freq = 45000;
+    //     const int ledChannel = 0;
+    //     const int resolution = 8;
+    //     ledcSetup(ledChannel, freq, resolution);
+    //     ledcAttachPin(PWD2, ledChannel);
+    //     ledcWrite(ledChannel, 254);
+    //     delay(1000);
+    //     ledcWrite(ledChannel, pwd);
+    //   }
+    // }
+    // else
+    // {
+    //   mcp.digitalWrite(DRV1_A, LOW);
+    //   pwd = 0;
+    // }
   }
-
+}
 #endif // c_MCP23017

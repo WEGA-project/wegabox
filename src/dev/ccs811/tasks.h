@@ -23,11 +23,14 @@ void TaskCCS811(void *parameters)
       // Print measurement results based on status
       if (errstat == CCS811_ERRSTAT_OK)
       {
-        CO2 = eco2;
-        tVOC = etvoc;
+        CCS811_eCO2RM.add(eco2);
+        CCS811_tVOCRM.add(etvoc);
         eRAW = raw;
+        CO2 = CCS811_eCO2RM.getAverage();
+        tVOC = CCS811_tVOCRM.getAverage();
       }
-      
+       
+
         syslog_ng("CCS811 CO2:" + fFTS(eco2, 3));
         syslog_ng("CCS811 tVOC:" + fFTS(etvoc, 3));
         syslog_ng("CCS811 raw:" + fFTS(raw, 3));

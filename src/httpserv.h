@@ -1,45 +1,92 @@
 
 // страница перезагрузки устройства http://[ip]/reset
-void handleReset(){
+void handleReset()
+{
   syslog_ng("WEB /reset");
-  server.send(200, "text/plain",  "restart");
+  server.send(200, "text/plain", "restart");
   delay(1000);
   ESP.restart();
-  
-  
 }
 
 // Основная страница http://[ip]
-void handleRoot() {
+void handleRoot()
+{
   syslog_ng("WEB /root");
-  String httpstr="<meta http-equiv='refresh' content='10'>";
-       httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
-       httpstr += "Firmware=" + String(Firmware) + "<br>";
-       if(RootTemp) { httpstr +=  "RootTemp=" + fFTS(RootTemp,3) + "<br>"; }
-       if(AirTemp)  { httpstr +=  "AirTemp=" +  fFTS(AirTemp,3) + "<br>"; }
-       if(AirHum)   { httpstr +=  "AirHum=" +   fFTS(AirHum,3) + "<br>"; }
-       if(CO2)   { httpstr +=  "CO2=" +   fFTS(CO2,0) + "<br>"; }
-       if(tVOC)   { httpstr +=  "tVOC=" +   fFTS(tVOC,0) + "<br>"; }
-       if(hall)   { httpstr +=  "hall=" +   fFTS(hall,3) + "<br>"; }     
-       if(pHmV)   { httpstr +=  "pHmV=" +   fFTS(pHmV,3) + "<br>"; }
-       if(NTC)   { httpstr +=  "NTC=" +   fFTS(NTC,3) + "<br>"; }
-       if(Ap)   { httpstr +=  "Ap=" +   fFTS(Ap,3) + "<br>"; }
-       if(An)   { httpstr +=  "An=" +   fFTS(An,3) + "<br>"; }
-       if(Dist)   { httpstr +=  "Dist=" +   fFTS(Dist,3) + "<br>"; }
-       if(PR)   { httpstr +=  "PR=" +   fFTS(PR,3) + "<br>"; }
-       if(AirPress)   { httpstr +=  "AirPress=" +   fFTS(AirPress,3) + "<br>"; }
-       if(CPUTemp)   { httpstr +=  "CPUTemp=" +   fFTS(CPUTemp,3) + "<br>"; }
-
-        if(wNTC >0 )  { httpstr +=  "wNTC=" +  fFTS(wNTC,3) + "<br>"; }
-        if(wR2 >0 )   { httpstr +=  "wR2=" +   fFTS(wR2, 3) + "<br>"; }
-        if(wEC >0 )   { httpstr +=  "wEC=" +   fFTS(wEC, 3) + "<br>"; }
-
-
-
-
-
-  server.send(200, "text/html",  httpstr);
+  String httpstr = "<meta http-equiv='refresh' content='10'>";
+  httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
+  httpstr += "Firmware=" + String(Firmware) + "<br>";
+  if (RootTemp)
+  {
+    httpstr += "RootTemp=" + fFTS(RootTemp, 3) + "<br>";
   }
+  if (AirTemp)
+  {
+    httpstr += "AirTemp=" + fFTS(AirTemp, 3) + "<br>";
+  }
+  if (AirHum)
+  {
+    httpstr += "AirHum=" + fFTS(AirHum, 3) + "<br>";
+  }
+  if (CO2)
+  {
+    httpstr += "CO2=" + fFTS(CO2, 0) + "<br>";
+  }
+  if (tVOC)
+  {
+    httpstr += "tVOC=" + fFTS(tVOC, 0) + "<br>";
+  }
+  if (hall)
+  {
+    httpstr += "hall=" + fFTS(hall, 3) + "<br>";
+  }
+  if (pHmV)
+  {
+    httpstr += "pHmV=" + fFTS(pHmV, 3) + "<br>";
+  }
+  if (NTC)
+  {
+    httpstr += "NTC=" + fFTS(NTC, 3) + "<br>";
+  }
+  if (Ap)
+  {
+    httpstr += "Ap=" + fFTS(Ap, 3) + "<br>";
+  }
+  if (An)
+  {
+    httpstr += "An=" + fFTS(An, 3) + "<br>";
+  }
+  if (Dist)
+  {
+    httpstr += "Dist=" + fFTS(Dist, 3) + "<br>";
+  }
+  if (PR)
+  {
+    httpstr += "PR=" + fFTS(PR, 3) + "<br>";
+  }
+  if (AirPress)
+  {
+    httpstr += "AirPress=" + fFTS(AirPress, 3) + "<br>";
+  }
+  if (CPUTemp)
+  {
+    httpstr += "CPUTemp=" + fFTS(CPUTemp, 3) + "<br>";
+  }
+
+  if (wNTC > 0)
+  {
+    httpstr += "wNTC=" + fFTS(wNTC, 3) + "<br>";
+  }
+  if (wR2 > 0)
+  {
+    httpstr += "wR2=" + fFTS(wR2, 3) + "<br>";
+  }
+  if (wEC > 0)
+  {
+    httpstr += "wEC=" + fFTS(wEC, 3) + "<br>";
+  }
+
+  server.send(200, "text/html", httpstr);
+}
 
 // Страница статуса http://[ip]/status
 void handleStatus()
@@ -57,8 +104,33 @@ void handleStatus()
     statusstr += "WEGA-API JSON STATUS: " + err_wegaapi_json + "\n";
     statusstr += "wNTC=" + fFTS(wNTC, 3) + " C\n";
     statusstr += "wR2=" + fFTS(wR2, 3) + " Omh\n";
-    statusstr += "wEC=" + fFTS(wEC, 3) + " mS/cm\n";    
+    statusstr += "wEC=" + fFTS(wEC, 3) + " mS/cm\n";
   }
 
   server.send(200, "text/plain", statusstr);
+}
+
+// страница PWD
+void handlePWD()
+{
+  mcp.pinMode(DRV1_A, OUTPUT);
+  mcp.digitalWrite(DRV1_A, HIGH);
+
+  pwd = server.arg("pwd").toInt();
+  syslog_ng("PWD set:" + fFTS(pwd, 0));
+
+  int freq = server.arg("freq").toInt();
+  syslog_ng("PWD freq set:" + fFTS(freq, 0));
+
+  // задаём свойства ШИМ-сигнала
+  //const int freq = 45000;
+  const int ledChannel = 0;
+  const int resolution = 8;
+  ledcSetup(ledChannel, freq, resolution);
+  ledcAttachPin(PWD2, ledChannel);
+  // ledcWrite(ledChannel, 255);
+  // delay(1000);
+  ledcWrite(ledChannel, pwd);
+
+  server.send(200, "text/plain", "pwd=" + fFTS(pwd, 0) + " freq=" + fFTS(freq, 0));
 }

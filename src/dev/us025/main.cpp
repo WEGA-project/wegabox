@@ -5,8 +5,8 @@
 UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
 
 #define US_MiddleCount 6000
-RunningMedian DstRM = RunningMedian(10);
+RunningMedian DstRM = RunningMedian(20);
 
 unsigned long US025_old = millis();
-unsigned long US025_Repeat = 30000;
+unsigned long US025_Repeat = 10000;
 #endif // c_US025

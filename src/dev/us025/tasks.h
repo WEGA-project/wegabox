@@ -25,7 +25,7 @@ void TaskUS(void *parameters)
           DstRM.add(us);
           //Serial.println(us);
         }
-        Dist = DstRM.getMedian();
+        Dist = DstRM.getAverage(4);
 
         US025_time = millis() - US025_time;        
         syslog_ng("US025 " + fFTS(US025_time, 0) + "ms end.");
