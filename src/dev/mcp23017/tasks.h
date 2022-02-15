@@ -2,12 +2,29 @@
 
 void TaskMCP23017(void *parameters)
 {
+  
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
 
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  int freq=0;
+
+  if ( pwd != preferences.getInt("PWD", 0)) 
+   { 
+    syslog_ng("PWD change set:" + fFTS(pwd, 0));
+    mcp.pinMode(DRV1_A, OUTPUT);
+    
+    pwd = preferences.getInt("PWD", 0);
+    freq = preferences.getInt("FREQ", 0);
+
+    ledcSetup(0, freq, 8);
+    ledcAttachPin(PWD2, 0);
+    ledcWrite(0, pwd);
+    mcp.digitalWrite(DRV1_A, HIGH);
+   }
+
 
     // Включаем насос циркуляции если свет горит и выключаем если нет
     // задаём свойства ШИМ-сигнала

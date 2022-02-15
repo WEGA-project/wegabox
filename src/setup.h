@@ -86,12 +86,15 @@ void setup()
   scanner.Init();
   scanner.Scan();
 
+  preferences.begin("settings", false); 
+
   MDNS.begin(HOSTNAME);
   MDNS.addService("http", "tcp", 80);
   server.on("/", handleRoot);
   server.on("/reset", handleReset);
   server.on("/status", handleStatus);
   server.on("/pwd", handlePWD);
+  server.on("/settings", handleSettings);
   server.begin();
 
   xTaskCreate(TaskOTA, "TaskOTA", 5000, NULL, 3, NULL);
