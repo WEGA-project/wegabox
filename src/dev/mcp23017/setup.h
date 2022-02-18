@@ -3,18 +3,13 @@
     syslog_ng("mcp23017 Error.");
   else
     syslog_ng("mcp23017 Start.");
-
-// // задаём свойства ШИМ-сигнала
-// const int freq = 300000;
-// const int ledChannel = 0;
-// const int resolution = 8;
-// pwd=255;
-// ledcSetup(ledChannel, freq, resolution);
-// ledcAttachPin(PWD2, ledChannel);
-
-//   ledcWrite(0, pwd);
-//   mcp.pinMode(DRV1_A, OUTPUT);
-//   mcp.digitalWrite(DRV1_A, HIGH);
+    // ledcSetup(0, 300000, 8);
+    // ledcAttachPin(PWD2, 0);
+    // ledcWrite(0, 254);
+    // delay (1000);
+    // mcp.pinMode(DRV1_A, OUTPUT);
+    // mcp.digitalWrite(DRV1_A, LOW);
+    // vTaskDelay(5000 / portTICK_PERIOD_MS);
 
 xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
 #endif // c_MCP23017

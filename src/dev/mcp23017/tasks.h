@@ -2,62 +2,43 @@
 
 void TaskMCP23017(void *parameters)
 {
-  
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-  int freq=0;
+    unsigned long MCP23017_LastTime = millis() - MCP23017_old;
 
-  if ( pwd != preferences.getInt("PWD", 0)) 
-   { 
-    syslog_ng("PWD change set:" + fFTS(pwd, 0));
-    mcp.pinMode(DRV1_A, OUTPUT);
-    
-    pwd = preferences.getInt("PWD", 0);
-    freq = preferences.getInt("FREQ", 0);
+    if (xSemaphoreX != NULL and MCP23017_LastTime > MCP23017_Repeat)
+    {
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      {
+        unsigned long MCP23017_time = millis();
+        syslog_ng("MCP23017 Start " + fFTS(MCP23017_LastTime - MCP23017_Repeat, 0) + "ms");
 
-    ledcSetup(0, freq, 8);
-    ledcAttachPin(PWD2, 0);
-    ledcWrite(0, pwd);
-    mcp.digitalWrite(DRV1_A, HIGH);
-   }
+        vTaskDelay(1000);
 
+        if (pwd != preferences.getInt("PWD", 0))
+        {
+          syslog_ng("PWD change set:" + fFTS(pwd, 0));
+          mcp.pinMode(DRV1_A, OUTPUT);
 
-    // Включаем насос циркуляции если свет горит и выключаем если нет
-    // задаём свойства ШИМ-сигнала
-    //const int freq = 300000;
-    // if (PR > 1)
-    // {
+          pwd = preferences.getInt("PWD", 0);
+          int freq = preferences.getInt("FREQ", 0);
 
-    //   if (pwd != 117)
-    //   {
-    //     mcp.pinMode(DRV1_A, OUTPUT);
-    //     mcp.digitalWrite(DRV1_A, HIGH);
-    //     pwd = 117;
-    //     syslog_ng("PWD set:" + fFTS(pwd, 0));
+          ledcSetup(0, freq, 8);
+          ledcAttachPin(PWD2, 0);
+          ledcWrite(0, pwd);
+          mcp.digitalWrite(DRV1_A, HIGH);
+        }
 
-    //     int freq = 300000;
-    //     syslog_ng("PWD freq set:" + fFTS(freq, 0));
-
-    //     // задаём свойства ШИМ-сигнала
-    //     //const int freq = 45000;
-    //     const int ledChannel = 0;
-    //     const int resolution = 8;
-    //     ledcSetup(ledChannel, freq, resolution);
-    //     ledcAttachPin(PWD2, ledChannel);
-    //     ledcWrite(ledChannel, 254);
-    //     delay(1000);
-    //     ledcWrite(ledChannel, pwd);
-    //   }
-    // }
-    // else
-    // {
-    //   mcp.digitalWrite(DRV1_A, LOW);
-    //   pwd = 0;
-    // }
+        MCP23017_time = millis() - MCP23017_time;
+        syslog_ng("MCP23017 " + fFTS(MCP23017_time, 0) + "ms end.");
+        MCP23017_old = millis();
+        xSemaphoreGive(xSemaphoreX);
+      }
+    }
   }
 }
+
 #endif // c_MCP23017
