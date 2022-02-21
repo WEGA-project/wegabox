@@ -8,6 +8,6 @@
   #define DRV1_C 2
   #define DRV1_D 3
     unsigned long MCP23017_old = millis();
-  unsigned long MCP23017_Repeat = 1000;
+  unsigned long MCP23017_Repeat = 20000;
 
 #endif // c_MCP23017

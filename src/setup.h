@@ -86,6 +86,10 @@ void setup()
   scanner.Init();
   scanner.Scan();
 
+
+
+
+
   preferences.begin("settings", false); 
 
   MDNS.begin(HOSTNAME);

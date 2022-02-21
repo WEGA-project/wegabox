@@ -114,27 +114,27 @@ void handleStatus()
 void handlePWD()
 {
   #if c_MCP23017 == 1
-  mcp.pinMode(DRV1_A, OUTPUT);
-  mcp.digitalWrite(DRV1_A, HIGH);
+  // mcp.pinMode(DRV1_A, OUTPUT);
+  // mcp.digitalWrite(DRV1_A, HIGH);
   
 
-  pwd = server.arg("pwd").toInt();
-  syslog_ng("PWD set:" + fFTS(pwd, 0));
+  // pwd = server.arg("pwd").toInt();
+  // syslog_ng("PWD set:" + fFTS(pwd, 0));
 
-  int freq = server.arg("freq").toInt();
-  syslog_ng("PWD freq set:" + fFTS(freq, 0));
+  // int freq = server.arg("freq").toInt();
+  // syslog_ng("PWD freq set:" + fFTS(freq, 0));
 
-  // задаём свойства ШИМ-сигнала
-  //const int freq = 45000;
-  const int ledChannel = 0;
-  const int resolution = 8;
-  ledcSetup(ledChannel, freq, resolution);
-  ledcAttachPin(PWD2, ledChannel);
-  // ledcWrite(ledChannel, 255);
-  // delay(1000);
-  ledcWrite(ledChannel, pwd);
+  // // задаём свойства ШИМ-сигнала
+  // //const int freq = 45000;
+  // const int ledChannel = 0;
+  // const int resolution = 8;
+  // ledcSetup(ledChannel, freq, resolution);
+  // ledcAttachPin(PWD2, ledChannel);
+  // // ledcWrite(ledChannel, 255);
+  // // delay(1000);
+  // ledcWrite(ledChannel, pwd);
 
-  server.send(200, "text/plain", "pwd=" + fFTS(pwd, 0) + " freq=" + fFTS(freq, 0));
+  // server.send(200, "text/plain", "pwd=" + fFTS(pwd, 0) + " freq=" + fFTS(freq, 0));
   #endif // c_MCP23017
 }
 

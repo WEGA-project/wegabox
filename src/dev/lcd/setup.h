@@ -15,7 +15,7 @@
   oled.println(".local");
   oled.update();
 
-xTaskCreate(TaskLCD,"TaskLCD",15000,NULL,1,NULL);
+xTaskCreate(TaskLCD,"TaskLCD",15000,NULL,0,NULL);
 syslog_ng("LCD add Task");
 #endif // c_LCD
 

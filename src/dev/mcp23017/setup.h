@@ -11,5 +11,10 @@
     // mcp.digitalWrite(DRV1_A, LOW);
     // vTaskDelay(5000 / portTICK_PERIOD_MS);
 
-xTaskCreate(TaskMCP23017,"MCP23017",10000,NULL,0,NULL);
+
+
+
+
+
+xTaskCreate(TaskMCP23017,"MCP23017",5000,NULL,1,NULL);
 #endif // c_MCP23017

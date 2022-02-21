@@ -15,24 +15,32 @@ void TaskDS18B20(void *parameters)
       {
         unsigned long DS18B20_time = millis();
         syslog_ng("DS18B20 Start " + fFTS(DS18B20_LastTime - DS18B20_Repeat, 0) + "ms");
-        sens18b20.begin();
-        sens18b20.begin();
         
-        //delay(100);
-        //syslog_ng(  fFTS( sens18b20.getDeviceCount(),0 ) );
-        if (sens18b20.getDeviceCount() > 0)
-        {
+        
+         sens18b20.begin();
+        // vTaskDelay(10 / portTICK_PERIOD_MS);
+        // syslog_ng("DS18B20 Begin:1");
+        // sens18b20.begin();
+        // vTaskDelay(10 / portTICK_PERIOD_MS);
+        // syslog_ng("DS18B20 Begin:2");
+        // //delay(100);
+        // //syslog_ng(  fFTS( sens18b20.getDeviceCount(),0 ) );
+        // if (sens18b20.getDeviceCount() > 0)
+        // {
 
           sens18b20.requestTemperatures();
 
           unsigned long cont;
           float ds0 = -127;
-          for (cont = 0; ds0 == -127 or ds0 == 85 or cont > 3; cont++)
+          for (cont = 0;  ( ds0 == -127 or ds0 == 85) and cont < 100; cont++)
           {
+            vTaskDelay(1);
             ds0 = sens18b20.getTempCByIndex(0);
           }
-          if (ds0 != -127 and ds0 != 85)
+          if (ds0 and ds0 != -127 and ds0 != 85)
             RootTempRM.add(ds0);
+          else
+            sens18b20.begin();
 
           syslog_ng("DS18B20:" + fFTS(ds0, 3));
           if (cont > 1)
@@ -40,11 +48,11 @@ void TaskDS18B20(void *parameters)
 
           RootTemp = RootTempRM.getAverage();
           syslog_ng("DS18B20 Filter:" + fFTS(RootTemp, 3));
-        }
-        else
-        {
-          syslog_ng("DS18B20 Error: 1-W devices not found");
-        }
+        // }
+        // else
+        // {
+        //   syslog_ng("DS18B20 Error: 1-W devices not found");
+        // }
 
         DS18B20_time = millis() - DS18B20_time;
 
@@ -54,5 +62,7 @@ void TaskDS18B20(void *parameters)
       }
     }
   }
+  syslog_ng("DS18B20 EXIT Task");
+
 }
 #endif // c_DS18B2
