@@ -15,6 +15,8 @@ void handleRoot()
   String httpstr = "<meta http-equiv='refresh' content='10'>";
   httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
   httpstr += "Firmware=" + String(Firmware) + "<br>";
+  httpstr += "Uptime=" + fFTS(millis()/1000,0) + " sec <br>";
+
   if (RootTemp)
   {
     httpstr += "RootTemp=" + fFTS(RootTemp, 3) + "<br>";

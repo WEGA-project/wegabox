@@ -22,15 +22,18 @@ void TaskSDC30(void *parameters)
           CO2 = airSensor.getCO2();
           AirTemp = airSensor.getTemperature();
           AirHum = airSensor.getHumidity();
-          if (airSensor.getAutoSelfCalibration() == true) syslog_ng("SDC30 Warning: Enable Auto Self Calibration");
+          if (airSensor.getAutoSelfCalibration() == true)
+            syslog_ng("SDC30 Warning: Enable Auto Self Calibration");
           syslog_ng("SDC30 CO2 (ppm): " + fFTS(CO2, 3));
           syslog_ng("SDC30 AirTemp: " + fFTS(AirTemp, 3));
           syslog_ng("SDC30 AirHum: " + fFTS(AirHum, 3));
         }
         else
-          syslog_ng("SDC30 Error");
-
-              SDC30_time = millis() - SDC30_time;
+        {
+          syslog_ng("SDC30 Error - restart");
+          airSensor.begin();
+        }
+        SDC30_time = millis() - SDC30_time;
         syslog_ng("SDC30 " + fFTS(SDC30_time, 0) + "ms end.");
         SDC30_old = millis();
         xSemaphoreGive(xSemaphoreX);

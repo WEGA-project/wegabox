@@ -4,6 +4,6 @@
   {
     syslog_ng("SDC30: Air sensor not detected.");
   }
-long SDC30_TaskErr = xTaskCreate(TaskSDC30,"TaskSDC30",5000,NULL,0,NULL);
+long SDC30_TaskErr = xTaskCreate(TaskSDC30,"TaskSDC30",8000,NULL,0,NULL);
 syslog_ng("SDC30 add Task:" + fFTS(SDC30_TaskErr,0) );
 #endif // c_SDC30  
