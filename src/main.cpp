@@ -45,7 +45,6 @@ RunningMedian CpuTempRM = RunningMedian(10);
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,PR,CPUTemp,CO2, tVOC, eRAW;
 float wNTC,wR2,wEC,wpH;
-int pwd_val, pwd_freq, pwd_port;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;

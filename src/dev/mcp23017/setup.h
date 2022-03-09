@@ -4,7 +4,44 @@
   else
     syslog_ng("mcp23017 Begin.");
 
+if (preferences.getInt("DRV1_A", -1) == -1)  preferences.putInt("DRV1_A", 0);
+if (preferences.getInt("DRV1_B", -1) == -1)  preferences.putInt("DRV1_B", 1);
+if (preferences.getInt("DRV1_C", -1) == -1)  preferences.putInt("DRV1_C", 2);
+if (preferences.getInt("DRV1_D", -1) == -1)  preferences.putInt("DRV1_D", 3);
+if (preferences.getInt("DRV2_A", -1) == -1)  preferences.putInt("DRV2_A", 4);
+if (preferences.getInt("DRV2_B", -1) == -1)  preferences.putInt("DRV2_B", 5);
+if (preferences.getInt("DRV2_C", -1) == -1)  preferences.putInt("DRV2_C", 6);
+if (preferences.getInt("DRV2_D", -1) == -1)  preferences.putInt("DRV2_D", 7);
+if (preferences.getInt("DRV3_A", -1) == -1)  preferences.putInt("DRV3_A", 8);
+if (preferences.getInt("DRV3_B", -1) == -1)  preferences.putInt("DRV3_B", 9);
+if (preferences.getInt("DRV3_C", -1) == -1)  preferences.putInt("DRV3_C", 10);
+if (preferences.getInt("DRV3_D", -1) == -1)  preferences.putInt("DRV3_D", 11);
+if (preferences.getInt("DRV4_A", -1) == -1)  preferences.putInt("DRV4_A", 12);
+if (preferences.getInt("DRV4_B", -1) == -1)  preferences.putInt("DRV4_B", 13);
+if (preferences.getInt("DRV4_C", -1) == -1)  preferences.putInt("DRV4_C", 14);
+if (preferences.getInt("DRV4_D", -1) == -1)  preferences.putInt("DRV4_D", 15);
 
+
+preferences.putInt("DRV1_A", 0);
+preferences.putInt("DRV1_B", 1);
+preferences.putInt("DRV1_C", 2);
+preferences.putInt("DRV1_D", 3);
+preferences.putInt("DRV2_A", 4);
+preferences.putInt("DRV2_B", 5);
+preferences.putInt("DRV2_C", 6);
+preferences.putInt("DRV2_D", 7);
+preferences.putInt("DRV3_A", 8);
+preferences.putInt("DRV3_B", 9);
+preferences.putInt("DRV3_C", 10);
+preferences.putInt("DRV3_D", 11);
+preferences.putInt("DRV4_A", 12);
+preferences.putInt("DRV4_B", 13);
+preferences.putInt("DRV4_C", 14);
+preferences.putInt("DRV4_D", 15);
+
+
+        for (int p=0;p<16;p++)
+         mcp.pinMode(p, OUTPUT); 
 
 xTaskCreate(TaskMCP23017,"MCP23017",5000,NULL,0,NULL);
 #endif // c_MCP23017

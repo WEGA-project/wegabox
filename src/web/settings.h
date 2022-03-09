@@ -1,15 +1,23 @@
 void handleSettings()
 {
-       
-    //preferences.putFloat("param1", 21.1);
 
-  //float dataF_read=preferences.getFloat("param1", 0);
+if (preferences.getInt("PWDport", -1) == -1)
+  preferences.putInt("PWDport", 16);
+  
+if (preferences.getInt("PWD", -1) == -1)
+  preferences.putInt("PWD", 0);
 
+if (preferences.getInt("FREQ", -1) == -1)
+  preferences.putInt("FREQ", 5000);
 
+if (preferences.getInt("PWDport2", -1) == -1)
+  preferences.putInt("PWDport2", 17);
+  
+if (preferences.getInt("PWD2", -1) == -1)
+  preferences.putInt("PWD2", 0);
 
-  // if(server.arg("PWD") != "")  preferences.putInt("PWD", server.arg("PWD").toInt());
-  // if(server.arg("FREQ") != "")  preferences.putInt("FREQ", server.arg("FREQ").toInt());
-    //float p1f=server.arg("p1").toFloat(), p1c=(p1-p1f)/p1f*100;
+if (preferences.getInt("FREQ2", -1) == -1)
+  preferences.putInt("FREQ2", 5000);
 
   syslog_ng("WEB /settings");
 
@@ -18,7 +26,7 @@ void handleSettings()
   h += "Firmware=" + String(Firmware) + "<br>\n";
   //h += fFTS(dataF_read,2) + "<br>\n";
   h +="<form action='' method='POST' id='set'></form>\n";
-  h +="<table><caption>PWD Settings</caption>\n";
+  h +="<table><caption>PWD group 1</caption>\n";
 
   if(server.arg("PWDport") != "")  preferences.putInt("PWDport", server.arg("PWDport").toInt());
   h +="<tr><td>PWDport<td><input type='text' name='PWDport' value='" + fFTS(preferences.getInt("PWDport", 0),0) + "' form='set'></tr>\n";
@@ -29,22 +37,136 @@ void handleSettings()
   if(server.arg("FREQ") != "")  preferences.putInt("FREQ", server.arg("FREQ").toInt());
   h +="<tr><td>FREQ<td><input type='text' name='FREQ' value='" + fFTS(preferences.getInt("FREQ", 0),0) + "' form='set'></tr>\n";
 
+  // h +="</table>\n";
+
+// DRV1 setting state
+
+  if(server.arg("DRV1_A_State") != "")  preferences.putInt("DRV1_A_State", server.arg("DRV1_A_State").toInt());
+  h +="<tr><td>DRV1_A_State<td><input type='text' name='DRV1_A_State' value='" + fFTS(preferences.getInt("DRV1_A_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV1_B_State") != "")  preferences.putInt("DRV1_B_State", server.arg("DRV1_B_State").toInt());
+  // h +="<tr><td>DRV1_B_State<td><input type='text' name='DRV1_B_State' value='" + fFTS(preferences.getInt("DRV1_B_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV1_C_State") != "")  preferences.putInt("DRV1_C_State", server.arg("DRV1_C_State").toInt());
+  // h +="<tr><td>DRV1_C_State<td><input type='text' name='DRV1_C_State' value='" + fFTS(preferences.getInt("DRV1_C_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV1_D_State") != "")  preferences.putInt("DRV1_D_State", server.arg("DRV1_D_State").toInt());
+  h +="<tr><td>DRV1_D_State<td><input type='text' name='DRV1_D_State' value='" + fFTS(preferences.getInt("DRV1_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV2 setting state
+
+  if(server.arg("DRV2_A_State") != "")  preferences.putInt("DRV2_A_State", server.arg("DRV2_A_State").toInt());
+  h +="<tr><td>DRV2_A_State<td><input type='text' name='DRV2_A_State' value='" + fFTS(preferences.getInt("DRV2_A_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV2_B_State") != "")  preferences.putInt("DRV2_B_State", server.arg("DRV2_B_State").toInt());
+  // h +="<tr><td>DRV2_B_State<td><input type='text' name='DRV2_B_State' value='" + fFTS(preferences.getInt("DRV2_B_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV2_C_State") != "")  preferences.putInt("DRV2_C_State", server.arg("DRV2_C_State").toInt());
+  // h +="<tr><td>DRV2_C_State<td><input type='text' name='DRV2_C_State' value='" + fFTS(preferences.getInt("DRV2_C_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV2_D_State") != "")  preferences.putInt("DRV2_D_State", server.arg("DRV2_D_State").toInt());
+  h +="<tr><td>DRV2_D_State<td><input type='text' name='DRV2_D_State' value='" + fFTS(preferences.getInt("DRV2_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV3 setting state
+
+  if(server.arg("DRV3_A_State") != "")  preferences.putInt("DRV3_A_State", server.arg("DRV3_A_State").toInt());
+  h +="<tr><td>DRV3_A_State<td><input type='text' name='DRV3_A_State' value='" + fFTS(preferences.getInt("DRV3_A_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV3_B_State") != "")  preferences.putInt("DRV3_B_State", server.arg("DRV3_B_State").toInt());
+  // h +="<tr><td>DRV3_B_State<td><input type='text' name='DRV3_B_State' value='" + fFTS(preferences.getInt("DRV3_B_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV3_C_State") != "")  preferences.putInt("DRV3_C_State", server.arg("DRV3_C_State").toInt());
+  // h +="<tr><td>DRV3_C_State<td><input type='text' name='DRV3_C_State' value='" + fFTS(preferences.getInt("DRV3_C_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV3_D_State") != "")  preferences.putInt("DRV3_D_State", server.arg("DRV3_D_State").toInt());
+  h +="<tr><td>DRV3_D_State<td><input type='text' name='DRV3_D_State' value='" + fFTS(preferences.getInt("DRV3_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV4 setting state
+
+  if(server.arg("DRV4_A_State") != "")  preferences.putInt("DRV4_A_State", server.arg("DRV4_A_State").toInt());
+  h +="<tr><td>DRV4_A_State<td><input type='text' name='DRV4_A_State' value='" + fFTS(preferences.getInt("DRV4_A_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV4_B_State") != "")  preferences.putInt("DRV4_B_State", server.arg("DRV4_B_State").toInt());
+  // h +="<tr><td>DRV4_B_State<td><input type='text' name='DRV4_B_State' value='" + fFTS(preferences.getInt("DRV4_B_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV4_C_State") != "")  preferences.putInt("DRV4_C_State", server.arg("DRV4_C_State").toInt());
+  // h +="<tr><td>DRV4_C_State<td><input type='text' name='DRV4_C_State' value='" + fFTS(preferences.getInt("DRV4_C_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV4_D_State") != "")  preferences.putInt("DRV4_D_State", server.arg("DRV4_D_State").toInt());
+  h +="<tr><td>DRV4_D_State<td><input type='text' name='DRV4_D_State' value='" + fFTS(preferences.getInt("DRV4_D_State", 0),0) + "' form='set'></tr>\n";
+
   h +="</table>\n";
 
-  h +="<table><caption>MCP23017 Status ports</caption>\n";  
-  if(server.arg("MCP23017_p0") != "")  preferences.putInt("MCP23017_p0", server.arg("MCP23017_p0").toInt());
-  if(server.arg("MCP23017_p1") != "")  preferences.putInt("MCP23017_p1", server.arg("MCP23017_p1").toInt());
-  if(server.arg("MCP23017_p2") != "")  preferences.putInt("MCP23017_p2", server.arg("MCP23017_p2").toInt());
-  if(server.arg("MCP23017_p3") != "")  preferences.putInt("MCP23017_p3", server.arg("MCP23017_p3").toInt());
+  h +="<table><caption>PWD group 2</caption>\n";
 
-  h +="<tr><td>MCP23017_p0<td><input type='text' name='MCP23017_p0' value='" + fFTS(preferences.getInt("MCP23017_p0", 0),0) + "' form='set'></tr>\n";
-  h +="<tr><td>MCP23017_p1<td><input type='text' name='MCP23017_p1' value='" + fFTS(preferences.getInt("MCP23017_p1", 0),0) + "' form='set'></tr>\n";
-  h +="<tr><td>MCP23017_p2<td><input type='text' name='MCP23017_p2' value='" + fFTS(preferences.getInt("MCP23017_p2", 0),0) + "' form='set'></tr>\n";
-  h +="<tr><td>MCP23017_p3<td><input type='text' name='MCP23017_p3' value='" + fFTS(preferences.getInt("MCP23017_p3", 0),0) + "' form='set'></tr>\n";
+  if(server.arg("PWDport2") != "")  preferences.putInt("PWDport2", server.arg("PWDport2").toInt());
+  h +="<tr><td>PWDport2<td><input type='text' name='PWDport2' value='" + fFTS(preferences.getInt("PWDport2", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("PWD2") != "")  preferences.putInt("PWD2", server.arg("PWD2").toInt());
+  h +="<tr><td>PWD2<td><input type='text' name='PWD2' value='" + fFTS(preferences.getInt("PWD2", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("FREQ2") != "")  preferences.putInt("FREQ2", server.arg("FREQ").toInt());
+  h +="<tr><td>FREQ2<td><input type='text' name='FREQ2' value='" + fFTS(preferences.getInt("FREQ2", 0),0) + "' form='set'></tr>\n";
+
+  // h +="</table>\n";
+
+// DRV1 setting state
+
+  // if(server.arg("DRV1_A_State") != "")  preferences.putInt("DRV1_A_State", server.arg("DRV1_A_State").toInt());
+  // h +="<tr><td>DRV1_A_State<td><input type='text' name='DRV1_A_State' value='" + fFTS(preferences.getInt("DRV1_A_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV1_B_State") != "")  preferences.putInt("DRV1_B_State", server.arg("DRV1_B_State").toInt());
+  h +="<tr><td>DRV1_B_State<td><input type='text' name='DRV1_B_State' value='" + fFTS(preferences.getInt("DRV1_B_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV1_C_State") != "")  preferences.putInt("DRV1_C_State", server.arg("DRV1_C_State").toInt());
+  h +="<tr><td>DRV1_C_State<td><input type='text' name='DRV1_C_State' value='" + fFTS(preferences.getInt("DRV1_C_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV1_D_State") != "")  preferences.putInt("DRV1_D_State", server.arg("DRV1_D_State").toInt());
+  // h +="<tr><td>DRV1_D_State<td><input type='text' name='DRV1_D_State' value='" + fFTS(preferences.getInt("DRV1_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV2 setting state
+
+  // if(server.arg("DRV2_A_State") != "")  preferences.putInt("DRV2_A_State", server.arg("DRV2_A_State").toInt());
+  // h +="<tr><td>DRV2_A_State<td><input type='text' name='DRV2_A_State' value='" + fFTS(preferences.getInt("DRV2_A_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV2_B_State") != "")  preferences.putInt("DRV2_B_State", server.arg("DRV2_B_State").toInt());
+  h +="<tr><td>DRV2_B_State<td><input type='text' name='DRV2_B_State' value='" + fFTS(preferences.getInt("DRV2_B_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV2_C_State") != "")  preferences.putInt("DRV2_C_State", server.arg("DRV2_C_State").toInt());
+  h +="<tr><td>DRV2_C_State<td><input type='text' name='DRV2_C_State' value='" + fFTS(preferences.getInt("DRV2_C_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV2_D_State") != "")  preferences.putInt("DRV2_D_State", server.arg("DRV2_D_State").toInt());
+  // h +="<tr><td>DRV2_D_State<td><input type='text' name='DRV2_D_State' value='" + fFTS(preferences.getInt("DRV2_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV3 setting state
+
+  // if(server.arg("DRV3_A_State") != "")  preferences.putInt("DRV3_A_State", server.arg("DRV3_A_State").toInt());
+  // h +="<tr><td>DRV3_A_State<td><input type='text' name='DRV3_A_State' value='" + fFTS(preferences.getInt("DRV3_A_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV3_B_State") != "")  preferences.putInt("DRV3_B_State", server.arg("DRV3_B_State").toInt());
+  h +="<tr><td>DRV3_B_State<td><input type='text' name='DRV3_B_State' value='" + fFTS(preferences.getInt("DRV3_B_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV3_C_State") != "")  preferences.putInt("DRV3_C_State", server.arg("DRV3_C_State").toInt());
+  h +="<tr><td>DRV3_C_State<td><input type='text' name='DRV3_C_State' value='" + fFTS(preferences.getInt("DRV3_C_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV3_D_State") != "")  preferences.putInt("DRV3_D_State", server.arg("DRV3_D_State").toInt());
+  // h +="<tr><td>DRV3_D_State<td><input type='text' name='DRV3_D_State' value='" + fFTS(preferences.getInt("DRV3_D_State", 0),0) + "' form='set'></tr>\n";
+
+// DRV4 setting state
+
+  // if(server.arg("DRV4_A_State") != "")  preferences.putInt("DRV4_A_State", server.arg("DRV4_A_State").toInt());
+  // h +="<tr><td>DRV4_A_State<td><input type='text' name='DRV4_A_State' value='" + fFTS(preferences.getInt("DRV4_A_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV4_B_State") != "")  preferences.putInt("DRV4_B_State", server.arg("DRV4_B_State").toInt());
+  h +="<tr><td>DRV4_B_State<td><input type='text' name='DRV4_B_State' value='" + fFTS(preferences.getInt("DRV4_B_State", 0),0) + "' form='set'></tr>\n";
+
+  if(server.arg("DRV4_C_State") != "")  preferences.putInt("DRV4_C_State", server.arg("DRV4_C_State").toInt());
+  h +="<tr><td>DRV4_C_State<td><input type='text' name='DRV4_C_State' value='" + fFTS(preferences.getInt("DRV4_C_State", 0),0) + "' form='set'></tr>\n";
+
+  // if(server.arg("DRV4_D_State") != "")  preferences.putInt("DRV4_D_State", server.arg("DRV4_D_State").toInt());
+  // h +="<tr><td>DRV4_D_State<td><input type='text' name='DRV4_D_State' value='" + fFTS(preferences.getInt("DRV4_D_State", 0),0) + "' form='set'></tr>\n";
 
   h +="</table>\n";
-
-
   h +="<input type='submit' value='save' form='set'/></form>\n";
  
 
