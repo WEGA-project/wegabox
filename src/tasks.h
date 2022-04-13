@@ -33,25 +33,7 @@ void TaskHall(void *parameters)
 }
 #endif //c_hall
 
-#if c_CPUTEMP == 1
-void TaskCPUtemp(void *parameters)
-{
-  for (;;)
-  {
-    if (OtaStart == true)
-    {
-      vTaskDelete(NULL);
-    }
-    else
-    {
 
-      CpuTempRM.add((temprature_sens_read() - 32) / 1.8);
-      CPUTemp = CpuTempRM.getMedian();
-      vTaskDelay(100 / portTICK_PERIOD_MS);
-    }
-  }
-}
-#endif //c_CPUTEMP
 
 
 
@@ -72,3 +54,4 @@ void TaskCPUtemp(void *parameters)
 #include <dev/DualBMx/tasks.h>
 #include <dev/sdc30/tasks.h>
 #include <dev/lcd/tasks.h>
+#include <dev/cput/tasks.h>

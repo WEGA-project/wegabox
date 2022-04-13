@@ -31,7 +31,7 @@ RunningMedian AirHumRM = RunningMedian(30);
 RunningMedian AirPressRM = RunningMedian(30);
 RunningMedian PRRM = RunningMedian(30);
 RunningMedian HallRM = RunningMedian(10);
-RunningMedian CpuTempRM = RunningMedian(10);
+
 
 
 #include <pre.h>
@@ -82,6 +82,7 @@ uint8_t appTaskCount = 0;
 SemaphoreHandle_t xI2CSemaphore;
 SemaphoreHandle_t xSemaphoreX = NULL;
 
+#include <dev/cput/main.cpp>
 #include <dev/ds18b20/main.cpp>
 #include <dev/aht10/main.cpp>
 #include <dev/ads1115/main.cpp>
@@ -100,11 +101,6 @@ SemaphoreHandle_t xSemaphoreX = NULL;
 #include <dev/lcd/main.cpp>
 
 
-#if c_CPUTEMP == 1
-  extern "C" {     
-    uint8_t temprature_sens_read(); 
-  }
-#endif //c_CPUTEMP
 
 
 #include <tasks.h>

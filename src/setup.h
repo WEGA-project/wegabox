@@ -109,42 +109,27 @@ void setup()
   adc1_config_width(ADC_WIDTH_BIT_12);
 
 #include <dev/ntc/setup.h>
-
 #include <dev/ds18b20/setup.h>
-
 #include <dev/aht10/setup.h>
-
 #include <dev/us025/setup.h>
-
 #include <dev/ccs811/setup.h>
-
 #include <dev/am2320/setup.h>
-
 #include <dev/mcp3421/setup.h>
-
 #include <dev/bmp280/setup.h>
-
 #include <dev/mcp23017/setup.h>
-
 #include <dev/hx710b/setup.h>
-
 #include <dev/ads1115/setup.h>
-
 #include <dev/pr/setup.h>
-
 #include <dev/ec/setup.h>
-
 #include <dev/DualBMx/setup.h>
-
 #include <dev/sdc30/setup.h>
+#include <dev/cput/setup.h>
 
 #if c_hall == 1
   xTaskCreate(TaskHall, "TaskHall", 10000, NULL, 0, NULL);
 #endif // c_hall
 
-#if c_CPUTEMP == 1
-  xTaskCreate(TaskCPUtemp, "TaskCPUtemp", 10000, NULL, 0, NULL);
-#endif // c_CPUTEMP
+
 
 #if c_LCD == 1
   oled.clear();
