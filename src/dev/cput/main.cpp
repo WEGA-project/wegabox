@@ -4,8 +4,8 @@
 //     uint8_t temprature_sens_read(); 
 //   }
     unsigned long CPUTEMP_old = millis();
-  unsigned long CPUTEMP_Repeat = 10000;
-// RunningMedian CpuTempRM = RunningMedian(1000);
+  unsigned long CPUTEMP_Repeat = 60000;
+RunningMedian CpuTempRM = RunningMedian(250);
 
 #include <soc/rtc.h>
 
@@ -24,10 +24,6 @@ float readTemp1(bool printRaw = false) {
   }
   value /= (uint64_t)rounds;
 
-  // if(printRaw) {
-  //   printf("%s: raw value is: %llu\r\n", __FUNCTION__, value);
-  // }
-
   return ((float)value - M1_CALPOINT1_RAW) * (M1_CALPOINT2_CELSIUS - M1_CALPOINT1_CELSIUS) / (M1_CALPOINT2_RAW - M1_CALPOINT1_RAW) + M1_CALPOINT1_CELSIUS;
 }
 
@@ -40,10 +36,6 @@ float readTemp2(bool printRaw = false) {
   uint64_t value = rtc_time_get();
   delay(100);
   value = (rtc_time_get() - value);
-
-  // if(printRaw) {
-  //   printf("%s: raw value is: %llu\r\n", __FUNCTION__, value);
-  // }
 
   return ((float)value*10.0 - M2_CALPOINT1_RAW) * (M2_CALPOINT2_CELSIUS - M2_CALPOINT1_CELSIUS) / (M2_CALPOINT2_RAW - M2_CALPOINT1_RAW) + M2_CALPOINT1_CELSIUS;
 }

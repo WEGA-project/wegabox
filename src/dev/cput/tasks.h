@@ -15,9 +15,9 @@ void TaskCPUTEMP(void *parameters)
       {
         unsigned long CPUTEMP_time = millis();
         syslog_ng("CPUTEMP Start " + fFTS(CPUTEMP_LastTime - CPUTEMP_Repeat, 0) + "ms");
+      for (long i=0;i<50;i++)     CpuTempRM.add((readTemp1(true) + readTemp2(true)) /2) ;
 
-        CPUTemp = (readTemp1(true) + readTemp2(true)) /2 ;
-
+        CPUTemp = CpuTempRM.getAverage();
         syslog_ng("CPUTemp-Core1:" + fFTS(readTemp1(true), 3));
         syslog_ng("CPUTemp-Core2:" + fFTS(readTemp2(true), 3));
         syslog_ng("CPUTemp:" + fFTS(CPUTemp, 3));

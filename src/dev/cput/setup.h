@@ -11,5 +11,5 @@
   //printf("%d -- %d -- %d\r\n", (int)rtc_clk_slow_freq_get(), rtc_clk_slow_freq_get_hz(), freq_config.freq_mhz);
 
 
-  xTaskCreate(TaskCPUTEMP, "TaskCPUTEMP", 10000, NULL, 0, NULL);
+  xTaskCreate(TaskCPUTEMP, "TaskCPUTEMP", 2000, NULL, 0, NULL);
 #endif // c_CPUTEMP
