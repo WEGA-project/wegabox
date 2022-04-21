@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.6.190422"
+#define Firmware "beta-0.6.210422"
 
 
 #include <WiFi.h>
@@ -21,7 +21,6 @@ Preferences preferences;
 #include <ArduinoJson.h>
     WiFiClient client;
     HTTPClient http;
-    
 
 #include <RunningMedian.h>
 RunningMedian PhRM = RunningMedian(90);
@@ -30,8 +29,6 @@ RunningMedian AirTempRM = RunningMedian(30);
 RunningMedian AirHumRM = RunningMedian(30);
 RunningMedian AirPressRM = RunningMedian(30);
 RunningMedian PRRM = RunningMedian(30);
-RunningMedian HallRM = RunningMedian(10);
-
 
 
 #include <pre.h>
@@ -73,15 +70,14 @@ uint8_t appTaskCount = 0;
 //I2CScanner scanner;
 
 
+
 // syslog
 #include <etc/syslog/main.cpp>
 
-
-
-
-SemaphoreHandle_t xI2CSemaphore;
+//SemaphoreHandle_t xI2CSemaphore;
 SemaphoreHandle_t xSemaphoreX = NULL;
 
+#include <dev/hall/main.cpp>
 #include <dev/cput/main.cpp>
 #include <dev/ds18b20/main.cpp>
 #include <dev/aht10/main.cpp>

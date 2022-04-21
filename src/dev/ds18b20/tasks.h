@@ -18,20 +18,23 @@ void TaskDS18B20(void *parameters)
         syslog_ng("DS18B20 Start " + fFTS(DS18B20_LastTime - DS18B20_Repeat, 0) + "ms");
         
         
-         sens18b20.begin();
+          sens18b20.begin();
           sens18b20.requestTemperatures();
 
           unsigned long cont;
           float ds0 = -127;
-          for (cont = 0;  ( ds0 == -127 or ds0 == 85) and cont < 100; cont++)
+          for (cont = 0;  ( ds0 == -127 or ds0 == 85) and cont < 500; cont++)
           {
             vTaskDelay(1);
             ds0 = sens18b20.getTempCByIndex(0);
+            //sens18b20.begin();
           }
           if (ds0 and ds0 != -127 and ds0 != 85)
             RootTempRM.add(ds0);
-          else
-            sens18b20.begin();
+         // else
+            //oneWire.reset();
+            //delay(1000);
+            //sens18b20.begin();
 
           syslog_ng("DS18B20:" + fFTS(ds0, 3));
           if (cont > 1)

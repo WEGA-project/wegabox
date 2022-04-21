@@ -11,33 +11,6 @@ void TaskOTA(void *parameters)
 }
 
 #include <etc/syslog/func.h>
-
-
-#if c_hall == 1
-void TaskHall(void *parameters)
-{
-  for (;;)
-  {
-    if (OtaStart == true)
-    {
-      vTaskDelete(NULL);
-    }
-    else
-    {
-
-      HallRM.add(hallRead());
-      hall = HallRM.getMedian();
-      vTaskDelay(300 / portTICK_PERIOD_MS);
-    }
-  }
-}
-#endif //c_hall
-
-
-
-
-
-
 #include <dev/ds18b20/tasks.h>
 #include <dev/aht10/tasks.h>
 #include <dev/ads1115/tasks.h>
@@ -55,3 +28,4 @@ void TaskHall(void *parameters)
 #include <dev/sdc30/tasks.h>
 #include <dev/lcd/tasks.h>
 #include <dev/cput/tasks.h>
+#include <dev/hall/tasks.h>

@@ -86,10 +86,6 @@ void setup()
   scanner.Init();
   scanner.Scan();
 
-
-
-
-
   preferences.begin("settings", false); 
 
   MDNS.begin(HOSTNAME);
@@ -124,11 +120,7 @@ void setup()
 #include <dev/DualBMx/setup.h>
 #include <dev/sdc30/setup.h>
 #include <dev/cput/setup.h>
-
-#if c_hall == 1
-  xTaskCreate(TaskHall, "TaskHall", 10000, NULL, 0, NULL);
-#endif // c_hall
-
+#include <dev/hall/setup.h>
 
 
 #if c_LCD == 1
