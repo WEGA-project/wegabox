@@ -4,7 +4,7 @@
 //     uint8_t temprature_sens_read(); 
 //   }
     unsigned long CPUTEMP_old = millis();
-  unsigned long CPUTEMP_Repeat = 60000;
+  unsigned long CPUTEMP_Repeat = 120000;
 RunningMedian CpuTempRM = RunningMedian(250);
 
 #include <soc/rtc.h>

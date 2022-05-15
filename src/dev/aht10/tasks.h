@@ -2,17 +2,17 @@
 void TaskAHT10(void *parameters)
 {
   for (;;)
-  { //
+  { 
     if (OtaStart == true)
       vTaskDelete(NULL);
     //syslog_ng("AHT10 loop");  
-    vTaskDelay(1000);
-
+    //vTaskDelay(1000);
+    delay(100);
     unsigned long AHT10_LastTime = millis() - AHT10_old;
     //if (AHT10_LastTime > AHT10_Repeat)
     if (xSemaphoreX != NULL and AHT10_LastTime > AHT10_Repeat)
     { //syslog_ng("AHT10 Semaphore");
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
         unsigned long AHT10_time = millis();
         syslog_ng("AHT10 Start " + fFTS(AHT10_LastTime - AHT10_Repeat, 0) + "ms");

@@ -6,13 +6,14 @@ void TaskDS18B20(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    vTaskDelay(1000);
+    //vTaskDelay(1000);
+    delay(100);
 
     unsigned long DS18B20_LastTime = millis() - DS18B20_old;
 
     if (xSemaphoreX != NULL and DS18B20_LastTime > DS18B20_Repeat)
     {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
         unsigned long DS18B20_time = millis();
         syslog_ng("DS18B20 Start " + fFTS(DS18B20_LastTime - DS18B20_Repeat, 0) + "ms");
@@ -23,7 +24,7 @@ void TaskDS18B20(void *parameters)
 
           unsigned long cont;
           float ds0 = -127;
-          for (cont = 0;  ( ds0 == -127 or ds0 == 85) and cont < 500; cont++)
+          for (cont = 0;  ( ds0 == -127 or ds0 == 85) and cont < 100; cont++)
           {
             vTaskDelay(1);
             ds0 = sens18b20.getTempCByIndex(0);

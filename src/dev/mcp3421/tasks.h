@@ -5,13 +5,13 @@ void TaskMCP3421(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    vTaskDelay(1000);
+    delay(100);
 
     unsigned long MCP3421_LastTime = millis() - MCP3421_old;
 
     if (xSemaphoreX != NULL and MCP3421_LastTime > MCP3421_Repeat)
     {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
         unsigned long MCP3421_time = millis();
         syslog_ng("MCP3421 Start " + fFTS(MCP3421_LastTime - MCP3421_Repeat, 0) + "ms");

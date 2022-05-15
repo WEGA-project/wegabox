@@ -4,9 +4,13 @@
     // Check device present
   Wire.requestFrom(address, (uint8_t)1);
   if (!Wire.available()) {
-    Serial.print("No device found at address ");
-    Serial.println(address, HEX);     
+    syslog_err("MCP3421: No device found");
+    //Serial.print("No device found at address ");
+    //Serial.println(address, HEX);     
   }
+  else 
+  syslog_ng("MCP3421: Device found!");
 
-xTaskCreate(TaskMCP3421,"TaskMCP3421",5000,NULL,0,NULL);
+
+xTaskCreate(TaskMCP3421,"TaskMCP3421",5000,NULL,1,NULL);
 #endif // c_MCP3421
