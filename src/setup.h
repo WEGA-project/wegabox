@@ -71,20 +71,30 @@ void setup()
                    Serial.println("End Failed");
                });
 
-  syslog_ng("WEGA Start");
+  syslog_ng("WEGABOX: Start system");
+  syslog_ng("WEGABOX NAME: "+ String(HOSTNAME));
+  syslog_ng("WEGABOX FW: "+ String(Firmware));
 
 #include <dev/lcd/setup.h>
   ArduinoOTA.begin();
 
+syslog_ng("WEGABOX: Wait OTA 30 sec");
   while (millis() < 30000)
     ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
 
   // Сканирование устройств на шине i2c
   Wire.begin(I2C_SDA, I2C_SCL);
-
+  
+syslog_ng("I2C: Scan I2C bus");
   I2CScanner scanner;
   scanner.Init();
   scanner.Scan();
+  syslog_ng("I2C found devices:"+ String(scanner.Devices_Count));
+
+
+
+
+
 
   preferences.begin("settings", false); 
 
@@ -121,7 +131,7 @@ void setup()
 #include <dev/sdc30/setup.h>
 #include <dev/cput/setup.h>
 #include <dev/hall/setup.h>
-
+#include <dev/vl6180x/setup.h>
 
 #if c_LCD == 1
   oled.clear();
