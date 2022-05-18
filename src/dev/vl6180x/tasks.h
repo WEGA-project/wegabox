@@ -17,35 +17,59 @@ void TaskVL6180X(void *parameters)
 
 
   //Serial.print("Ambient: ");
-  syslog_ng("VL6180X Ambient:" + fFTS(s_vl6180X.readAmbientSingle(),0 ) );
+  //syslog_ng("VL6180X Ambient:" + fFTS(s_vl6180X.readAmbientSingle(),0 ) );
   // if (s_vl6180X.timeoutOccurred()) { syslog_err("VL6180X Ambient: TIMEOUT"); }
-
+  
   // //Serial.print("\tRange: ");
   syslog_ng("VL6180X Range:" + fFTS(s_vl6180X.readRangeSingleMillimeters(),0 ) );
-  syslog_ng("VL6180X RangeRAW:" + fFTS(s_vl6180X.readRangeSingle(),0 ) );
+  
+  //syslog_ng("VL6180X RangeRAW:" + fFTS(s_vl6180X.readRangeSingle(),0 ) );
   // if (s_vl6180X.timeoutOccurred()) { syslog_err("VL6180X Range: TIMEOUT"); }
   
 //syslog_ng("VL6180X Range:" + fFTS(s_vl6180X.readRangeContinuousMillimeters(),0 ) );  
 delay(100);
+s_vl6180X.init();
 long err=0;
-
-for (long i=0;i<VL6180X_Count;i++){
-//float range=s_vl6180X.readRangeContinuousMillimeters();
-float range=s_vl6180X.readRangeSingleMillimeters();
-delay(10);
-if(range != 765) VL6180X_RangeRM.add(range/10);
-else err++;
+float range=0;
+float range0=0;
+unsigned cont=0;
+unsigned long t=millis();
+while (millis()-t<20000)
+{
+  cont++;
+  
+  s_vl6180X.timeoutOccurred();
+  range0=s_vl6180X.readRangeSingleMillimeters();
+  if(range0 != 765) range = range0/10 + range;
+    else err++;
+  s_vl6180X.init();
 }
-Dist=VL6180X_RangeRM.getAverage(128);
+VL6180X_RangeRM.add(range/(cont-err));
+//Dist=range/(cont-err);
+Dist=VL6180X_RangeRM.getAverage();
+
+
+// for (long i=0;i<VL6180X_Count;i++){
+// //float range=s_vl6180X.readRangeContinuousMillimeters();
+// //
+// s_vl6180X.timeoutOccurred();
+// range=s_vl6180X.readRangeSingleMillimeters()/10+range;
+
+// if(range != 765) VL6180X_RangeRM.add(range/10);
+// else err++;
+// }
+// Dist=VL6180X_RangeRM.getAverage();
+
 
         VL6180X_time = millis() - VL6180X_time;
 
 
 
         syslog_ng("VL6180X dist: " + fFTS(Dist, 3));
+        syslog_ng("VL6180X Error/Count: " + String(err) + "/" + String(cont));
         syslog_ng("VL6180X Highest: " + fFTS(VL6180X_RangeRM.getHighest(), 1));
         syslog_ng("VL6180X Lowest: " + fFTS(VL6180X_RangeRM.getLowest(), 1));
-        syslog_ng("VL6180X err: " + fFTS(err, 0) + "/" + String(VL6180X_Count));
+        
         syslog_ng("VL6180X " + fFTS(VL6180X_time, 0) + "ms end.");
         VL6180X_old = millis();
         xSemaphoreGive(xSemaphoreX);
