@@ -103,6 +103,15 @@ void TaskMCP23017(void *parameters)
         mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_A_State", 0));
         syslog_ng("MCP23017 DRV1_A (" + fFTS(DRV1_A, 0) + "):" + fFTS(preferences.getInt("DRV1_A_State", 0), 0));
 
+        mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_B_State", 0));
+        syslog_ng("MCP23017 DRV1_B (" + fFTS(DRV1_B, 0) + "):" + fFTS(preferences.getInt("DRV1_B_State", 0), 0));
+
+        mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_C_State", 0));
+        syslog_ng("MCP23017 DRV1_C (" + fFTS(DRV1_C, 0) + "):" + fFTS(preferences.getInt("DRV1_C_State", 0), 0));
+
+        mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_D_State", 0));
+        syslog_ng("MCP23017 DRV1_D (" + fFTS(DRV1_D, 0) + "):" + fFTS(preferences.getInt("DRV1_D_State", 0), 0));
+
         vTaskDelay(MCP23017_Repeat);
 
         syslog_ng("MCP23017 End ");
