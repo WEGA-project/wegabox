@@ -20,25 +20,28 @@ void TaskMCP23017(void *parameters)
         // Адаптивная циркуляция для снижения скачков корневого давления
         if (preferences.getInt("RootPomp", -1) == 1)
         {
-          pwd_val=preferences.getInt("PWD",254);
-          
+          pwd_val = preferences.getInt("PWD", 254);
+          RootPwdMax = preferences.getInt("RootPwdMax", 254);
+          RootPwdMin = preferences.getInt("RootPwdMin", 0);
 
           if (RootTemp > AirTemp and RootTemp > 15)
           {
-            //preferences.putInt("DRV1_A_State", 0);
+            // preferences.putInt("DRV1_A_State", 0);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
-            pwd_val=pwd_val-10;
+            pwd_val = pwd_val - 2;
           }
           else
           {
-            //preferences.putInt("DRV1_A_State", 1);
+            // preferences.putInt("DRV1_A_State", 1);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
-            pwd_val=pwd_val+10;
+            pwd_val = pwd_val + 1;
           }
-            if (pwd_val < 15 ) pwd_val = 15;
-            if (pwd_val > 254 ) pwd_val = 254;
-            preferences.putInt("PWD", pwd_val);
 
+          if (pwd_val < RootPwdMin)
+            pwd_val = RootPwdMin;
+          if (pwd_val > RootPwdMax)
+            pwd_val = RootPwdMax;
+          preferences.putInt("PWD", pwd_val);
         }
 
         // Параметры портов

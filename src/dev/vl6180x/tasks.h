@@ -27,8 +27,9 @@ void TaskVL6180X(void *parameters)
   // if (s_vl6180X.timeoutOccurred()) { syslog_err("VL6180X Range: TIMEOUT"); }
   
 //syslog_ng("VL6180X Range:" + fFTS(s_vl6180X.readRangeContinuousMillimeters(),0 ) );  
-delay(100);
 s_vl6180X.init();
+
+delay(100);
 long err=0;
 float range=0;
 float range0=0;
