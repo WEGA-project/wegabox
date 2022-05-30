@@ -73,10 +73,11 @@ void TaskMCP23017(void *parameters)
         if (preferences.getInt("ECStabEnable", -1) == 1)
         {
           float setEC=preferences.getFloat("ECStabValue", 2.5);
+          int setTime=preferences.getInt("ECStabTime", 20);
           if (wEC>setEC){
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp power up");
             mcp.digitalWrite(DRV1_D, 1);
-            delay (20000);
+            delay (setTime*1000);
             mcp.digitalWrite(DRV1_D, 0);
             syslog_ng("EC Stab: ECStab pomp power down");
           }
