@@ -23,8 +23,9 @@ void TaskMCP23017(void *parameters)
           pwd_val = preferences.getInt("PWD", 254);
           RootPwdMax = preferences.getInt("RootPwdMax", 254);
           RootPwdMin = preferences.getInt("RootPwdMin", 0);
+          RootDistMin = preferences.getInt("RootDistMin", 6);
 
-          if (RootTemp > AirTemp and RootTemp > 15)
+          if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
           {
             // preferences.putInt("DRV1_A_State", 0);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
@@ -32,6 +33,7 @@ void TaskMCP23017(void *parameters)
           }
           else
           {
+            
             // preferences.putInt("DRV1_A_State", 1);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
             pwd_val = pwd_val + 1;
