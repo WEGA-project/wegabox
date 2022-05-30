@@ -33,7 +33,7 @@ void TaskMCP23017(void *parameters)
           }
           else
           {
-            
+
             // preferences.putInt("DRV1_A_State", 1);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
             pwd_val = pwd_val + 1;
@@ -45,6 +45,8 @@ void TaskMCP23017(void *parameters)
             pwd_val = RootPwdMax;
           preferences.putInt("PWD", pwd_val);
         }
+
+
 
         // Параметры портов
         long DRV1_A = preferences.getInt("DRV1_A", -1);
@@ -66,6 +68,21 @@ void TaskMCP23017(void *parameters)
         long DRV4_B = preferences.getInt("DRV4_B", -1);
         long DRV4_C = preferences.getInt("DRV4_C", -1);
         long DRV4_D = preferences.getInt("DRV4_D", -1);
+
+                // Коррекция ЕС путем разбавления
+        if (preferences.getInt("ECStabEnable", -1) == 1)
+        {
+          float setEC=preferences.getFloat("ECStabValue", 2.5);
+          if (wEC>setEC){
+            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp power up");
+            mcp.digitalWrite(DRV1_D, 1);
+            delay (20000);
+            mcp.digitalWrite(DRV1_D, 0);
+            syslog_ng("EC Stab: ECStab pomp power down");
+          }
+          else
+          mcp.digitalWrite(DRV1_D, 0);
+        }
 
         // Параметры шимов
         pwd_val = preferences.getInt("PWD", 0);

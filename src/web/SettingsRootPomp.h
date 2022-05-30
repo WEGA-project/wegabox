@@ -23,10 +23,10 @@ RootDistMin=preferences.getInt("RootDistMin", 0);
 String RootPomp=fFTS(preferences.getInt("RootPomp", 0), 0);
 String SelectedRootPomp=preferences.getString("SelectedRootPomp", "DRV1_A");
 //h +="<details>\n";
-h +="<summary>Root pressure management</summary>\n";
+//h +="<summary>Root pressure management</summary>\n";
 h +="<form action='' method='POST' id='set'></form>\n";
 h +=" <table>\n";
-h +="     <caption>Root pomp</caption>\n";
+h +="     <caption>Root pressure management</caption>\n";
 
 h += "<tr><td>AirHum<td>" + fFTS(AirHum,3) + "%</tr>\n";
 h += "<tr><td>RootTemp<td>" + fFTS(RootTemp,3) + "</tr>\n";

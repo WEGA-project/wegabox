@@ -7,9 +7,9 @@ void handleSettings()
   h += "HOSTNAME=" + String(HOSTNAME) + "<br>\n";
   h += "Firmware=" + String(Firmware) + "<br>\n";
 
-  #include <web/RootPomp.h>
+  #include <web/SettingsRootPomp.h>
+  #include <web/SettingsECCorr.h>
   #include <web/SettingsPoms.h>
-
   //#include <web/RootPomp.html>
 
 
