@@ -64,6 +64,7 @@ void TaskWegaApi(void *parameters)
       httpstr += "&eRAW=" + fFTS(eRAW, 3);
 
     http.begin(client, httpstr);
+    http.setTimeout(2000);
     http.GET();
     wegareply = http.getString();
 
