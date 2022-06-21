@@ -3,6 +3,9 @@
 void setup()
 {
 
+#include <etc/syslog/setup.h>
+
+
 #if c_EC == 1
   pinMode(EC_DigitalPort1, INPUT);
   pinMode(EC_DigitalPort2, INPUT);

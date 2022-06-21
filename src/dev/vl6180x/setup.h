@@ -13,11 +13,14 @@
   //s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 30);
   //s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
   s_vl6180X.setScaling(3);
+  
 
-  //s_vl6180X.setTimeout(100);
+  s_vl6180X.setTimeout(100);
 
    // stop continuous mode if already active
   s_vl6180X.stopContinuous();
+  s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 20);
+  s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
   // in case stopContinuous() triggered a single-shot
   // measurement, wait for it to complete
   delay(300);

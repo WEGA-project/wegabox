@@ -7,9 +7,9 @@ VL6180X s_vl6180X;
 
     unsigned long VL6180X_Count = 254; //усреднений
     unsigned long VL6180X_old = millis();
-    unsigned long VL6180X_Repeat = 20000;
+    unsigned long VL6180X_Repeat = 5000;
 
-    RunningMedian VL6180X_RangeRM = RunningMedian(20);
+    RunningMedian VL6180X_RangeRM = RunningMedian(30);
 
 
 
