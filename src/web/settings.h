@@ -9,6 +9,7 @@ void handleSettings()
 
   #include <web/SettingsRootPomp.h>
   #include <web/SettingsECCorr.h>
+  #include <web/SettingsPompNight.h>
   #include <web/SettingsPoms.h>
   //#include <web/RootPomp.html>
 
