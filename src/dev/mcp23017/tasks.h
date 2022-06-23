@@ -6,7 +6,7 @@ void TaskMCP23017(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    vTaskDelay(1000);
+    vTaskDelay(100);
 
     unsigned long MCP23017_LastTime = millis() - MCP23017_old;
 
@@ -46,8 +46,6 @@ void TaskMCP23017(void *parameters)
           preferences.putInt("PWD", pwd_val);
         }
 
-
-
         // Параметры портов
         long DRV1_A = preferences.getInt("DRV1_A", -1);
         long DRV1_B = preferences.getInt("DRV1_B", -1);
@@ -69,30 +67,70 @@ void TaskMCP23017(void *parameters)
         long DRV4_C = preferences.getInt("DRV4_C", -1);
         long DRV4_D = preferences.getInt("DRV4_D", -1);
 
-                // Коррекция ЕС путем разбавления
+        // Коррекция ЕС путем разбавления
         if (preferences.getInt("ECStabEnable", -1) == 1)
         {
-          float setEC=preferences.getFloat("ECStabValue", 2.5);
-          int setTime=preferences.getInt("ECStabTime", 20);
-          if (wEC>setEC){
+          float setEC = preferences.getFloat("ECStabValue", 2.5);
+          int setTime = preferences.getInt("ECStabTime", 20);
+          if (wEC > setEC)
+          {
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp power up");
+            
             mcp.digitalWrite(DRV1_D, 1);
-            delay (setTime*1000);
+            delay(setTime * 1000);
             mcp.digitalWrite(DRV1_D, 0);
             syslog_ng("EC Stab: ECStab pomp power down");
           }
           else
-          mcp.digitalWrite(DRV1_D, 0);
+            mcp.digitalWrite(DRV1_D, 0);
+        }
+
+        // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
+        if (preferences.getInt("PompNightEnable", -1) == 1 and PR)
+        {
+          float PompNightLightLevel = preferences.getFloat("PompNightLightLevel", 0);
+          String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
+          if (PompNightLightLevel < PR)
+          {
+            preferences.putInt((PompNightPomp + "_State").c_str(), 1);
+            syslog_ng("PompNight " + PompNightPomp + ": UP PR=" + fFTS(PR, 3));
+          }
+          else
+          {
+            preferences.putInt((PompNightPomp + "_State").c_str(), 0);
+            syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3));
+          }
         }
 
         // Параметры шимов
-        pwd_val = preferences.getInt("PWD", 0);
-        pwd_freq = preferences.getInt("FREQ", 0);
-        pwd_port = preferences.getInt("PWDport", 0);
 
-        syslog_ng("MCP23017 PWD PORT:" + fFTS(pwd_port, 0));
-        syslog_ng("MCP23017 PWD VALUE:" + fFTS(pwd_val, 0));
-        syslog_ng("MCP23017 PWD FREQ:" + fFTS(pwd_freq, 0));
+        if (pwd_val != preferences.getInt("PWD", 0) or pwd_freq != preferences.getInt("FREQ", 0) or pwd_port != preferences.getInt("PWDport", 0))
+
+        {
+          int PompKickUP=0;
+          if (preferences.getInt("PWD", 0) > pwd_val or !pwd_val)
+            PompKickUP = 1;
+
+          pwd_val = preferences.getInt("PWD", 0);
+          pwd_freq = preferences.getInt("FREQ", 0);
+          pwd_port = preferences.getInt("PWDport", 0);
+
+          syslog_ng("MCP23017 PWD PORT:" + String(pwd_port));
+          syslog_ng("MCP23017 PWD VALUE:" + String(pwd_val));
+          syslog_ng("MCP23017 PWD FREQ:" + String(pwd_freq));
+          lcd("PWD1-" + String(pwd_freq) + "Hz:" + String(pwd_val));
+
+          const int ledChannel = 1;
+          const int resolution = 8;
+          ledcSetup(ledChannel, pwd_freq, resolution);
+          ledcAttachPin(pwd_port, ledChannel);
+          if (PompKickUP == 1)
+          {
+            ledcWrite(ledChannel, 254);
+            delay(300);
+          }
+          ledcWrite(ledChannel, pwd_val);
+        }
 
         pwd_val2 = preferences.getInt("PWD2", 0);
         pwd_freq2 = preferences.getInt("FREQ2", 0);
@@ -101,15 +139,6 @@ void TaskMCP23017(void *parameters)
         syslog_ng("MCP23017 PWD2 PORT:" + fFTS(pwd_port2, 0));
         syslog_ng("MCP23017 PWD2 VALUE:" + fFTS(pwd_val2, 0));
         syslog_ng("MCP23017 PWD2 FREQ:" + fFTS(pwd_freq2, 0));
-
-        if (pwd_freq != 0 and pwd_port != 0)
-        {
-          const int ledChannel = 1;
-          const int resolution = 8;
-          ledcSetup(ledChannel, pwd_freq, resolution);
-          ledcAttachPin(pwd_port, ledChannel);
-          ledcWrite(ledChannel, pwd_val);
-        }
 
         if (pwd_freq2 != 0 and pwd_port2 != 0)
         {
