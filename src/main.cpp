@@ -46,7 +46,7 @@ float PR=-1;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
-int readGPIO_0,readGPIO_1;
+int readGPIO_0,readGPIO_1,readGPIO;
 
 String wegareply;
 String err_wegaapi_json;
