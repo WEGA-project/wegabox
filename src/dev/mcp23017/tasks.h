@@ -75,7 +75,7 @@ void TaskMCP23017(void *parameters)
           if (wEC > setEC)
           {
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp power up");
-            
+
             mcp.digitalWrite(DRV1_D, 1);
             delay(setTime * 1000);
             mcp.digitalWrite(DRV1_D, 0);
@@ -86,7 +86,7 @@ void TaskMCP23017(void *parameters)
         }
 
         // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
-        if (preferences.getInt("PompNightEnable", -1) == 1 and PR)
+        if (preferences.getInt("PompNightEnable", -1) == 1 and PR != -1)
         {
           float PompNightLightLevel = preferences.getFloat("PompNightLightLevel", 0);
           String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
@@ -103,11 +103,20 @@ void TaskMCP23017(void *parameters)
         }
 
         // Параметры шимов
+        const int PwdChannel1 = 1;
+        const int PwdResolution1 = 8;
+        const int PwdChannel2 = 2;
+        const int PwdResolution2 = 8;
 
+        // KickUp пнуть шим насоса до предела перед снижением оборотов до нормы при включении
+        int PompKickUP = 0;     // Пинок для насоса
+        int KickUpMax = 254;    // максимум мощности пинка
+        int KickUpStrart = 10; // начальная можность пинка
+        int KickUpTime = 300;   // Время пинка в миллисекундах
         if (pwd_val != preferences.getInt("PWD", 0) or pwd_freq != preferences.getInt("FREQ", 0) or pwd_port != preferences.getInt("PWDport", 0))
 
         {
-          int PompKickUP=0;
+
           if (preferences.getInt("PWD", 0) > pwd_val or !pwd_val)
             PompKickUP = 1;
 
@@ -120,16 +129,11 @@ void TaskMCP23017(void *parameters)
           syslog_ng("MCP23017 PWD FREQ:" + String(pwd_freq));
           lcd("PWD1-" + String(pwd_freq) + "Hz:" + String(pwd_val));
 
-          const int ledChannel = 1;
-          const int resolution = 8;
-          ledcSetup(ledChannel, pwd_freq, resolution);
-          ledcAttachPin(pwd_port, ledChannel);
+          ledcSetup(PwdChannel1, pwd_freq, PwdResolution1);
+          ledcAttachPin(pwd_port, PwdChannel1);
           if (PompKickUP == 1)
-          {
-            ledcWrite(ledChannel, 254);
-            delay(300);
-          }
-          ledcWrite(ledChannel, pwd_val);
+            PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
+          ledcWrite(PwdChannel1, pwd_val);
         }
 
         pwd_val2 = preferences.getInt("PWD2", 0);
@@ -142,24 +146,50 @@ void TaskMCP23017(void *parameters)
 
         if (pwd_freq2 != 0 and pwd_port2 != 0)
         {
-          const int ledChannel2 = 2;
-          const int resolution2 = 8;
-          ledcSetup(ledChannel2, pwd_freq2, resolution2);
-          ledcAttachPin(pwd_port2, ledChannel2);
-          ledcWrite(ledChannel2, pwd_val2);
+          ledcSetup(PwdChannel2, pwd_freq2, PwdResolution2);
+          ledcAttachPin(pwd_port2, PwdChannel2);
+          ledcWrite(PwdChannel2, pwd_val2);
         }
+        readGPIO_0 = mcp.readGPIO(0);
+        readGPIO_1 = mcp.readGPIO(1);
 
         mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_A_State", 0));
+        if (bitRead(readGPIO_0, 0) == 0 and preferences.getInt("DRV1_A_State", 0) == 1)
+          PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_A (" + fFTS(DRV1_A, 0) + "):" + fFTS(preferences.getInt("DRV1_A_State", 0), 0));
 
         mcp.digitalWrite(DRV1_B, preferences.getInt("DRV1_B_State", 0));
+        if (bitRead(readGPIO_0, 1) == 0 and preferences.getInt("DRV1_B_State", 0) == 1)
+          PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_B (" + fFTS(DRV1_B, 0) + "):" + fFTS(preferences.getInt("DRV1_B_State", 0), 0));
 
         mcp.digitalWrite(DRV1_C, preferences.getInt("DRV1_C_State", 0));
+        if (bitRead(readGPIO_0, 2) == 0 and preferences.getInt("DRV1_C_State", 0) == 1)
+          PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_C (" + fFTS(DRV1_C, 0) + "):" + fFTS(preferences.getInt("DRV1_C_State", 0), 0));
 
         mcp.digitalWrite(DRV1_D, preferences.getInt("DRV1_D_State", 0));
+        if (bitRead(readGPIO_0, 3) == 0 and preferences.getInt("DRV1_D_State", 0) == 1)
+          PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_D (" + fFTS(DRV1_D, 0) + "):" + fFTS(preferences.getInt("DRV1_D_State", 0), 0));
+
+        mcp.digitalWrite(DRV2_A, preferences.getInt("DRV2_A_State", 0));
+        mcp.digitalWrite(DRV2_B, preferences.getInt("DRV2_B_State", 0));
+        mcp.digitalWrite(DRV2_C, preferences.getInt("DRV2_C_State", 0));
+        mcp.digitalWrite(DRV2_D, preferences.getInt("DRV2_D_State", 0));
+
+        mcp.digitalWrite(DRV3_A, preferences.getInt("DRV3_A_State", 0));
+        mcp.digitalWrite(DRV3_B, preferences.getInt("DRV3_B_State", 0));
+        mcp.digitalWrite(DRV3_C, preferences.getInt("DRV3_C_State", 0));
+        mcp.digitalWrite(DRV3_D, preferences.getInt("DRV3_D_State", 0));
+
+        mcp.digitalWrite(DRV4_A, preferences.getInt("DRV4_A_State", 0));
+        mcp.digitalWrite(DRV4_B, preferences.getInt("DRV4_B_State", 0));
+        mcp.digitalWrite(DRV4_C, preferences.getInt("DRV4_C_State", 0));
+        mcp.digitalWrite(DRV4_D, preferences.getInt("DRV4_D_State", 0));
+
+        readGPIO_0 = mcp.readGPIO(0);
+        readGPIO_1 = mcp.readGPIO(1);
 
         vTaskDelay(MCP23017_Repeat);
 

@@ -40,12 +40,13 @@ RunningMedian PRRM = RunningMedian(30);
 // #include "esp_task_wdt.h"
 
 // Переменные
-float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,PR,CPUTemp,CO2, tVOC, eRAW;
+float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,CPUTemp,CO2, tVOC, eRAW;
 float wNTC,wR2,wEC,wpH;
+float PR=-1;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
-
+int readGPIO_0,readGPIO_1;
 
 String wegareply;
 String err_wegaapi_json;

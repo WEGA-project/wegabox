@@ -61,7 +61,7 @@ void handleRoot()
   {
     httpstr += "Dist=" + fFTS(Dist, 3) + "<br>";
   }
-  if (PR)
+  if (PR != -1)
   {
     httpstr += "PR=" + fFTS(PR, 3) + "<br>";
   }

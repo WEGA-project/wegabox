@@ -18,7 +18,7 @@ h +=" <table>\n";
 h +="     <caption>Pomp Night Stoping</caption>\n";
 
 h += "<tr><td>Light Sensor<td>" + fFTS(PR,3) + "</tr>\n";
-
+     
 
 h +="     <tr>\n";
 h +="         <td>Pomp Night Enable\n";

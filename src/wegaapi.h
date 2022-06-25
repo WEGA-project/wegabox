@@ -40,7 +40,7 @@ void TaskWegaApi(void *parameters)
       httpstr += "&" + db_Dist + "=" + fFTS(Dist, 3);
     if (DstRAW and !isnan(DstRAW))
       httpstr += "&DstRAW=" + fFTS(DstRAW, 3);
-    if (PR and !isnan(PR))
+    if (PR != -1 and !isnan(PR))
       httpstr += "&" + db_PR + "=" + fFTS(PR, 3);
     if (AirPress and !isnan(AirPress))
       httpstr += "&" + db_AirPress + "=" + fFTS(AirPress, 3);
