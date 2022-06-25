@@ -152,41 +152,67 @@ void TaskMCP23017(void *parameters)
         }
         readGPIO_0 = mcp.readGPIO(0);
         readGPIO_1 = mcp.readGPIO(1);
+        int ms=10;
 
         mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_A_State", 0));
         if (bitRead(readGPIO_0, 0) == 0 and preferences.getInt("DRV1_A_State", 0) == 1)
           PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_A (" + fFTS(DRV1_A, 0) + "):" + fFTS(preferences.getInt("DRV1_A_State", 0), 0));
+delay (ms);
 
         mcp.digitalWrite(DRV1_B, preferences.getInt("DRV1_B_State", 0));
         if (bitRead(readGPIO_0, 1) == 0 and preferences.getInt("DRV1_B_State", 0) == 1)
           PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_B (" + fFTS(DRV1_B, 0) + "):" + fFTS(preferences.getInt("DRV1_B_State", 0), 0));
+delay (ms);
 
         mcp.digitalWrite(DRV1_C, preferences.getInt("DRV1_C_State", 0));
         if (bitRead(readGPIO_0, 2) == 0 and preferences.getInt("DRV1_C_State", 0) == 1)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_C (" + fFTS(DRV1_C, 0) + "):" + fFTS(preferences.getInt("DRV1_C_State", 0), 0));
+delay (ms);
 
         mcp.digitalWrite(DRV1_D, preferences.getInt("DRV1_D_State", 0));
         if (bitRead(readGPIO_0, 3) == 0 and preferences.getInt("DRV1_D_State", 0) == 1)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
         syslog_ng("MCP23017 DRV1_D (" + fFTS(DRV1_D, 0) + "):" + fFTS(preferences.getInt("DRV1_D_State", 0), 0));
+delay (ms);
 
         mcp.digitalWrite(DRV2_A, preferences.getInt("DRV2_A_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV2_B, preferences.getInt("DRV2_B_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV2_C, preferences.getInt("DRV2_C_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV2_D, preferences.getInt("DRV2_D_State", 0));
+delay (ms);
 
         mcp.digitalWrite(DRV3_A, preferences.getInt("DRV3_A_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV3_B, preferences.getInt("DRV3_B_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV3_C, preferences.getInt("DRV3_C_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV3_D, preferences.getInt("DRV3_D_State", 0));
+delay (ms);
 
         mcp.digitalWrite(DRV4_A, preferences.getInt("DRV4_A_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV4_B, preferences.getInt("DRV4_B_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV4_C, preferences.getInt("DRV4_C_State", 0));
+delay (ms);
+
         mcp.digitalWrite(DRV4_D, preferences.getInt("DRV4_D_State", 0));
+delay (ms);
 
         readGPIO_0 = mcp.readGPIO(0);
         readGPIO_1 = mcp.readGPIO(1);
