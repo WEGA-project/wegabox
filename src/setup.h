@@ -87,6 +87,7 @@ syslog_ng("WEGABOX: Wait OTA 30 sec");
 
   // Сканирование устройств на шине i2c
   Wire.begin(I2C_SDA, I2C_SCL);
+  syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
   
 syslog_ng("I2C: Scan I2C bus");
   I2CScanner scanner;
