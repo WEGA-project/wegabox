@@ -98,6 +98,7 @@ SemaphoreHandle_t xSemaphoreX = NULL;
 #include <dev/DualBMx/main.cpp>
 #include <dev/sdc30/main.cpp>
 #include <dev/lcd/main.cpp>
+#include <dev/lcd/func.h>
 #include <dev/vl6180x/main.cpp>
 
 
