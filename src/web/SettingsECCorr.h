@@ -16,6 +16,13 @@ if (server.arg("ECStabTime") != "")
   preferences.putInt("ECStabTime", server.arg("ECStabTime").toInt());
   int ECStabTime=preferences.getInt("ECStabTime", 20);
 
+if (server.arg("ECStabInterval") != "")
+  preferences.putInt("ECStabInterval", server.arg("ECStabInterval").toInt());
+  int ECStabInterval=preferences.getInt("ECStabInterval", 180);
+
+if (server.arg("ECStabCriticalLevel") != "")
+  preferences.putFloat("ECStabCriticalLevel", server.arg("ECStabCriticalLevel").toFloat());
+  float ECStabCriticalLevel=preferences.getFloat("ECStabCriticalLevel", 5);
 
 h +="<form action='' method='POST' id='set'></form>\n";
 h +=" <table>\n";
@@ -43,6 +50,16 @@ h +="     </tr>\n";
 h +="     <tr>\n";
 h +="         <td>EC Stab Time\n";
 h +="         <td><input type='text' name='ECStabTime' value='" + String(ECStabTime) + "' form='set'>\n";
+h +="     </tr>\n";
+
+h +="     <tr>\n";
+h +="         <td>EC Stab Critical Level\n";
+h +="         <td><input type='text' name='ECStabCriticalLevel' value='" + String(ECStabCriticalLevel) + "' form='set'>\n";
+h +="     </tr>\n";
+
+h +="     <tr>\n";
+h +="         <td>EC Stab Interval\n";
+h +="         <td><input type='text' name='ECStabInterval' value='" + String(ECStabInterval) + "' form='set'>\n";
 h +="     </tr>\n";
 
 h += "</table>\n";

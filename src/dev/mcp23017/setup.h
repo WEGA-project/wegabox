@@ -4,6 +4,11 @@ if (!mcp.begin_I2C())
 else
   syslog_ng("mcp23017 Begin.");
 
+for (int p = 0; p < 16; p++){
+  mcp.pinMode(p, OUTPUT);
+  mcp.digitalWrite(p,0);
+}
+
 if (preferences.getInt("DRV1_A", -1) == -1)
   preferences.putInt("DRV1_A", 0);
 if (preferences.getInt("DRV1_B", -1) == -1)
@@ -37,8 +42,7 @@ if (preferences.getInt("DRV4_C", -1) == -1)
 if (preferences.getInt("DRV4_D", -1) == -1)
   preferences.putInt("DRV4_D", 15);
 
-for (int p = 0; p < 16; p++)
-  mcp.pinMode(p, OUTPUT);
+
 
 xTaskCreate(TaskMCP23017, "MCP23017", 5000, NULL, 0, NULL);
 #endif // c_MCP23017

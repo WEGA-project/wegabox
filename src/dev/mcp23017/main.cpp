@@ -8,6 +8,7 @@ int RootPwdMin, RootPwdMax, RootDistMin;
 
 unsigned long MCP23017_old = millis();
 unsigned long MCP23017_Repeat = 5000;
+unsigned long ECStabTimeStart;
 #include <dev/mcp23017/func.h>
 
 #endif // c_MCP23017

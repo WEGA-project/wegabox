@@ -75,17 +75,25 @@ void TaskMCP23017(void *parameters)
         {
           float setEC = preferences.getFloat("ECStabValue", 2.5);
           int setTime = preferences.getInt("ECStabTime", 20);
-          if (wEC > setEC)
-          {
-            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp power up");
+          String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
+          int DRV = preferences.getInt(ECStabPomp.c_str(), -1);
+          int ECStabInterval = preferences.getInt("ECStabInterval", 180);
+          float ECStabCriticalLevel = preferences.getFloat("ECStabCriticalLevel", 5);
 
-            mcp.digitalWrite(DRV1_D, 1);
+
+          if (wEC > setEC and millis()-ECStabTimeStart > ECStabInterval*1000 and Dist >= ECStabCriticalLevel)
+          {
+            
+            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp:"+ECStabPomp+" power up on "+String(setTime)+" sec");
+            mcp.digitalWrite(DRV, 1);
             delay(setTime * 1000);
-            mcp.digitalWrite(DRV1_D, 0);
-            syslog_ng("EC Stab: ECStab pomp power down");
+            mcp.digitalWrite(DRV, 0);
+            syslog_ng("EC Stab: ECStab pomp:"+ECStabPomp+" power down");
+            ECStabTimeStart=millis();
           }
           else
-            mcp.digitalWrite(DRV1_D, 0);
+            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " ECStab pomp:"+ECStabPomp+" power Off. Time old:"+fFTS( (millis()-ECStabTimeStart)/1000,0 )+" sec. Dist="+fFTS(Dist,3)+"cm");
+            mcp.digitalWrite(DRV, 0);
         }
 
         // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
