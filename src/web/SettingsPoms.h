@@ -1,7 +1,5 @@
+
 #if c_MCP23017 == 1
-
-
-
 
 if (preferences.getInt("PWDport", -1) == -1)
   preferences.putInt("PWDport", 16);
@@ -21,9 +19,9 @@ if (preferences.getInt("PWD2", -1) == -1)
 if (preferences.getInt("FREQ2", -1) == -1)
   preferences.putInt("FREQ2", 5000);
 
-// h +="<details>\n";
-// h +="<summary>Manual control of power ports</summary>\n";
 h += "<form action='' method='POST' id='set'></form>\n";
+
+/////////PWD2 GROUP//////////////
 h += "<table><caption>PWD group 1</caption>\n";
 
 if (server.arg("PWDport") != "")

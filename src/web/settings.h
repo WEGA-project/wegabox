@@ -10,13 +10,19 @@ void handleSettings()
   #include <web/SettingsRootPomp.h>
   #include <web/SettingsECCorr.h>
   #include <web/SettingsPompNight.h>
-  #include <web/SettingsPoms.h>
-  //#include <web/RootPomp.html>
+   //#include <web/RootPomp.html>
 
 
 
-  // h += fFTS(dataF_read,2) + "<br>\n";
+
  
 
   server.send(200, "text/html", h);
+}
+
+void handleSettingsPomps()
+{
+ String h = "<!DOCTYPE html> <html>\n";
+ #include <web/SettingsPoms.h>
+ server.send(200, "text/html", h);
 }

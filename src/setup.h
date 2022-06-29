@@ -104,11 +104,15 @@ syslog_ng("I2C: Scan I2C bus");
 
   MDNS.begin(HOSTNAME);
   MDNS.addService("http", "tcp", 80);
+  server.enableDelay(true);
   server.on("/", handleRoot);
+  server.on("/menu", handleMenu);
+  server.on("/main", handleMain);
   server.on("/reset", handleReset);
   server.on("/status", handleStatus);
   server.on("/pwd", handlePWD);
   server.on("/settings", handleSettings);
+  server.on("/SettingsPomps", handleSettingsPomps);
   server.begin();
 
   xTaskCreate(TaskOTA, "TaskOTA", 5000, NULL, 3, NULL);

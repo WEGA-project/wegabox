@@ -8,10 +8,41 @@ void handleReset()
   ESP.restart();
 }
 
-// Основная страница http://[ip]
+// index
 void handleRoot()
 {
-  syslog_ng("WEB /root");
+ syslog_ng("WEB /root");
+ String s = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+
+ s += "<frameset cols='20%,*'>";
+ s += "  <frame src='menu' name='MENU'>";
+ s += "  <frame src='main' name='CONTENT'>";
+ s += "</frameset>";
+server.send(200, "text/html", s);
+
+}
+
+// MENU
+void handleMenu(){
+
+  String s = "<body>";
+  s += "<u1>";
+  s += "<li><a href='main' target='CONTENT'>main </a></li>";
+  s += "<li><a href='status' target='CONTENT'>wega-server api</a></li>";
+    s += "<li><a href='settings' target='CONTENT'>Settings</a></li>";
+  s += "<li><a href='SettingsPomps' target='CONTENT'>SettingsPomps</a></li>";
+  s += "</ul>";
+  s += "<u1>";
+  s += "<li><a href='reset' target='CONTENT'>REBOOT</a></li>";
+  s += "</ul>";
+s += "</body>";
+
+  server.send(200, "text/html", s);
+}
+
+// Основная страница
+void handleMain()
+{
   String httpstr = "<meta http-equiv='refresh' content='10'>";
   httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
   httpstr += "Firmware=" + String(Firmware) + "<br>";
