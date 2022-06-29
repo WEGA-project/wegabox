@@ -18,7 +18,6 @@ void TaskMCP23017(void *parameters)
         syslog_ng("MCP23017 Start " + fFTS(MCP23017_LastTime - MCP23017_Repeat, 0) + "ms");
 
         mcp.begin_I2C();
-        
 
         // Параметры портов
         long DRV1_A = preferences.getInt("DRV1_A", -1);
@@ -41,78 +40,6 @@ void TaskMCP23017(void *parameters)
         long DRV4_C = preferences.getInt("DRV4_C", -1);
         long DRV4_D = preferences.getInt("DRV4_D", -1);
 
-        // Адаптивная циркуляция для снижения скачков корневого давления
-        if (preferences.getInt("RootPomp", -1) == 1)
-        {
-          pwd_val = preferences.getInt("PWD", 254);
-          RootPwdMax = preferences.getInt("RootPwdMax", 254);
-          RootPwdMin = preferences.getInt("RootPwdMin", 0);
-          RootDistMin = preferences.getInt("RootDistMin", 6);
-
-          if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
-          {
-            // preferences.putInt("DRV1_A_State", 0);
-            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
-            pwd_val = pwd_val - 2;
-          }
-          else
-          {
-
-            // preferences.putInt("DRV1_A_State", 1);
-            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
-            pwd_val = pwd_val + 1;
-          }
-
-          if (pwd_val < RootPwdMin)
-            pwd_val = RootPwdMin;
-          if (pwd_val > RootPwdMax)
-            pwd_val = RootPwdMax;
-          preferences.putInt("PWD", pwd_val);
-        }
-
-        // Коррекция ЕС путем разбавления
-        if (preferences.getInt("ECStabEnable", -1) == 1)
-        {
-          float setEC = preferences.getFloat("ECStabValue", 2.5);
-          int setTime = preferences.getInt("ECStabTime", 20);
-          String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
-          int DRV = preferences.getInt(ECStabPomp.c_str(), -1);
-          int ECStabInterval = preferences.getInt("ECStabInterval", 180);
-          float ECStabCriticalLevel = preferences.getFloat("ECStabCriticalLevel", 5);
-
-
-          if (wEC > setEC and millis()-ECStabTimeStart > ECStabInterval*1000 and Dist >= ECStabCriticalLevel)
-          {
-            
-            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp:"+ECStabPomp+" power up on "+String(setTime)+" sec");
-            mcp.digitalWrite(DRV, 1);
-            delay(setTime * 1000);
-            mcp.digitalWrite(DRV, 0);
-            syslog_ng("EC Stab: ECStab pomp:"+ECStabPomp+" power down");
-            ECStabTimeStart=millis();
-          }
-          else
-            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " ECStab pomp:"+ECStabPomp+" power Off. Time old:"+fFTS( (millis()-ECStabTimeStart)/1000,0 )+" sec. Dist="+fFTS(Dist,3)+"cm");
-            mcp.digitalWrite(DRV, 0);
-        }
-
-        // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
-        if (preferences.getInt("PompNightEnable", -1) == 1 and PR != -1)
-        {
-          float PompNightLightLevel = preferences.getFloat("PompNightLightLevel", 0);
-          String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
-          if (PompNightLightLevel < PR)
-          {
-            preferences.putInt((PompNightPomp + "_State").c_str(), 1);
-            syslog_ng("PompNight " + PompNightPomp + ": UP PR=" + fFTS(PR, 3));
-          }
-          else
-          {
-            preferences.putInt((PompNightPomp + "_State").c_str(), 0);
-            syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3));
-          }
-        }
-
         // Параметры шимов
         const int PwdChannel1 = 1;
         const int PwdResolution1 = 8;
@@ -126,7 +53,9 @@ void TaskMCP23017(void *parameters)
         int KickUpTime = 300;  // Время пинка в миллисекундах
 
         // PWD 1
-        if (pwd_val != preferences.getInt("PWD", 0) or pwd_freq != preferences.getInt("FREQ", 0) or pwd_port != preferences.getInt("PWDport", 0))
+        if (pwd_val != preferences.getInt("PWD", 0) 
+        or pwd_freq != preferences.getInt("FREQ", 0) 
+        or pwd_port != preferences.getInt("PWDport", 0))
 
         {
 
@@ -149,7 +78,7 @@ void TaskMCP23017(void *parameters)
           ledcWrite(PwdChannel1, pwd_val);
         }
 
-        // PWD 2
+        //PWD 2
         if (pwd_val2 != preferences.getInt("PWD2", 0) or pwd_freq2 != preferences.getInt("FREQ2", 0) or pwd_port2 != preferences.getInt("PWDport2", 0))
 
         {
@@ -172,6 +101,83 @@ void TaskMCP23017(void *parameters)
             PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val2, KickUpTime);
           ledcWrite(PwdChannel2, pwd_val2);
         }
+
+
+
+
+
+        // Адаптивная циркуляция для снижения скачков корневого давления
+        int pwd_val_root;
+        if (preferences.getInt("RootPomp", -1) == 1)
+        {
+          pwd_val_root = preferences.getInt("PWD", 254);
+          RootPwdMax = preferences.getInt("RootPwdMax", 254);
+          RootPwdMin = preferences.getInt("RootPwdMin", 0);
+          RootDistMin = preferences.getInt("RootDistMin", 6);
+
+          if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
+          {
+            // preferences.putInt("DRV1_A_State", 0);
+            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
+            pwd_val_root = pwd_val_root - 2;
+          }
+          else
+          {
+
+            // preferences.putInt("DRV1_A_State", 1);
+            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
+            pwd_val_root = pwd_val_root + 1;
+          }
+
+          if (pwd_val_root < RootPwdMin)
+            pwd_val_root = RootPwdMin;
+          if (pwd_val_root > RootPwdMax)
+            pwd_val_root = RootPwdMax;
+          preferences.putInt("PWD", pwd_val_root);
+        }
+
+        // Коррекция ЕС путем разбавления
+        if (preferences.getInt("ECStabEnable", -1) == 1)
+        {
+          float setEC = preferences.getFloat("ECStabValue", 2.5);
+          int setTime = preferences.getInt("ECStabTime", 20);
+          String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
+          int DRV = preferences.getInt(ECStabPomp.c_str(), -1);
+          int ECStabInterval = preferences.getInt("ECStabInterval", 180);
+          float ECStabCriticalLevel = preferences.getFloat("ECStabCriticalLevel", 5);
+
+          if (wEC > setEC and millis() - ECStabTimeStart > ECStabInterval * 1000 and Dist >= ECStabCriticalLevel)
+          {
+
+            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp:" + ECStabPomp + " power up on " + String(setTime) + " sec");
+            mcp.digitalWrite(DRV, 1);
+            delay(setTime * 1000);
+            mcp.digitalWrite(DRV, 0);
+            syslog_ng("EC Stab: ECStab pomp:" + ECStabPomp + " power down");
+            ECStabTimeStart = millis();
+          }
+          else
+            syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " ECStab pomp:" + ECStabPomp + " power Off. Time old:" + fFTS((millis() - ECStabTimeStart) / 1000, 0) + " sec. Dist=" + fFTS(Dist, 3) + "cm");
+          mcp.digitalWrite(DRV, 0);
+        }
+
+        // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
+        if (preferences.getInt("PompNightEnable", -1) == 1 and PR != -1)
+        {
+          float PompNightLightLevel = preferences.getFloat("PompNightLightLevel", 0);
+          String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
+          if (PompNightLightLevel < PR)
+          {
+            preferences.putInt((PompNightPomp + "_State").c_str(), 1);
+            syslog_ng("PompNight " + PompNightPomp + ": UP PR=" + fFTS(PR, 3));
+          }
+          else
+          {
+            preferences.putInt((PompNightPomp + "_State").c_str(), 0);
+            syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3));
+          }
+        }
+
 
 
         readGPIO = mcp.readGPIOAB();
