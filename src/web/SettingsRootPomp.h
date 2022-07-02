@@ -16,6 +16,12 @@ RootPwdMin=preferences.getInt("RootPwdMin", 0);
 if (server.arg("RootDistMin") != "")   preferences.putInt("RootDistMin", server.arg("RootDistMin").toInt());
 RootDistMin=preferences.getInt("RootDistMin", 0);
 
+if (server.arg("PwdStepUp") != "")   preferences.putInt("PwdStepUp", server.arg("PwdStepUp").toInt());
+int PwdStepUp=preferences.getInt("PwdStepUp", 1);
+
+if (server.arg("PwdStepDown") != "")   preferences.putInt("PwdStepDown", server.arg("PwdStepDown").toInt());
+int PwdStepDown=preferences.getInt("PwdStepDown", 10);
+
 // h += "<tr><td>RootPomp<td><input type='text' name='RootPomp' value='" + fFTS(preferences.getInt("RootPomp", 0), 0) + "' form='set'></tr>\n";
 // h += "</table>\n";
 // h += "<input type='submit' value='save' form='set'/></form>\n";
@@ -28,11 +34,7 @@ h +="<form action='' method='POST' id='set'></form>\n";
 h +=" <table>\n";
 h +="     <caption>Root pressure management</caption>\n";
 
-h += "<tr><td>AirHum<td>" + fFTS(AirHum,3) + "%</tr>\n";
-h += "<tr><td>RootTemp<td>" + fFTS(RootTemp,3) + "</tr>\n";
-h += "<tr><td>AirTemp<td>" + fFTS(AirTemp,3) + "</tr>\n";
-h += "<tr><td>AirTemp-RootTemp<td>" + fFTS(AirTemp-RootTemp,3) + "</tr>\n";
-h += "<tr><td>Dist<td>" + fFTS(Dist,3) + "</tr>\n";
+
 
 h +="     <tr>\n";
 h +="         <td>Selected Root Pomp\n";
@@ -62,6 +64,19 @@ h +="     <tr>\n";
 h +="         <td>Dist Minimum\n";
 h +="         <td><input type='text' name='RootDistMin' value='" + String(RootDistMin) + "' form='set'>\n";
 h +="     </tr>\n";
+
+// Шаг шим при увеличении
+h +="     <tr>\n";
+h +="         <td>PwdStepUp\n";
+h +="         <td><input type='text' name='PwdStepUp' value='" + String(PwdStepUp) + "' form='set'>\n";
+h +="     </tr>\n";
+
+// Шаг шим при уменьшении
+h +="     <tr>\n";
+h +="         <td>PwdStepDown\n";
+h +="         <td><input type='text' name='PwdStepDown' value='" + String(PwdStepDown) + "' form='set'>\n";
+h +="     </tr>\n";
+
 
 h +=" </table>\n";
 h +=" <input type='submit' value='save' form='set' /></form>\n";

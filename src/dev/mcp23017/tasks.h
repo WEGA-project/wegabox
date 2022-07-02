@@ -76,6 +76,7 @@ void TaskMCP23017(void *parameters)
           if (PompKickUP == 1)
             PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
           ledcWrite(PwdChannel1, pwd_val);
+          PWD1=pwd_val;
         }
 
         //PWD 2
@@ -100,6 +101,7 @@ void TaskMCP23017(void *parameters)
           if (PompKickUP == 1)
             PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val2, KickUpTime);
           ledcWrite(PwdChannel2, pwd_val2);
+          PWD2=pwd_val2;
         }
 
 
@@ -114,19 +116,22 @@ void TaskMCP23017(void *parameters)
           RootPwdMax = preferences.getInt("RootPwdMax", 254);
           RootPwdMin = preferences.getInt("RootPwdMin", 0);
           RootDistMin = preferences.getInt("RootDistMin", 6);
+          int PwdStepUp = preferences.getInt("PwdStepUp", 1);
+          int PwdStepDown = preferences.getInt("PwdStepDown", 10);
 
           if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
           {
             // preferences.putInt("DRV1_A_State", 0);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
-            pwd_val_root = pwd_val_root - 2;
+            pwd_val_root = pwd_val_root - PwdStepDown;
+            
           }
           else
           {
 
             // preferences.putInt("DRV1_A_State", 1);
             syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
-            pwd_val_root = pwd_val_root + 1;
+            pwd_val_root = pwd_val_root + PwdStepUp;
           }
 
           if (pwd_val_root < RootPwdMin)
@@ -144,9 +149,11 @@ void TaskMCP23017(void *parameters)
           String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
           int DRV = preferences.getInt(ECStabPomp.c_str(), -1);
           int ECStabInterval = preferences.getInt("ECStabInterval", 180);
-          float ECStabCriticalLevel = preferences.getFloat("ECStabCriticalLevel", 5);
+          float ECStabMinDist = preferences.getFloat("ECStabMinDist", 5);
+          float ECStabMaxDist = preferences.getFloat("ECStabMaxDist", 50);
 
-          if (wEC > setEC and millis() - ECStabTimeStart > ECStabInterval * 1000 and Dist >= ECStabCriticalLevel)
+
+          if (wEC > setEC and millis() - ECStabTimeStart > ECStabInterval * 1000 and Dist >= ECStabMinDist)
           {
 
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " > EC max=" + fFTS(setEC, 3) + " ECStab pomp:" + ECStabPomp + " power up on " + String(setTime) + " sec");

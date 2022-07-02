@@ -20,15 +20,17 @@ if (server.arg("ECStabInterval") != "")
   preferences.putInt("ECStabInterval", server.arg("ECStabInterval").toInt());
   int ECStabInterval=preferences.getInt("ECStabInterval", 180);
 
-if (server.arg("ECStabCriticalLevel") != "")
-  preferences.putFloat("ECStabCriticalLevel", server.arg("ECStabCriticalLevel").toFloat());
-  float ECStabCriticalLevel=preferences.getFloat("ECStabCriticalLevel", 5);
+if (server.arg("ECStabMinDist") != "")
+  preferences.putFloat("ECStabMinDist", server.arg("ECStabMinDist").toFloat());
+  float ECStabMinDist=preferences.getFloat("ECStabMinDist", 5);
+
+if (server.arg("ECStabMaxDist") != "")
+  preferences.putFloat("ECStabMaxDist", server.arg("ECStabMaxDist").toFloat());
+  float ECStabMaxDist=preferences.getFloat("ECStabMaxDist", 50);
 
 h +="<form action='' method='POST' id='set'></form>\n";
 h +=" <table>\n";
 h +="     <caption>EC correction</caption>\n";
-
-h += "<tr><td>EC<td>" + fFTS(wEC,3) + "mS/cm</tr>\n";
 
 
 h +="     <tr>\n";
@@ -53,13 +55,18 @@ h +="         <td><input type='text' name='ECStabTime' value='" + String(ECStabT
 h +="     </tr>\n";
 
 h +="     <tr>\n";
-h +="         <td>EC Stab Critical Level\n";
-h +="         <td><input type='text' name='ECStabCriticalLevel' value='" + String(ECStabCriticalLevel) + "' form='set'>\n";
+h +="         <td>EC Stab Interval\n";
+h +="         <td><input type='text' name='ECStabInterval' value='" + String(ECStabInterval) + "' form='set'>\n";
 h +="     </tr>\n";
 
 h +="     <tr>\n";
-h +="         <td>EC Stab Interval\n";
-h +="         <td><input type='text' name='ECStabInterval' value='" + String(ECStabInterval) + "' form='set'>\n";
+h +="         <td>EC Stab Miniman Dist\n";
+h +="        <td><input type='text' name='ECStabMinDist' value='"+ fFTS(ECStabMinDist,1) +"' form='set'>\n";
+h +="     </tr>\n";
+
+h +="     <tr>\n";
+h +="         <td>EC Stab Maximal Dist\n";
+h +="        <td><input type='text' name='ECStabMaxDist' value='"+ fFTS(ECStabMaxDist,1) +"' form='set'>\n";
 h +="     </tr>\n";
 
 h += "</table>\n";

@@ -62,6 +62,13 @@ void TaskWegaApi(void *parameters)
 
     if (eRAW and !isnan(eRAW) and isinf(eRAW))
       httpstr += "&eRAW=" + fFTS(eRAW, 3);
+    
+    if (readGPIO)
+      httpstr += "&readGPIO=" + String(readGPIO);
+    if (PWD1)
+      httpstr += "&PWD1=" + String(PWD1);
+    if (PWD2)
+      httpstr += "&PWD2=" + String(PWD2);  
 
     http.begin(client, httpstr);
     http.setTimeout(2000);
