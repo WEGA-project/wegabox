@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.7.020722"
+#define Firmware "beta-0.7.060722"
 
 
 #include <WiFi.h>
@@ -47,6 +47,7 @@ bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
 int readGPIO,PWD1,PWD2;
+long ECStabOn;
 
 String wegareply;
 String err_wegaapi_json;

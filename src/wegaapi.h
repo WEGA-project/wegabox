@@ -69,6 +69,8 @@ void TaskWegaApi(void *parameters)
       httpstr += "&PWD1=" + String(PWD1);
     if (PWD2)
       httpstr += "&PWD2=" + String(PWD2);  
+    if (ECStabOn) 
+      httpstr += "&ECStabOn=" + String(ECStabOn); 
 
     http.begin(client, httpstr);
     http.setTimeout(2000);

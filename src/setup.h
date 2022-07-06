@@ -115,7 +115,7 @@ syslog_ng("I2C: Scan I2C bus");
   server.on("/SettingsPomps", handleSettingsPomps);
   server.begin();
 
-  xTaskCreate(TaskOTA, "TaskOTA", 5000, NULL, 3, NULL);
+  xTaskCreate(TaskOTA, "TaskOTA", 10000, NULL, 3, NULL);
   xTaskCreate(TaskWegaApi, "TaskWegaApi", 10000, NULL, 1, &appTasks[appTaskCount++]);
 
   xSemaphoreX = xSemaphoreCreateMutex();

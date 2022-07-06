@@ -6,7 +6,7 @@ void TaskOTA(void *parameters)
   {
     server.handleClient();
     ArduinoOTA.handle();
-    vTaskDelay(10);
+    vTaskDelay(100);
   }
 }
 

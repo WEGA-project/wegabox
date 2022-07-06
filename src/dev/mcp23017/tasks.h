@@ -119,6 +119,9 @@ void TaskMCP23017(void *parameters)
           int PwdStepUp = preferences.getInt("PwdStepUp", 1);
           int PwdStepDown = preferences.getInt("PwdStepDown", 10);
 
+          if (PwdStepUp=255)
+           PwdStepUp=AirTemp-RootTemp;
+
           if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
           {
             // preferences.putInt("DRV1_A_State", 0);
@@ -144,6 +147,7 @@ void TaskMCP23017(void *parameters)
         // Коррекция ЕС путем разбавления
         if (preferences.getInt("ECStabEnable", -1) == 1)
         {
+          if(!ECStabOn)ECStabOn=0;
           float setEC = preferences.getFloat("ECStabValue", 2.5);
           int setTime = preferences.getInt("ECStabTime", 20);
           String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
@@ -160,12 +164,15 @@ void TaskMCP23017(void *parameters)
             mcp.digitalWrite(DRV, 1);
             delay(setTime * 1000);
             mcp.digitalWrite(DRV, 0);
-            syslog_ng("EC Stab: ECStab pomp:" + ECStabPomp + " power down");
+            
+            ECStabOn=ECStabOn+setTime;
+            syslog_ng("EC Stab: ECStab pomp:" + ECStabPomp + " power down. Sum time on="+String(ECStabOn)+"sec");
             ECStabTimeStart = millis();
           }
           else
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " ECStab pomp:" + ECStabPomp + " power Off. Time old:" + fFTS((millis() - ECStabTimeStart) / 1000, 0) + " sec. Dist=" + fFTS(Dist, 3) + "cm");
           mcp.digitalWrite(DRV, 0);
+          
         }
 
         // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)

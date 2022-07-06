@@ -44,5 +44,5 @@ if (preferences.getInt("DRV4_D", -1) == -1)
 
 
 
-xTaskCreate(TaskMCP23017, "MCP23017", 5000, NULL, 0, NULL);
+xTaskCreate(TaskMCP23017, "MCP23017", 10000, NULL, 0, NULL);
 #endif // c_MCP23017
