@@ -78,12 +78,20 @@ void setup()
   syslog_ng("WEGABOX NAME: "+ String(HOSTNAME));
   syslog_ng("WEGABOX FW: "+ String(Firmware));
 
+
+
+
+
+
 #include <dev/lcd/setup.h>
   ArduinoOTA.begin();
 
 syslog_ng("WEGABOX: Wait OTA 30 sec");
   while (millis() < 30000)
     ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
+
+syslog_ng("Reset_reason CPU0: "+ reset_reason(rtc_get_reset_reason(0)) );
+syslog_ng("Reset_reason CPU1: "+ reset_reason(rtc_get_reset_reason(1)) );
 
   // Сканирование устройств на шине i2c
   Wire.begin(I2C_SDA, I2C_SCL);
