@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.7.080722"
+#define Firmware "beta-0.7.120722"
 
 
 #include <WiFi.h>
@@ -37,7 +37,7 @@ RunningMedian PRRM = RunningMedian(30);
 
 // #include "soc/rtc_wdt.h"
 // #include "esp_int_wdt.h"
-// #include "esp_task_wdt.h"
+#include "esp_task_wdt.h"
 
 // Переменные
 float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,CPUTemp,CO2, tVOC, eRAW;
@@ -52,6 +52,7 @@ long ECStabOn;
 String wegareply;
 String err_wegaapi_json;
 String dt;
+String Reset_reason0, Reset_reason1;
 // Калибровочные значения для определения ЕС
 float EC_R1, EC_R2_p1, EC_R2_p2;
 

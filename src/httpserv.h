@@ -11,31 +11,31 @@ void handleReset()
 // index
 void handleRoot()
 {
- syslog_ng("WEB /root");
- String s = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+  syslog_ng("WEB /root");
+  String s = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
 
- s += "<frameset cols='20%,*'>";
- s += "  <frame src='menu' name='MENU'>";
- s += "  <frame src='main' name='CONTENT'>";
- s += "</frameset>";
-server.send(200, "text/html", s);
-
+  s += "<frameset cols='20%,*'>";
+  s += "  <frame src='menu' name='MENU'>";
+  s += "  <frame src='main' name='CONTENT'>";
+  s += "</frameset>";
+  server.send(200, "text/html", s);
 }
 
 // MENU
-void handleMenu(){
+void handleMenu()
+{
 
   String s = "<body>";
   s += "<u1>";
   s += "<li><a href='main' target='CONTENT'>main </a></li>";
   s += "<li><a href='status' target='CONTENT'>wega-server api</a></li>";
-    s += "<li><a href='settings' target='CONTENT'>Settings</a></li>";
+  s += "<li><a href='settings' target='CONTENT'>Settings</a></li>";
   s += "<li><a href='SettingsPomps' target='CONTENT'>SettingsPomps</a></li>";
   s += "</ul>";
   s += "<u1>";
   s += "<li><a href='reset' target='CONTENT'>REBOOT</a></li>";
   s += "</ul>";
-s += "</body>";
+  s += "</body>";
 
   server.send(200, "text/html", s);
 }
@@ -46,7 +46,7 @@ void handleMain()
   String httpstr = "<meta http-equiv='refresh' content='10'>";
   httpstr += "HOSTNAME=" + String(HOSTNAME) + "<br>";
   httpstr += "Firmware=" + String(Firmware) + "<br>";
-  httpstr += "Uptime=" + fFTS(millis()/1000,0) + " sec <br>";
+  httpstr += "Uptime=" + fFTS(millis() / 1000, 0) + " sec <br>";
 
   if (RootTemp)
   {
@@ -128,6 +128,8 @@ void handleStatus()
   String statusstr = "status ok \n";
 
   statusstr += "Uptime=" + fFTS(millis() / 1000, 0) + "\n";
+  statusstr += "Last Time Reset_reason CPU 0:" + Reset_reason0 + "\n";
+  statusstr += "Last Time Reset_reason CPU 1:" + Reset_reason1 + "\n";
   // statusstr += "EC Times=" + fFTS(float(t_EC / 1000), 3) + " msec\n";
   // statusstr += "EC Freq=" + fFTS(f_EC, 3) + " Hz\n";
 
@@ -146,29 +148,28 @@ void handleStatus()
 // страница PWD
 void handlePWD()
 {
-  #if c_MCP23017 == 1
-  // mcp.pinMode(DRV1_A, OUTPUT);
-  // mcp.digitalWrite(DRV1_A, HIGH);
-  
+#if c_MCP23017 == 1
+// mcp.pinMode(DRV1_A, OUTPUT);
+// mcp.digitalWrite(DRV1_A, HIGH);
 
-  // pwd = server.arg("pwd").toInt();
-  // syslog_ng("PWD set:" + fFTS(pwd, 0));
+// pwd = server.arg("pwd").toInt();
+// syslog_ng("PWD set:" + fFTS(pwd, 0));
 
-  // int freq = server.arg("freq").toInt();
-  // syslog_ng("PWD freq set:" + fFTS(freq, 0));
+// int freq = server.arg("freq").toInt();
+// syslog_ng("PWD freq set:" + fFTS(freq, 0));
 
-  // // задаём свойства ШИМ-сигнала
-  // //const int freq = 45000;
-  // const int ledChannel = 0;
-  // const int resolution = 8;
-  // ledcSetup(ledChannel, freq, resolution);
-  // ledcAttachPin(PWD2, ledChannel);
-  // // ledcWrite(ledChannel, 255);
-  // // delay(1000);
-  // ledcWrite(ledChannel, pwd);
+// // задаём свойства ШИМ-сигнала
+// //const int freq = 45000;
+// const int ledChannel = 0;
+// const int resolution = 8;
+// ledcSetup(ledChannel, freq, resolution);
+// ledcAttachPin(PWD2, ledChannel);
+// // ledcWrite(ledChannel, 255);
+// // delay(1000);
+// ledcWrite(ledChannel, pwd);
 
-  // server.send(200, "text/plain", "pwd=" + fFTS(pwd, 0) + " freq=" + fFTS(freq, 0));
-  #endif // c_MCP23017
+// server.send(200, "text/plain", "pwd=" + fFTS(pwd, 0) + " freq=" + fFTS(freq, 0));
+#endif // c_MCP23017
 }
 
 #include <web/settings.h>

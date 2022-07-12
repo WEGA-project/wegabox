@@ -5,6 +5,7 @@ Adafruit_MCP23X17 mcp;
 int pwd_val, pwd_freq, pwd_port;
 int pwd_val2, pwd_freq2, pwd_port2;
 int RootPwdMin, RootPwdMax, RootDistMin;
+unsigned int bitw= 0b0000000000000000;
 
 unsigned long MCP23017_old = millis();
 unsigned long MCP23017_Repeat = 10000;
