@@ -30,7 +30,7 @@ void TaskDS18B20(void *parameters)
             ds0 = sens18b20.getTempCByIndex(0);
             //sens18b20.begin();
           }
-          if (ds0 and ds0 != -127 and ds0 != 85)
+          if (ds0 and ds0 != -127 and ds0 != 85 and ds0 != -255)
             RootTempRM.add(ds0);
          // else
             //oneWire.reset();
