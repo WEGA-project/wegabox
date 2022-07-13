@@ -53,9 +53,7 @@ void TaskMCP23017(void *parameters)
         int KickUpTime = 300;  // Время пинка в миллисекундах
 
         // PWD 1
-        if (pwd_val != preferences.getInt("PWD", 0) 
-        or pwd_freq != preferences.getInt("FREQ", 0) 
-        or pwd_port != preferences.getInt("PWDport", 0))
+        if (pwd_val != preferences.getInt("PWD", 0) or pwd_freq != preferences.getInt("FREQ", 0) or pwd_port != preferences.getInt("PWDport", 0))
 
         {
 
@@ -76,10 +74,10 @@ void TaskMCP23017(void *parameters)
           if (PompKickUP == 1)
             PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
           ledcWrite(PwdChannel1, pwd_val);
-          PWD1=pwd_val;
+          PWD1 = pwd_val;
         }
 
-        //PWD 2
+        // PWD 2
         if (pwd_val2 != preferences.getInt("PWD2", 0) or pwd_freq2 != preferences.getInt("FREQ2", 0) or pwd_port2 != preferences.getInt("PWDport2", 0))
 
         {
@@ -101,53 +99,70 @@ void TaskMCP23017(void *parameters)
           if (PompKickUP == 1)
             PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val2, KickUpTime);
           ledcWrite(PwdChannel2, pwd_val2);
-          PWD2=pwd_val2;
+          PWD2 = pwd_val2;
         }
 
-
-
-
-
         // Адаптивная циркуляция для снижения скачков корневого давления
-        int pwd_val_root;
+
         if (preferences.getInt("RootPomp", -1) == 1)
         {
+          String SelectedRootPomp = preferences.getString("SelectedRootPomp", "DRV1_A");
           pwd_val_root = preferences.getInt("PWD", 254);
+          RootPwdOn = preferences.getInt("RootPwdOn", 1);
           RootPwdMax = preferences.getInt("RootPwdMax", 254);
           RootPwdMin = preferences.getInt("RootPwdMin", 0);
           RootDistMin = preferences.getInt("RootDistMin", 6);
-          int PwdStepUp = preferences.getInt("PwdStepUp", 1);
-          int PwdStepDown = preferences.getInt("PwdStepDown", 10);
+          PwdStepUp = preferences.getInt("PwdStepUp", 1);
+          PwdStepDown = preferences.getInt("PwdStepDown", 10);
 
-          if (PwdStepUp=255)
-           PwdStepUp=AirTemp-RootTemp;
-
-          if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
+          // Если включен режим ШИМ регулировать шимом, если нет то портом.
+          if (RootPwdOn == 1)
           {
-            // preferences.putInt("DRV1_A_State", 0);
-            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
-            pwd_val_root = pwd_val_root - PwdStepDown;
-            
+            if (PwdStepUp == 255)
+              PwdStepUp = AirTemp - RootTemp;
+
+            if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
+            {
+              // preferences.putInt("DRV1_A_State", 0);
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
+              syslog_ng("Root pomp controll: PWD StepDown " + String(pwd_val_root) + "-" + String(PwdStepDown));
+              pwd_val_root = pwd_val_root - PwdStepDown;
+            }
+            else
+            {
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
+              syslog_ng("Root pomp controll: PWD StepUp " + String(pwd_val_root) + "+" + String(PwdStepUp));
+              pwd_val_root = pwd_val_root + PwdStepUp;
+            }
+
+            if (pwd_val_root < RootPwdMin)
+              pwd_val_root = RootPwdMin;
+            if (pwd_val_root > RootPwdMax)
+              pwd_val_root = RootPwdMax;
+            preferences.putInt("PWD", pwd_val_root);
+            syslog_ng("Root pomp controll: PWD=" + String(pwd_val_root));
           }
-          else
+          else // Управление включением выключением помпы без шима
           {
 
-            // preferences.putInt("DRV1_A_State", 1);
-            syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
-            pwd_val_root = pwd_val_root + PwdStepUp;
+            if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
+            {
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + "Pomp:"+SelectedRootPomp+" Power DOWN set");
+              preferences.putInt((SelectedRootPomp + "_State").c_str(), 0);
+            }
+            else
+            {
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + "Pomp:"+SelectedRootPomp+" Power UP set");
+              preferences.putInt((SelectedRootPomp + "_State").c_str(), 1);
+            }
           }
-
-          if (pwd_val_root < RootPwdMin)
-            pwd_val_root = RootPwdMin;
-          if (pwd_val_root > RootPwdMax)
-            pwd_val_root = RootPwdMax;
-          preferences.putInt("PWD", pwd_val_root);
         }
 
         // Коррекция ЕС путем разбавления
         if (preferences.getInt("ECStabEnable", -1) == 1)
         {
-          if(!ECStabOn)ECStabOn=0;
+          if (!ECStabOn)
+            ECStabOn = 0;
           float setEC = preferences.getFloat("ECStabValue", 2.5);
           int setTime = preferences.getInt("ECStabTime", 20);
           String ECStabPomp = preferences.getString("ECStabPomp", "DRV1_D");
@@ -156,7 +171,6 @@ void TaskMCP23017(void *parameters)
           float ECStabMinDist = preferences.getFloat("ECStabMinDist", 5);
           float ECStabMaxDist = preferences.getFloat("ECStabMaxDist", 50);
 
-
           if (wEC > setEC and millis() - ECStabTimeStart > ECStabInterval * 1000 and Dist >= ECStabMinDist)
           {
 
@@ -164,15 +178,14 @@ void TaskMCP23017(void *parameters)
             mcp.digitalWrite(DRV, 1);
             delay(setTime * 1000);
             mcp.digitalWrite(DRV, 0);
-            
-            ECStabOn=ECStabOn+setTime;
-            syslog_ng("EC Stab: ECStab pomp:" + ECStabPomp + " power down. Sum time on="+String(ECStabOn)+"sec");
+
+            ECStabOn = ECStabOn + setTime;
+            syslog_ng("EC Stab: ECStab pomp:" + ECStabPomp + " power down. Sum time on=" + String(ECStabOn) + "sec");
             ECStabTimeStart = millis();
           }
           else
             syslog_ng("EC Stab: EC=" + fFTS(wEC, 3) + " ECStab pomp:" + ECStabPomp + " power Off. Time old:" + fFTS((millis() - ECStabTimeStart) / 1000, 0) + " sec. Dist=" + fFTS(Dist, 3) + "cm");
           mcp.digitalWrite(DRV, 0);
-          
         }
 
         // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
@@ -191,8 +204,6 @@ void TaskMCP23017(void *parameters)
             syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3));
           }
         }
-
-
 
         readGPIO = mcp.readGPIOAB();
 
@@ -224,33 +235,33 @@ void TaskMCP23017(void *parameters)
         // mcp.digitalWrite(DRV4_B, preferences.getInt("DRV4_B_State", 0));
         // mcp.digitalWrite(DRV4_C, preferences.getInt("DRV4_C_State", 0));
         // mcp.digitalWrite(DRV4_D, preferences.getInt("DRV4_D_State", 0));
-        
-        bitWrite(bitw,DRV1_A, preferences.getInt("DRV1_A_State", 0));
-        bitWrite(bitw,DRV1_B, preferences.getInt("DRV1_B_State", 0));
-        bitWrite(bitw,DRV1_C, preferences.getInt("DRV1_C_State", 0));
-        bitWrite(bitw,DRV1_D, preferences.getInt("DRV1_D_State", 0));
 
-        bitWrite(bitw,DRV2_A, preferences.getInt("DRV2_A_State", 0));
-        bitWrite(bitw,DRV2_B, preferences.getInt("DRV2_B_State", 0));
-        bitWrite(bitw,DRV2_C, preferences.getInt("DRV2_C_State", 0));
-        bitWrite(bitw,DRV2_D, preferences.getInt("DRV2_D_State", 0));
+        bitWrite(bitw, DRV1_A, preferences.getInt("DRV1_A_State", 0));
+        bitWrite(bitw, DRV1_B, preferences.getInt("DRV1_B_State", 0));
+        bitWrite(bitw, DRV1_C, preferences.getInt("DRV1_C_State", 0));
+        bitWrite(bitw, DRV1_D, preferences.getInt("DRV1_D_State", 0));
 
-        bitWrite(bitw,DRV3_A, preferences.getInt("DRV3_A_State", 0));
-        bitWrite(bitw,DRV3_B, preferences.getInt("DRV3_B_State", 0));
-        bitWrite(bitw,DRV3_C, preferences.getInt("DRV3_C_State", 0));
-        bitWrite(bitw,DRV3_D, preferences.getInt("DRV3_D_State", 0));
+        bitWrite(bitw, DRV2_A, preferences.getInt("DRV2_A_State", 0));
+        bitWrite(bitw, DRV2_B, preferences.getInt("DRV2_B_State", 0));
+        bitWrite(bitw, DRV2_C, preferences.getInt("DRV2_C_State", 0));
+        bitWrite(bitw, DRV2_D, preferences.getInt("DRV2_D_State", 0));
 
-        bitWrite(bitw,DRV4_A, preferences.getInt("DRV4_A_State", 0));
-        bitWrite(bitw,DRV4_B, preferences.getInt("DRV4_B_State", 0));
-        bitWrite(bitw,DRV4_C, preferences.getInt("DRV4_C_State", 0));
-        bitWrite(bitw,DRV4_D, preferences.getInt("DRV4_D_State", 0)); 
+        bitWrite(bitw, DRV3_A, preferences.getInt("DRV3_A_State", 0));
+        bitWrite(bitw, DRV3_B, preferences.getInt("DRV3_B_State", 0));
+        bitWrite(bitw, DRV3_C, preferences.getInt("DRV3_C_State", 0));
+        bitWrite(bitw, DRV3_D, preferences.getInt("DRV3_D_State", 0));
+
+        bitWrite(bitw, DRV4_A, preferences.getInt("DRV4_A_State", 0));
+        bitWrite(bitw, DRV4_B, preferences.getInt("DRV4_B_State", 0));
+        bitWrite(bitw, DRV4_C, preferences.getInt("DRV4_C_State", 0));
+        bitWrite(bitw, DRV4_D, preferences.getInt("DRV4_D_State", 0));
 
         syslog_ng("MCP23017 bitw:" + String(bitw));
-        mcp.writeGPIOAB(bitw); 
-        
-// PWD Kick for DRV1   
+        mcp.writeGPIOAB(bitw);
+
+        // PWD Kick for DRV1
         if (bitRead(readGPIO, DRV1_A) == 0 and preferences.getInt("DRV1_A_State", 0) == 1)
-          PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);      
+          PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
 
         if (bitRead(readGPIO, DRV1_B) == 0 and preferences.getInt("DRV1_B_State", 0) == 1)
           PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
@@ -261,10 +272,7 @@ void TaskMCP23017(void *parameters)
         if (bitRead(readGPIO, DRV1_D) == 0 and preferences.getInt("DRV1_D_State", 0) == 1)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
 
-
-
         readGPIO = mcp.readGPIOAB();
-        
 
         for (int p = 0; p < 16; p++)
         {
