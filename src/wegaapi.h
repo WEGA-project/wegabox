@@ -73,7 +73,7 @@ void TaskWegaApi(void *parameters)
       httpstr += "&ECStabOn=" + String(ECStabOn); 
 
     http.begin(client, httpstr);
-    http.setTimeout(2000);
+    //http.setTimeout(2000);
     http.GET();
     wegareply = http.getString();
 

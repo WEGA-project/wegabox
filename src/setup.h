@@ -114,7 +114,7 @@ syslog_ng("I2C: Scan I2C bus");
 
   MDNS.begin(HOSTNAME);
   MDNS.addService("http", "tcp", 80);
-  server.enableDelay(true);
+  //server.enableDelay(true);
   server.on("/", handleRoot);
   server.on("/menu", handleMenu);
   server.on("/main", handleMain);
@@ -125,7 +125,7 @@ syslog_ng("I2C: Scan I2C bus");
   server.on("/SettingsPomps", handleSettingsPomps);
   server.begin();
 
-  xTaskCreate(TaskOTA, "TaskOTA", 10000, NULL, 3, NULL);
+  xTaskCreate(TaskOTA, "TaskOTA", 5000, NULL, 3, NULL);
   xTaskCreate(TaskWegaApi, "TaskWegaApi", 10000, NULL, 1, &appTasks[appTaskCount++]);
 
   xSemaphoreX = xSemaphoreCreateMutex();
