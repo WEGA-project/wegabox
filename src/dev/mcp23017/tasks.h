@@ -17,8 +17,7 @@ void TaskMCP23017(void *parameters)
         unsigned long MCP23017_time = millis();
         syslog_ng("MCP23017 Start " + fFTS(MCP23017_LastTime - MCP23017_Repeat, 0) + "ms");
 
-        mcp.begin_I2C();
-
+        
         // Параметры портов
         long DRV1_A = preferences.getInt("DRV1_A", -1);
         long DRV1_B = preferences.getInt("DRV1_B", -1);
@@ -273,6 +272,15 @@ void TaskMCP23017(void *parameters)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
 
         readGPIO = mcp.readGPIOAB();
+
+while(readGPIO != bitw){
+  mcp.begin_I2C();
+  delay(100);
+  mcp.writeGPIOAB(bitw);
+  delay(100);
+  readGPIO = mcp.readGPIOAB();
+  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw));
+}
 
         for (int p = 0; p < 16; p++)
         {
