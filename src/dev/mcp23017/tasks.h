@@ -274,12 +274,12 @@ void TaskMCP23017(void *parameters)
         readGPIO = mcp.readGPIOAB();
 
 while(readGPIO != bitw){
+  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw));
   mcp.begin_I2C();
   delay(100);
   mcp.writeGPIOAB(bitw);
   delay(100);
-  readGPIO = mcp.readGPIOAB();
-  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw));
+  readGPIO = mcp.readGPIOAB();  
 }
 
         for (int p = 0; p < 16; p++)
