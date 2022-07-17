@@ -272,9 +272,13 @@ void TaskMCP23017(void *parameters)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
 
         readGPIO = mcp.readGPIOAB();
-
-while(readGPIO != bitw){
-  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw));
+int GPIOerrcont=0;
+while(readGPIO != bitw and GPIOerrcont < 10){
+  GPIOerrcont++;
+  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw)+" count error:"+String(GPIOerrcont));
+  
+  Wire.begin();
+  delay(100);
   mcp.begin_I2C();
   delay(100);
   mcp.writeGPIOAB(bitw);
