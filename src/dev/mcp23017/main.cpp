@@ -10,6 +10,7 @@ int pwd_val_root, RootPwdOn, PwdStepUp, PwdStepDown;
 unsigned long MCP23017_old = millis();
 unsigned long MCP23017_Repeat = 10000;
 unsigned long ECStabTimeStart;
+float aPWD=0;
 #include <dev/mcp23017/func.h>
 
 #endif // c_MCP23017

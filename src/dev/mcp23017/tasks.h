@@ -17,7 +17,6 @@ void TaskMCP23017(void *parameters)
         unsigned long MCP23017_time = millis();
         syslog_ng("MCP23017 Start " + fFTS(MCP23017_LastTime - MCP23017_Repeat, 0) + "ms");
 
-        
         // Параметры портов
         long DRV1_A = preferences.getInt("DRV1_A", -1);
         long DRV1_B = preferences.getInt("DRV1_B", -1);
@@ -117,21 +116,29 @@ void TaskMCP23017(void *parameters)
           // Если включен режим ШИМ регулировать шимом, если нет то портом.
           if (RootPwdOn == 1)
           {
-            if (PwdStepUp == 255)
-              PwdStepUp = AirTemp - RootTemp;
 
             if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
             {
               // preferences.putInt("DRV1_A_State", 0);
-              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power down");
+              syslog_ng("Root pomp controll: AirTemp-RootTemp=" + fFTS(AirTemp-RootTemp, 3) + " Root pomp power down");
               syslog_ng("Root pomp controll: PWD StepDown " + String(pwd_val_root) + "-" + String(PwdStepDown));
               pwd_val_root = pwd_val_root - PwdStepDown;
             }
             else
             {
-              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + " Root pomp power up");
-              syslog_ng("Root pomp controll: PWD StepUp " + String(pwd_val_root) + "+" + String(PwdStepUp));
-              pwd_val_root = pwd_val_root + PwdStepUp;
+              if (PwdStepUp == 255)
+              {
+                aPWD = (AirTemp - RootTemp);         
+                pwd_val_root = round(aPWD*200);
+                syslog_ng("Root pomp controll: PWD Adaptive StepUp=" + fFTS(aPWD, 3));
+              }
+              else
+              {
+                pwd_val_root = pwd_val_root + PwdStepUp;
+                syslog_ng("Root pomp controll: PWD StepUp " + String(pwd_val_root) + "+" + String(PwdStepUp));
+              }
+              syslog_ng("Root pomp controll: AirTemp-RootTemp=" + fFTS(AirTemp-RootTemp, 3) + " Root pomp power up");
+              
             }
 
             if (pwd_val_root < RootPwdMin)
@@ -146,12 +153,12 @@ void TaskMCP23017(void *parameters)
 
             if (RootTemp > AirTemp and RootTemp > 15 and Dist > RootDistMin)
             {
-              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + "Pomp:"+SelectedRootPomp+" Power DOWN set");
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " > AirTemp=" + fFTS(AirTemp, 3) + "Pomp:" + SelectedRootPomp + " Power DOWN set");
               preferences.putInt((SelectedRootPomp + "_State").c_str(), 0);
             }
             else
             {
-              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + "Pomp:"+SelectedRootPomp+" Power UP set");
+              syslog_ng("Root pomp controll: RootTemp=" + fFTS(RootTemp, 3) + " < AirTemp=" + fFTS(AirTemp, 3) + "Pomp:" + SelectedRootPomp + " Power UP set");
               preferences.putInt((SelectedRootPomp + "_State").c_str(), 1);
             }
           }
@@ -206,35 +213,6 @@ void TaskMCP23017(void *parameters)
 
         readGPIO = mcp.readGPIOAB();
 
-        // mcp.digitalWrite(DRV1_A, preferences.getInt("DRV1_A_State", 0));
-        // if (bitRead(readGPIO, DRV1_A) == 0 and preferences.getInt("DRV1_A_State", 0) == 1)
-        //   PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
-
-        // mcp.digitalWrite(DRV1_B, preferences.getInt("DRV1_B_State", 0));
-        // if (bitRead(readGPIO, DRV1_B) == 0 and preferences.getInt("DRV1_B_State", 0) == 1)
-        //   PwdPompKick(PwdChannel1, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
-
-        // mcp.digitalWrite(DRV1_C, preferences.getInt("DRV1_C_State", 0));
-        // if (bitRead(readGPIO, DRV1_C) == 0 and preferences.getInt("DRV1_C_State", 0) == 1)
-        //   PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
-
-        // mcp.digitalWrite(DRV1_D, preferences.getInt("DRV1_D_State", 0));
-        // if (bitRead(readGPIO, DRV1_D) == 0 and preferences.getInt("DRV1_D_State", 0) == 1)
-        //   PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
-
-        // mcp.digitalWrite(DRV2_A, preferences.getInt("DRV2_A_State", 0));
-        // mcp.digitalWrite(DRV2_B, preferences.getInt("DRV2_B_State", 0));
-        // mcp.digitalWrite(DRV2_C, preferences.getInt("DRV2_C_State", 0));
-        // mcp.digitalWrite(DRV2_D, preferences.getInt("DRV2_D_State", 0));
-        // mcp.digitalWrite(DRV3_A, preferences.getInt("DRV3_A_State", 0));
-        // mcp.digitalWrite(DRV3_B, preferences.getInt("DRV3_B_State", 0));
-        // mcp.digitalWrite(DRV3_C, preferences.getInt("DRV3_C_State", 0));
-        // mcp.digitalWrite(DRV3_D, preferences.getInt("DRV3_D_State", 0));
-        // mcp.digitalWrite(DRV4_A, preferences.getInt("DRV4_A_State", 0));
-        // mcp.digitalWrite(DRV4_B, preferences.getInt("DRV4_B_State", 0));
-        // mcp.digitalWrite(DRV4_C, preferences.getInt("DRV4_C_State", 0));
-        // mcp.digitalWrite(DRV4_D, preferences.getInt("DRV4_D_State", 0));
-
         bitWrite(bitw, DRV1_A, preferences.getInt("DRV1_A_State", 0));
         bitWrite(bitw, DRV1_B, preferences.getInt("DRV1_B_State", 0));
         bitWrite(bitw, DRV1_C, preferences.getInt("DRV1_C_State", 0));
@@ -272,19 +250,24 @@ void TaskMCP23017(void *parameters)
           PwdPompKick(PwdChannel2, KickUpMax, KickUpStrart, pwd_val, KickUpTime);
 
         readGPIO = mcp.readGPIOAB();
-int GPIOerrcont=0;
-while(readGPIO != bitw and GPIOerrcont < 10){
-  GPIOerrcont++;
-  syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO)+" != writeGPIO:"+String(bitw)+" count error:"+String(GPIOerrcont));
-  
-  Wire.begin();
-  delay(100);
-  mcp.begin_I2C();
-  delay(100);
-  mcp.writeGPIOAB(bitw);
-  delay(100);
-  readGPIO = mcp.readGPIOAB();  
-}
+        int GPIOerrcont = 0;
+        while (readGPIO != bitw and GPIOerrcont < 10)
+        {
+          GPIOerrcont++;
+          syslog_err("MCP23017 Error set: readGPIO:" + String(readGPIO) + " != writeGPIO:" + String(bitw) + " count error:" + String(GPIOerrcont));
+          if (GPIOerrcont == 10) {
+            syslog_err("MCP23017 Error Critical: GPIO Set Maximum error - reset system");
+            ESP.restart();}
+
+          Wire.begin();
+          delay(100);
+          mcp.begin_I2C();
+          delay(100);
+          mcp.writeGPIOAB(bitw);
+          delay(100);
+          readGPIO = mcp.readGPIOAB();
+          
+        }
 
         for (int p = 0; p < 16; p++)
         {
