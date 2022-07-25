@@ -158,7 +158,6 @@ void TaskWegaApi(void *parameters)
 
 
     }
-
     http.end();
 
     if (WiFi.status() != WL_CONNECTED)

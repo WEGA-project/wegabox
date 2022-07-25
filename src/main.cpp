@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.7.190722"
+#define Firmware "beta-0.7.250722"
 
 
 #include <WiFi.h>
@@ -21,6 +21,7 @@ Preferences preferences;
 #include <ArduinoJson.h>
     WiFiClient client;
     HTTPClient http;
+    
 
 #include <RunningMedian.h>
 RunningMedian PhRM = RunningMedian(90);

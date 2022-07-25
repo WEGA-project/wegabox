@@ -197,17 +197,17 @@ void TaskMCP23017(void *parameters)
         // Остановка помпы ночью по датчику освещенности (если темно то отключить, если светло включить)
         if (preferences.getInt("PompNightEnable", -1) == 1 and PR != -1)
         {
-          float PompNightLightLevel = preferences.getFloat("PompNightLightLevel", 0);
+          float NightLightLevel = preferences.getFloat("NightLightLevel", 0);
           String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
-          if (PompNightLightLevel < PR)
+          if (NightLightLevel < PR)
           {
             preferences.putInt((PompNightPomp + "_State").c_str(), 1);
-            syslog_ng("PompNight " + PompNightPomp + ": UP PR=" + fFTS(PR, 3));
+            syslog_ng("PompNight " + PompNightPomp + ": UP PR=" + fFTS(PR, 3)+" > Min="+fFTS(NightLightLevel,1));
           }
           else
           {
             preferences.putInt((PompNightPomp + "_State").c_str(), 0);
-            syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3));
+            syslog_ng("PompNight " + PompNightPomp + ": DOWN PR=" + fFTS(PR, 3)+" < Min="+fFTS(NightLightLevel,1));
           }
         }
 
