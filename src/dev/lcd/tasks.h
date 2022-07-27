@@ -2,7 +2,7 @@
 void TaskLCD(void *parameters)
 {
   // vTaskDelay(10000);
-  delay(30000);
+  delay(40000);
   for (;;)
   {
 

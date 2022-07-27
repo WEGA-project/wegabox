@@ -49,7 +49,7 @@ void TaskVL6180X(void *parameters)
           s_vl6180X.setTimeout(100);
         }
         VL6180X_RangeRM.add(range / (cont - err));
-        Dist = VL6180X_RangeRM.getAverage();
+        Dist = VL6180X_RangeRM.getAverage(100);
 
         VL6180X_time = millis() - VL6180X_time;
 
