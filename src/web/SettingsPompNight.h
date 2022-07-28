@@ -8,9 +8,9 @@ if (server.arg("PompNightPomp") != "")
   preferences.putString("PompNightPomp", server.arg("PompNightPomp"));
 String PompNightPomp = preferences.getString("PompNightPomp", "DRV1_A");
 
-if (server.arg("NightLightLevel") != "")
-  preferences.putFloat("NightLightLevel", server.arg("NightLightLevel").toFloat());
-float NightLightLevel = preferences.getFloat("NightLightLevel", 10);
+if (server.arg("MinLightLevel") != "")
+  preferences.putInt("MinLightLevel", server.arg("MinLightLevel").toInt());
+int MinLightLevel = preferences.getInt("MinLightLevel", 10);
 
 h += "<form action='' method='POST' id='set'></form>\n";
 h += " <table>\n";
@@ -26,9 +26,10 @@ h += "         <td>Pomp Night Pomp\n";
 h += "        <td><input type='text' name='PompNightPomp' value='" + PompNightPomp + "' form='set'>\n";
 h += "     </tr>\n";
 
+
 h += "     <tr>\n";
-h += "         <td>NightLightLevel\n";
-h += "        <td><input type='text' name='Minimum Light Level' value='" + fFTS(NightLightLevel, 1) + "' form='set'>\n";
+h += "         <td>MinLightLevel\n";
+h += "        <td><input type='text' name='MinLightLevel' value='" + String(MinLightLevel) + "' form='set'>\n";
 h += "     </tr>\n";
 
 h += "</table>\n";
