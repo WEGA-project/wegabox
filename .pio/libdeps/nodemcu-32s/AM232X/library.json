@@ -1,0 +1,23 @@
+{
+  "name": "AM232X",
+  "keywords": "Temperature,Humidity,DHT12,AM2320,AM3231,AM2322",
+  "description": "Arduino library for AM2320 AM2321 and AM2323 I2C temperature and humidity sensor. ",
+  "authors":
+  [
+    {
+      "name": "Rob Tillaart",
+      "email": "Rob.Tillaart@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/RobTillaart/AM232X"
+  },
+  "version": "0.3.4",
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "headers": "AM232X.h"
+}

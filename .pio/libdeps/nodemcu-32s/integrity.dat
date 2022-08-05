@@ -1,0 +1,19 @@
+sparkfun/SparkFun SCD30 Arduino Library@^1.0.17
+adafruit/Adafruit MCP23017 Arduino Library@^2.0.2
+milesburton/DallasTemperature@^3.9.1
+stevemarple/MCP342x@^1.0.2
+pololu/VL6180X@^1.3.1
+arcao/Syslog@^2.0.0
+me-no-dev/ESP Async WebServer@^1.2.3
+bitbucket-christandlg/BMx280MI@^1.2.1
+luisllamasbinaburo/I2CScanner@^1.0.1
+adafruit/Adafruit BusIO@^1.10.0
+enjoyneering/AHT10@^1.1.0
+martinsos/HCSR04@^2.0.0
+andhiesetyabudi/HX710B@^1.0.0
+robtillaart/RunningMedian@^0.3.4
+bblanchon/ArduinoJson@^6.18.5
+gyverlibs/GyverOLED@^1.3.2
+maarten-pennings/CCS811@^12.0.0
+robtillaart/AM232X@^0.3.2
+wollewald/ADS1115_WE@^1.3.9

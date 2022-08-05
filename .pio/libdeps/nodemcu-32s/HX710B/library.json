@@ -1,0 +1,20 @@
+{
+    "name": "HX710B",
+    "keywords": "HX7108B, air pressure sensor",
+    "description": "Arduino library for Air Pressure Sensor HX710B",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/andhieSetyabudi/hx710b_arduino.git"
+    },
+    "authors":
+    {
+        "name": "Andhie Setyabudi",
+        "url": "https://github.com/andhieSetyabudi",
+        "maintainer": true
+    },
+    "version": "1.0.0",
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": "*"
+}
