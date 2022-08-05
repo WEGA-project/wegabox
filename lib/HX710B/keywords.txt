@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map for Statistic Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+HX710B	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+init KEYWORD2
+setMode KEYWORD2
+read KEYWORD2
+isReady KEYWORD2
+attachDelay KEYWORD2
+attachTick KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
