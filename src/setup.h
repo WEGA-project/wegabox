@@ -97,6 +97,8 @@ syslog_ng("Reset_reason CPU1: "+ Reset_reason1 );
 
   // Сканирование устройств на шине i2c
   Wire.begin(I2C_SDA, I2C_SCL);
+  
+  //Wire.begin();
   syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
   
 syslog_ng("I2C: Scan I2C bus");
@@ -153,6 +155,7 @@ syslog_ng("I2C: Scan I2C bus");
 #include <dev/cput/setup.h>
 #include <dev/hall/setup.h>
 #include <dev/vl6180x/setup.h>
+#include <dev/vl6180x_us/setup.h>
 
 #if c_LCD == 1
   oled.clear();

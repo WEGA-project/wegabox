@@ -128,6 +128,7 @@ String reset_reason(RESET_REASON reason)
 #include <dev/lcd/main.cpp>
 #include <dev/lcd/func.h>
 #include <dev/vl6180x/main.cpp>
+#include <dev/vl6180x_us/main.cpp>
 
 
 
