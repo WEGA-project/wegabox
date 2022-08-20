@@ -156,6 +156,7 @@ syslog_ng("I2C: Scan I2C bus");
 #include <dev/hall/setup.h>
 #include <dev/vl6180x/setup.h>
 #include <dev/vl6180x_us/setup.h>
+#include <dev/vl53l0x_us/setup.h>
 
 #if c_LCD == 1
   oled.clear();

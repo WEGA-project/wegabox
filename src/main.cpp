@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.7.300722"
+#define Firmware "beta-0.8.200822"
 
 
 #include <WiFi.h>
@@ -129,6 +129,7 @@ String reset_reason(RESET_REASON reason)
 #include <dev/lcd/func.h>
 #include <dev/vl6180x/main.cpp>
 #include <dev/vl6180x_us/main.cpp>
+#include <dev/vl53l0x_us/main.cpp>
 
 
 
