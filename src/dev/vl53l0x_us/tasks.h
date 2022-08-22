@@ -75,7 +75,7 @@ void TaskVL53L0X(void *parameters)
         //Dist = range / cont / 10;
 
          VL53L0X_RangeRM.add(range / (cont - err) /10);
-         Dist = VL53L0X_RangeRM.getMedian();
+         Dist = VL53L0X_RangeRM.getAverage(3);
 
         VL53L0X_time = millis() - VL53L0X_time;
 
