@@ -1,6 +1,7 @@
 #if c_VL53L0X_us == 1
 void TaskVL53L0X(void *parameters)
 {
+
   for (;;)
   {
     if (OtaStart == true)
@@ -15,46 +16,77 @@ void TaskVL53L0X(void *parameters)
         unsigned long VL53L0X_time = millis();
         syslog_ng("VL53L0X Start " + fFTS(VL53L0X_LastTime - VL53L0X_Repeat, 0) + "ms");
 
-        // Serial.print("Ambient: ");
-        // syslog_ng("VL6180X Ambient:" + fFTS(s_vl6180X.readAmbientSingle(),0 ) );
-        //  if (s_vl6180X.timeoutOccurred()) { syslog_err("VL6180X Ambient: TIMEOUT"); }
+        Wire.begin(13, 14);
+        
 
-        // //Serial.print("\tRange: ");
-        Wire.begin(13,14);
+        // syslog_ng("VL53L0X Range:" + fFTS(s_VL53L0X.readRangeSingleMillimeters(), 0));
 
-
-        syslog_ng("VL53L0X Range:" + fFTS(s_VL53L0X.readRangeSingleMillimeters(), 0));
-
-        delay(100);
+        // delay(100);
         long err = 0;
         float range = 0;
         float range0 = 0;
         unsigned cont = 0;
         unsigned long t = millis();
-        while (millis() - t < 1000)
+
+        // delay(500);
+        // Dist = float(s_VL53L0X.readRangeContinuousMillimeters())/10;
+        while (millis() - t < 15000)
         {
-          cont++;
+             cont++;
+          //delay(10);
+          if (!s_VL53L0X.timeoutOccurred())
+            range0 = s_VL53L0X.readRangeContinuousMillimeters();
+            if (range0 and range0 != 65535 and range0 !=0 )
+            {
+             range = range + range0;
+             //cont++;
+            }
+           else
+           {
+             err++;
 
-          if (s_VL53L0X.timeoutOccurred())
-          syslog_err("VL53L0X dist: TIMEOUT");
+           }
 
-          range0 = s_VL53L0X.readRangeSingleMillimeters();
-          if (range0 != 765)
-            range = range0 / 10 + range;
+          //   // syslog_err("VL53L0X dist: restart...");
+          //   // Wire.begin(13, 14);
+          //   // s_VL53L0X.stopContinuous();
+          //   // delay(100);
+          //   // s_VL53L0X.setTimeout(500);
+          //   // s_VL53L0X.init();
+          //   // delay(100);
+          //   // //s_VL53L0X.setMeasurementTimingBudget(200000);
+
+          //   // // Start continuous back-to-back mode (take readings as
+          //   // // fast as possible).  To use continuous timed mode
+          //   // // instead, provide a desired inter-measurement period in
+          //   // // ms (e.g. sensor.startContinuous(100)).
+          //   // s_VL53L0X.startContinuous(10);
+
+          // }
+          //     VL53L0X_RangeRM.add(range0);
+          //   else
+          //     {err++;
+          //     s_VL53L0X.init();
+          //     s_VL53L0X.stopContinuous();
+          //     delay(100);
+          //     s_VL53L0X.startContinuous();
+          //     }
         }
-        VL53L0X_RangeRM.add(range / (cont - err));
-        Dist = VL53L0X_RangeRM.getAverage(100);
+        //Dist = range / cont / 10;
+
+         VL53L0X_RangeRM.add(range / (cont - err) /10);
+         Dist = VL53L0X_RangeRM.getMedian();
 
         VL53L0X_time = millis() - VL53L0X_time;
 
         syslog_ng("VL53L0X dist: " + fFTS(Dist, 3));
         syslog_ng("VL53L0X Error/Count: " + String(err) + "/" + String(cont));
-        syslog_ng("VL53L0X Highest: " + fFTS(VL53L0X_RangeRM.getHighest(), 1));
-        syslog_ng("VL53L0X Lowest: " + fFTS(VL53L0X_RangeRM.getLowest(), 1));
+        // syslog_ng("VL53L0X Highest: " + fFTS(VL53L0X_RangeRM.getHighest(), 1));
+        // syslog_ng("VL53L0X Lowest: " + fFTS(VL53L0X_RangeRM.getLowest(), 1));
 
         syslog_ng("VL53L0X " + fFTS(VL53L0X_time, 0) + "ms end.");
 
-        Wire.begin(I2C_SDA, I2C_SCL);
+        Wire.begin(I2C_SDA, I2C_SCL, 100000L);
         VL53L0X_old = millis();
         xSemaphoreGive(xSemaphoreX);
       }
