@@ -35,7 +35,8 @@ void TaskVL53L0X(void *parameters)
              cont++;
           //delay(10);
           if (!s_VL53L0X.timeoutOccurred())
-            range0 = s_VL53L0X.readRangeContinuousMillimeters();
+            //range0 = s_VL53L0X.readRangeContinuousMillimeters();
+            range0 = s_VL53L0X.readRangeSingleMillimeters();
             if (range0 and range0 != 65535 and range0 !=0 )
             {
              range = range + range0;
@@ -75,7 +76,7 @@ void TaskVL53L0X(void *parameters)
         //Dist = range / cont / 10;
 
          VL53L0X_RangeRM.add(range / (cont - err) /10);
-         Dist = VL53L0X_RangeRM.getAverage(3);
+         Dist = VL53L0X_RangeRM.getAverage(6);
 
         VL53L0X_time = millis() - VL53L0X_time;
 
