@@ -22,7 +22,7 @@
 //   s_VL53L0X.setMeasurementTimingBudget(20000);
 // #elif defined HIGH_ACCURACY
 //   // increase timing budget to 200 ms
-   s_VL53L0X.setMeasurementTimingBudget(100);
+   s_VL53L0X.setMeasurementTimingBudget(200000);
 // #endif
 
 

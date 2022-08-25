@@ -17,6 +17,7 @@ void TaskVL53L0X(void *parameters)
         syslog_ng("VL53L0X Start " + fFTS(VL53L0X_LastTime - VL53L0X_Repeat, 0) + "ms");
 
         Wire.begin(13, 14);
+        //s_VL53L0X.init();
         
 
         // syslog_ng("VL53L0X Range:" + fFTS(s_VL53L0X.readRangeSingleMillimeters(), 0));
@@ -28,25 +29,25 @@ void TaskVL53L0X(void *parameters)
         unsigned cont = 0;
         unsigned long t = millis();
 
-        // delay(500);
-        // Dist = float(s_VL53L0X.readRangeContinuousMillimeters())/10;
-        while (millis() - t < 15000)
-        {
-             cont++;
-          //delay(10);
-          if (!s_VL53L0X.timeoutOccurred())
-            //range0 = s_VL53L0X.readRangeContinuousMillimeters();
-            range0 = s_VL53L0X.readRangeSingleMillimeters();
-            if (range0 and range0 != 65535 and range0 !=0 )
-            {
-             range = range + range0;
-             //cont++;
-            }
-           else
-           {
-             err++;
+        // // delay(500);
+        // // Dist = float(s_VL53L0X.readRangeContinuousMillimeters())/10;
+        // while (millis() - t < 30000)
+        // {
+        //      cont++;
+        //   //delay(10);
+        //   if (!s_VL53L0X.timeoutOccurred())
+        //     //range0 = s_VL53L0X.readRangeContinuousMillimeters();
+        //     range0 = s_VL53L0X.readRangeSingleMillimeters();
+        //     if (range0 and range0 != 65535 and range0 !=0 )
+        //     {
+        //      range = range + range0;
+        //      //cont++;
+        //     }
+        //    else
+        //    {
+        //      err++;
 
-           }
+        //    }
 
           //   // syslog_err("VL53L0X dist: restart...");
           //   // Wire.begin(13, 14);
@@ -72,16 +73,20 @@ void TaskVL53L0X(void *parameters)
           //     delay(100);
           //     s_VL53L0X.startContinuous();
           //     }
-        }
+        //}
         //Dist = range / cont / 10;
 
-         VL53L0X_RangeRM.add(range / (cont - err) /10);
-         Dist = VL53L0X_RangeRM.getAverage(12);
+        //VL53L0X_RangeRM.add(range / (cont - err) /10);
+        //  Dist = VL53L0X_RangeRM.getAverage();
+        VL53L0X_RangeRM.add(s_VL53L0X.readRangeSingleMillimeters());
+        //Dist = float(VL53L0X_RangeRM.getMedian())/10;
+        Dist = float(VL53L0X_RangeRM.getAverage(50))/10;
+        //Dist = float(s_VL53L0X.readRangeSingleMillimeters())/10;
 
         VL53L0X_time = millis() - VL53L0X_time;
 
         syslog_ng("VL53L0X dist: " + fFTS(Dist, 3));
-        syslog_ng("VL53L0X Error/Count: " + String(err) + "/" + String(cont));
+        //syslog_ng("VL53L0X Error/Count: " + String(err) + "/" + String(cont));
         // syslog_ng("VL53L0X Highest: " + fFTS(VL53L0X_RangeRM.getHighest(), 1));
         // syslog_ng("VL53L0X Lowest: " + fFTS(VL53L0X_RangeRM.getLowest(), 1));
 
