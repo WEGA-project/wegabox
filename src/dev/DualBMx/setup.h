@@ -1,4 +1,6 @@
 #if c_DualBMx == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
+
     if (!bmx280_1.begin())
       {
         syslog_ng("Check your BMx280_1 Interface and I2C Address.");
@@ -26,6 +28,7 @@
       //if sensor is a BME280, set an oversampling setting for humidity measurements.
       // if (bmx280.isBME280())
       //   bmx280.writeOversamplingHumidity(BMx280MI::OSRS_H_x16);
+xSemaphoreGive(xSemaphoreX);
 
 xTaskCreate(TaskDualBMx,"TaskDualBMx",20000,NULL,0,NULL);
 syslog_ng("DualBMx add Task");

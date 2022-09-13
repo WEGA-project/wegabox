@@ -28,12 +28,17 @@ void TaskCCS811(void *parameters)
         eRAW = raw;
         CO2 = CCS811_eCO2RM.getAverage();
         tVOC = CCS811_tVOCRM.getAverage();
-      }
-       
 
         syslog_ng("CCS811 CO2:" + fFTS(eco2, 3));
         syslog_ng("CCS811 tVOC:" + fFTS(etvoc, 3));
         syslog_ng("CCS811 raw:" + fFTS(raw, 3));
+
+
+      }
+       
+      else{
+      syslog_err("CCS811: ERROR SENSOR. Restart");
+      ccs811.begin();}
 
         CCS811_time = millis() - CCS811_time;
 

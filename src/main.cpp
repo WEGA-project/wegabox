@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.8.270822"
+#define Firmware "beta-0.8.130922"
 
 
 #include <WiFi.h>
@@ -71,16 +71,13 @@ uint8_t appTaskCount = 0;
 #define I2C_SDA 21         // SDA
 #define I2C_SCL 22         // SCL
 
-#include "I2CScanner.h"
-
-//I2CScanner scanner;
-
 
 
 // syslog
 #include <etc/syslog/main.cpp>
 
-//SemaphoreHandle_t xI2CSemaphore;
+//SemaphoreHandle_t xSemaphoreI2C= NULL;;
+
 SemaphoreHandle_t xSemaphoreX = NULL;
 
 #include <rom/rtc.h>
@@ -136,6 +133,29 @@ String reset_reason(RESET_REASON reason)
 #include <tasks.h>
 #include <httpserv.h>
 #include <wegaapi.h>
+
+#include "I2CScanner.h"
+
+I2CScanner scanner;
+
+
+void debug(byte addscan)
+{
+	// Serial.print("Found at 0x");
+	// Serial.println(addscan, HEX);
+  syslog_ng("I2C found: device 0x"+ String(addscan, HEX));
+  if (addscan == 0x48) syslog_ng("I2C found: ADS1115 - 4-channel 16-bit ADC");
+  if (addscan == 0x76) syslog_ng("I2C found: BMP280/BME280 - Temp/Barometric sensor");
+  if (addscan == 0x38) syslog_ng("I2C found: AHT10 Humidity and Temperature sensor");
+  if (addscan == 0x5b) syslog_ng("I2C found: CCS811 Volatile organics (VOC) and equivalent CO2 (eCO2) sensor");
+  if (addscan == 0x5c) syslog_ng("I2C found: AM2320 Humidity and Temperature sensor");
+  if (addscan == 0x68) syslog_ng("I2C found: MCP3421 18-Bit Analog-to-Digital Converter");
+  if (addscan == 0x20) syslog_ng("I2C found: MCP23017 I2C GPIO Expander Breakout has 16 GPIO");
+  if (addscan == 0x61) syslog_ng("I2C found: SCD-30 - NDIR CO2 Temperature and Humidity Sensor");
+  if (addscan == 0x3c) syslog_ng("I2C found: SSD1306 OLED Display");
+  if (addscan == 0x29) syslog_ng("I2C found: vl6180x laser distance sensor"); 
+}
+
 
 
 #include <setup.h>

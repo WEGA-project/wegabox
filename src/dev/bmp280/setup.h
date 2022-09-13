@@ -1,4 +1,6 @@
 #if c_BMP280 == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+
     if (!bmx280.begin())
       {
         Serial.println("begin() failed. check your BMx280 Interface and I2C Address.");
@@ -23,6 +25,7 @@
       if (bmx280.isBME280())
         bmx280.writeOversamplingHumidity(BMx280MI::OSRS_H_x16);
 
+xSemaphoreGive(xSemaphoreX);
 
 
 xTaskCreate(TaskBMP280,"TaskBMP280",10000,NULL,0,NULL);

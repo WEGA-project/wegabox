@@ -1,5 +1,6 @@
 #if c_VL6180X == 1
 
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
   Wire.begin();
 
@@ -23,6 +24,8 @@
   s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
   // in case stopContinuous() triggered a single-shot
   // measurement, wait for it to complete
+        xSemaphoreGive(xSemaphoreX);    
+
   delay(300);
   // start interleaved continuous mode with period of 100 ms
   //s_vl6180X.startInterleavedContinuous(100);

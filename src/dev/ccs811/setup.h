@@ -1,5 +1,7 @@
 #if c_CCS811 == 1
   // Enable CCS811
+  while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+
 ccs811.set_i2cdelay(50); 
 bool ok= ccs811.begin();
   
@@ -18,6 +20,7 @@ if( !ok ) Serial.println("setup: CCS811 flash FAILED");
 //Serial.println("");
 }
 ccs811.start(CCS811_MODE_1SEC);
+xSemaphoreGive(xSemaphoreX);
 
 xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,&appTasks[appTaskCount++]);
 #endif // c_CCS811

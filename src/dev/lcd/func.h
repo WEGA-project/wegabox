@@ -6,6 +6,6 @@ void lcd(String x){
        oled.home();
         oled.println(x); 
         oled.update();    
-        delay(10); 
+        vTaskDelay(10); 
       #endif // c_LCD
 }

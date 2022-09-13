@@ -1,4 +1,6 @@
 #if c_MCP23017 == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
+
 if (!mcp.begin_I2C())
   syslog_ng("mcp23017 Begin Error.");
 else
@@ -8,6 +10,9 @@ for (int p = 0; p < 16; p++){
   mcp.pinMode(p, OUTPUT);
   mcp.digitalWrite(p,0);
 }
+
+    xSemaphoreGive(xSemaphoreX);    
+
 
 if (preferences.getInt("DRV1_A", -1) == -1)
   preferences.putInt("DRV1_A", 0);

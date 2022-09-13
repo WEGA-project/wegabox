@@ -1,4 +1,6 @@
 #if c_MCP3421 == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
+
   MCP342x::generalCallReset();
   delay(1); // MC342x needs 300us to settle
     // Check device present
@@ -10,6 +12,7 @@
   }
   else 
   syslog_ng("MCP3421: Device found!");
+    xSemaphoreGive(xSemaphoreX);    
 
 
 xTaskCreate(TaskMCP3421,"TaskMCP3421",5000,NULL,1,NULL);

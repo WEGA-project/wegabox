@@ -1,4 +1,5 @@
 #if c_VL6180X_us == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
 
   Wire.begin(13,14);
@@ -28,6 +29,7 @@
   delay(300);
   // start interleaved continuous mode with period of 100 ms
   //s_vl6180X.startInterleavedContinuous(100);
+        xSemaphoreGive(xSemaphoreX);    
 
 
 xTaskCreate(TaskVL6180X,"VL6180X",10000,NULL,0,NULL);

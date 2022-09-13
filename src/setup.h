@@ -77,13 +77,31 @@ void setup()
   syslog_ng("WEGABOX: Start system");
   syslog_ng("WEGABOX NAME: "+ String(HOSTNAME));
   syslog_ng("WEGABOX FW: "+ String(Firmware));
+  syslog_ng("WEGABOX IP: "+ WiFi.localIP().toString());
+  syslog_ng("WEGABOX Mac: "+ WiFi.macAddress());
+
+#if c_LCD == 1
+
+  oled.init();              // инициализация
+ 
+  oled.clear();
+  oled.home();
+  oled.autoPrintln(true);
+  oled.setScale(3);
+  oled.println("WEGABOX");
+  oled.setScale(1.3);
+  oled.println();
+  oled.println(Firmware);
+  oled.println(WiFi.localIP().toString());
+  oled.print(HOSTNAME);
+  oled.println(".local");
+  oled.update();
+
+#endif // c_LCD
 
 
 
 
-
-
-#include <dev/lcd/setup.h>
   ArduinoOTA.begin();
 
 syslog_ng("WEGABOX: Wait OTA 30 sec");
@@ -95,17 +113,31 @@ Reset_reason1=reset_reason(rtc_get_reset_reason(1));
 syslog_ng("Reset_reason CPU0: "+ Reset_reason0 );
 syslog_ng("Reset_reason CPU1: "+ Reset_reason1 );
 
+
   // Сканирование устройств на шине i2c
-  Wire.begin(I2C_SDA, I2C_SCL);
+//   Wire.begin(I2C_SDA, I2C_SCL);
   
-  //Wire.begin();
-  syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
+//   //Wire.begin();
+//   syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
   
-syslog_ng("I2C: Scan I2C bus");
-  I2CScanner scanner;
-  scanner.Init();
-  scanner.Scan();
-  syslog_ng("I2C found devices:"+ String(scanner.Devices_Count));
+// syslog_ng("I2C: Scan I2C bus");
+//   I2CScanner scanner;
+//   scanner.Init();
+//   scanner.Scan();
+//   syslog_ng("I2C found devices:"+ String(scanner.Devices_Count));
+
+
+
+	scanner.Init();
+	scanner.Execute(debug);
+
+
+
+
+
+
+
+
 
 
 
@@ -137,6 +169,7 @@ syslog_ng("I2C: Scan I2C bus");
 
   adc1_config_width(ADC_WIDTH_BIT_12);
 
+#include <dev/lcd/setup.h>
 #include <dev/ntc/setup.h>
 #include <dev/ds18b20/setup.h>
 #include <dev/aht10/setup.h>

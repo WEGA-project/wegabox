@@ -1,4 +1,6 @@
 #if c_DS18B20 == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
+
 
 sens18b20.begin();
 sens18b20.begin();
@@ -12,6 +14,7 @@ else
 {
     syslog_ng("DS18B20 not found!");
 }
+    xSemaphoreGive(xSemaphoreX);    
 
 long DS18B20_TaskErr = xTaskCreate(TaskDS18B20, "TaskDS18B20", 10000, NULL, 1, NULL);
 syslog_ng("DS18B20 add Task:" + fFTS(DS18B20_TaskErr, 0));
