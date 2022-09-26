@@ -1,12 +1,14 @@
 void TaskWegaApi(void *parameters)
 {
+  http.setConnectTimeout(10000);
+  http.setTimeout(10000);
   for (;;)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    syslog_ng("WegaApi loop");
-
-    // Отправка данных на WEGA-API
+    syslog_ng("WegaApi loop. WIFI RSSI="+ String( WiFi.RSSI() ) );
+    
+        // Отправка данных на WEGA-API
 
 
     String httpstr = wegaapi;
@@ -71,6 +73,8 @@ void TaskWegaApi(void *parameters)
       httpstr += "&PWD2=" + String(PWD2);  
     if (ECStabOn) 
       httpstr += "&ECStabOn=" + String(ECStabOn); 
+
+    httpstr += "&RSSI=" + String(WiFi.RSSI());
 
     http.begin(client, httpstr);
     //http.setTimeout(2000);
@@ -158,6 +162,7 @@ void TaskWegaApi(void *parameters)
 
 
     }
+    
     http.end();
 
     if (WiFi.status() != WL_CONNECTED)
@@ -165,7 +170,6 @@ void TaskWegaApi(void *parameters)
       WiFi.disconnect(true);
       WiFi.begin(ssid, password);
     }
-
     vTaskDelay(freqdb * 1000 / portTICK_PERIOD_MS);
     //delay (freqdb*1000); // Периодичность отправки данных в базу (в мс)
   }
