@@ -33,7 +33,7 @@ Web Electronic Garden Automatic on ESP32.
 * Мониторинг `Освещенности`
 * Мониторинг `Уровня раствора`
 * Управление корневым давление(на сколько это возможно)
-* Контроль `ЕС` в рабочем баке(в разработке, дата релиза не известна)
+* Контроль `ЕС` в рабочем баке
 
 Важно: **WEGABOX** не имеет смысла без [WEGA](https://github.com/WEGA-project/WEGA/wiki) части.
 
@@ -59,13 +59,16 @@ Web Electronic Garden Automatic on ESP32.
 
 Для простоты сборки `WEGABOX` была разработана PCB плата, которую можно заказать и собрать самостоятельно.
 
-[PCB WEGABOX](https://oshwlab.com/siv237/esp32wega4-2_copy)
+[PCB WEGABOX](https://oshwlab.com/siv237/esp32wega4-2_copy_copy_copy)
 
 Плату можно заказать через `https://www.allpcb.com/` или любой другой сайт, на ваш вкус.
 
 ### Внешний вид платы
 
-<a href="img/2d_model.png"><img src="img/2d_model.png" width="250"></a><a href="img/3d_model.png"><img src="img/3d_model.png" width="250"></a>
+<a href="https://user-images.githubusercontent.com/13055750/194756894-9cd8f6c9-1083-43a2-bf40-7dc877b92777.png"><img src="https://user-images.githubusercontent.com/13055750/194756894-9cd8f6c9-1083-43a2-bf40-7dc877b92777.png" width="250"></a>
+<a href="https://user-images.githubusercontent.com/13055750/194756944-268e292f-fe4b-44db-b8b0-dea410a2e2ea.png"><img src="https://user-images.githubusercontent.com/13055750/194756944-268e292f-fe4b-44db-b8b0-dea410a2e2ea.png" width="250"></a>
+
+
 
 ### Распиновка Jack для датчиков <a name="jack"></a>
 <a href="img/jack_connections.png"><img src="img/jack_connections.png" width="250"></a>
