@@ -18,6 +18,18 @@ void TaskVL53L0X(void *parameters)
 
         Wire.begin(US_SDA, US_SCL);
 
+s_VL53L0X.init();
+s_VL53L0X.setTimeout(500);
+s_VL53L0X.setSignalRateLimit(0.01);
+
+s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+
+s_VL53L0X.setMeasurementTimingBudget(200000);
+
+
+
+
         long range = s_VL53L0X.readRangeSingleMillimeters();
         if (range != 65535)
           VL53L0X_RangeRM.add(range);
