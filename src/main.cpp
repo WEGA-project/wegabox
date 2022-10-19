@@ -2,8 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "v0.3.0"
-
+#define Firmware "v0.8.0"
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -11,65 +10,60 @@
 #include <ArduinoOTA.h>
 #include <WebServer.h>
 WebServer server(80);
+#include <Preferences.h>
+Preferences preferences;
+
+#include <loop.h>
 
 #include <WiFiClient.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include "GyverFilters.h"
+    WiFiClient client;
+    HTTPClient http;
+    
 
+#include <RunningMedian.h>
+RunningMedian PhRM = RunningMedian(90);
 
-GMedian<30, float> AirTempMediana;  
-GMedian<30, float> AirHumMediana;
-GMedian<30, float> RootTempMediana;
-GMedian<180, float> NTCMediana;
-GMedian<90, float> PRMediana;
-GMedian<90, float> PhMediana;
-GMedian<60, float> DstMediana;
-
-GKalman CpuTempKalman(1, 0.0001);
-
-GABfilter ApGAB(10, 1, 1);
-GABfilter AnGAB(10, 1, 1);
-GABfilter NTCGAB(10, 1, 1);
-GABfilter PRGAB(1, 1, 1);
-GABfilter DstGAB(1, 1, 1);
-GABfilter HallGAB(0.001, 1, 1);
-GABfilter PhGAB(0.001, 150, 1);
-
-GMedian<254, long> ApMed;
-GMedian<254, long> AnMed;
-GMedian<254, long> NTCMed;
-
-
+RunningMedian AirTempRM = RunningMedian(30);
+RunningMedian AirHumRM = RunningMedian(30);
+RunningMedian AirPressRM = RunningMedian(30);
+RunningMedian PRRM = RunningMedian(30);
 
 
 #include <pre.h>
 #include <func>
 #include <driver/adc.h>
 
-#include "soc/rtc_wdt.h"
-#include "esp_int_wdt.h"
-#include "esp_task_wdt.h"
+// #include "soc/rtc_wdt.h"
+// #include "esp_int_wdt.h"
+//#include "esp_task_wdt.h"
 
 // Переменные
-float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,PR,CPUTemp,CO2, tVOC, eRAW;
-float wNTC,wR2,wEC;
+float AirTemp, AirHum, AirPress, RootTemp,hall,pHmV,pHraw,NTC,Ap,An,Dist,DstRAW,CPUTemp,CO2, tVOC, eRAW;
+float wNTC,wR2,wEC,wpH;
+float PR=-1;
 bool OtaStart = false;
 bool ECwork = false;
 bool USwork = false;
+int readGPIO,PWD1,PWD2;
+long ECStabOn;
 
-unsigned long t_EC=0;
-//,t_Dist,t_NTC,t_pH;
-float f_EC=0;
 String wegareply;
 String err_wegaapi_json;
 String dt;
+String Reset_reason0, Reset_reason1;
 // Калибровочные значения для определения ЕС
 float EC_R1, EC_R2_p1, EC_R2_p2;
 
+//#define SPIRAM_MALLOC_RESERVE_INTERNAL 0;
 
 
-TaskHandle_t TaskAHT10Handler;
+TaskHandle_t appTasks[48];
+uint8_t appTaskCount = 0;
+
+
+
 
 #define ONE_WIRE_BUS 23    // Порт 1-Wire
 #include <Wire.h>          // Шина I2C
@@ -77,96 +71,95 @@ TaskHandle_t TaskAHT10Handler;
 #define I2C_SCL 22         // SCL
 
 
-#if c_DS18B20 == 1
-  #include <OneWire.h>
-  #include <DallasTemperature.h>
-  OneWire oneWire(ONE_WIRE_BUS);
-  DallasTemperature sens18b20(&oneWire);
-  String st_DS18B20;
-#endif
 
-#if c_AHT10 == 1
-  #include <AHT10.h>
-  uint8_t readStatus = 0;
-  AHT10 myAHT10(AHT10_ADDRESS_0X38);
-  String st_AHT10;
-#endif
+// syslog
+#include <etc/syslog/main.cpp>
 
-#if c_AM2320 == 1
-  #include <AM232X.h>
-  AM232X AM2320;
-  String st_AM2320;
-#endif
+//SemaphoreHandle_t xSemaphoreI2C= NULL;;
 
-#if c_CCS811 == 1
-  #include "ccs811.h"  // CCS811 library
-  #include <spec/CCS811_FW_App_v2-0-0.h>
-  CCS811 ccs811;
-  
-#endif
+SemaphoreHandle_t xSemaphoreX = NULL;
 
-#if c_MCP3421 == 1
-  #include <MCP342x.h>
-  uint8_t address = 0x68;
-  MCP342x adc = MCP342x(address);
-#endif
+#include <rom/rtc.h>
 
-#if c_ADS1115 == 1
-  #include<ADS1115_WE.h> 
-  #define I2C_ADDRESS 0x48
-  ADS1115_WE adc = ADS1115_WE(I2C_ADDRESS);
-  #define ADS1115_MiddleCount 5000
-#endif
-
-#if c_NTC == 1
- #define NTC_port ADC1_CHANNEL_4 // gpio32
- #define NTC_MiddleCount 900000
-#endif
-
-#if c_EC == 1
-  #define EC_DigitalPort1 18
-  #define EC_DigitalPort2 19
-  #define EC_AnalogPort ADC1_CHANNEL_5 // gpio33
-  #define EC_MiddleCount 500000  // 12000 в секунду
-#endif
-
-#if c_US025 == 1
-  #define US_ECHO 13
-  #define US_TRIG 14
-  #include <HCSR04.h>
-  UltraSonicDistanceSensor distanceSensor(US_ECHO, US_TRIG);
-  #define US_MiddleCount 6000
-
-#endif // c_US025
-
-#if c_MCP23017 == 1
-  #include <Adafruit_MCP23X17.h>
-  Adafruit_MCP23X17 mcp;
-#endif // c_MCP23017
-
-#if c_PR == 1
- #define PR_AnalogPort ADC1_CHANNEL_7 // gpio35
- #define PR_MiddleCount 10000
-#endif // c_PR
-
-#if c_BME280 == 1
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#define SEALEVELPRESSURE_HPA (1013.25)
-Adafruit_BME280 bme; // I2C
-#endif //c_BME280
-
-#if c_CPUTEMP == 1
-  extern "C" {      
-    uint8_t temprature_sens_read(); 
+String reset_reason(RESET_REASON reason)
+{
+  switch ( reason)
+  {
+    case 1 : return ("POWERON_RESET (1,Vbat power on reset)");break;
+    case 3 : return ("SW_RESET (3,Software reset digital core)");break; 
+    case 4 : return ("OWDT_RESET (4,Legacy watch dog reset digital core)");break; 
+    case 5 : return ("DEEPSLEEP_RESET (5,Deep Sleep reset digital core)");break; 
+    case 6 : return ("SDIO_RESET (6,Reset by SLC module, reset digital core)");break; 
+    case 7 : return ("TG0WDT_SYS_RESET (7,Timer Group0 Watch dog reset digital core)");break;
+    case 8 : return ("TG1WDT_SYS_RESET (8,Timer Group1 Watch dog reset digital core)");break;
+    case 9 : return ("RTCWDT_SYS_RESET (9,RTC Watch dog Reset digital core)");break;
+    case 10 : return ("INTRUSION_RESET (10,Instrusion tested to reset CPU)");break;
+    case 11 : return ("TGWDT_CPU_RESET (11,Time Group reset CPU)");break; 
+    case 12 : return ("SW_CPU_RESET (12,Software reset CPU)");break;   
+    case 13 : return ("RTCWDT_CPU_RESET (13,RTC Watch dog Reset CPU)");break;  
+    case 14 : return ("EXT_CPU_RESET (14,for APP CPU, reseted by PRO CPU)");break;  
+    case 15 : return ("RTCWDT_BROWN_OUT_RESET (15,Reset when the vdd voltage is not stable)");break;
+    case 16 : return ("RTCWDT_RTC_RESET (16,RTC Watch dog reset digital core and rtc module)");break;
+    default : return (String(reason)+",NO_MEAN");
   }
-#endif //c_CPUTEMP
+}
+
+#include <dev/hall/main.cpp>
+#include <dev/cput/main.cpp>
+#include <dev/ds18b20/main.cpp>
+#include <dev/aht10/main.cpp>
+#include <dev/ads1115/main.cpp>
+#include <dev/pr/main.cpp>
+#include <dev/us025/main.cpp>
+#include <dev/ccs811/main.cpp>
+#include <dev/am2320/main.cpp>
+#include <dev/mcp3421/main.cpp>
+#include <dev/bmp280/main.cpp>
+#include <dev/mcp23017/main.cpp>
+#include <dev/hx710b/main.cpp>
+#include <dev/ec/main.cpp>
+#include <dev/ntc/main.cpp>
+#include <dev/DualBMx/main.cpp>
+#include <dev/sdc30/main.cpp>
+#include <dev/lcd/main.cpp>
+#include <dev/lcd/func.h>
+#include <dev/vl6180x/main.cpp>
+#include <dev/vl6180x_us/main.cpp>
+#include <dev/vl53l0x_us/main.cpp>
+
+
 
 #include <tasks.h>
 #include <httpserv.h>
 #include <wegaapi.h>
+
+#include "I2CScanner.h"
+
+I2CScanner scanner;
+
+
+void debug(byte addscan)
+{
+	// Serial.print("Found at 0x");
+	// Serial.println(addscan, HEX);
+  syslog_ng("I2C found: device 0x"+ String(addscan, HEX));
+  if (addscan == 0x48) syslog_ng("I2C found: ADS1115 - 4-channel 16-bit ADC");
+  if (addscan == 0x76) syslog_ng("I2C found: BMP280/BME280 - Temp/Barometric sensor");
+  if (addscan == 0x38) syslog_ng("I2C found: AHT10 Humidity and Temperature sensor");
+  if (addscan == 0x5b) syslog_ng("I2C found: CCS811 Volatile organics (VOC) and equivalent CO2 (eCO2) sensor");
+  if (addscan == 0x5c) syslog_ng("I2C found: AM2320 Humidity and Temperature sensor");
+  if (addscan == 0x68) syslog_ng("I2C found: MCP3421 18-Bit Analog-to-Digital Converter");
+  if (addscan == 0x20) syslog_ng("I2C found: MCP23017 I2C GPIO Expander Breakout has 16 GPIO");
+  if (addscan == 0x61) syslog_ng("I2C found: SCD-30 - NDIR CO2 Temperature and Humidity Sensor");
+  if (addscan == 0x3c) syslog_ng("I2C found: SSD1306 OLED Display");
+  if (addscan == 0x29) syslog_ng("I2C found: vl6180x laser distance sensor"); 
+}
+
+
+
 #include <setup.h>
-#include <loop.h>
+
+
 
 
 
