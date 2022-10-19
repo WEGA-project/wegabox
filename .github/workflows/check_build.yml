@@ -1,0 +1,33 @@
+name: Check build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        python-version: [3.7]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Chekout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Create pre.h file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "src/pre.h.rename"
+          target: "src/pre.h"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: Build the project
+        run: |
+          platformio run -d .
