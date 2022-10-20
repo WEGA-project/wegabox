@@ -107,7 +107,8 @@ uint16_t SCD30::getCO2(void)
   if (co2HasBeenReported == true) // Trigger a new read
   {
     if (readMeasurement() == false) // Pull in new co2, humidity, and temp into global vars
-      co2 = 0;                      // Failed to read sensor
+      if (!_useStaleData)
+        co2 = 0; // Failed to read sensor
   }
 
   co2HasBeenReported = true;
@@ -121,7 +122,8 @@ float SCD30::getHumidity(void)
 {
   if (humidityHasBeenReported == true) // Trigger a new read
     if (readMeasurement() == false)    // Pull in new co2, humidity, and temp into global vars
-      humidity = 0;                    // Failed to read sensor
+      if (!_useStaleData)
+        humidity = 0; // Failed to read sensor
 
   humidityHasBeenReported = true;
 
@@ -134,7 +136,8 @@ float SCD30::getTemperature(void)
 {
   if (temperatureHasBeenReported == true) // Trigger a new read
     if (readMeasurement() == false)       // Pull in new co2, humidity, and temp into global vars
-      temperature = 0;                    // Failed to read sensor
+      if (!_useStaleData)
+        temperature = 0; // Failed to read sensor
 
   temperatureHasBeenReported = true;
 
@@ -171,7 +174,7 @@ float SCD30::getTemperatureOffset(void)
     int16_t signed16;
     uint16_t unsigned16;
   } signedUnsigned; // Avoid any ambiguity casting int16_t to uint16_t
-  signedUnsigned.signed16 = response;
+  signedUnsigned.unsigned16 = response;
 
   return (((float)signedUnsigned.signed16) / 100.0);
 }
