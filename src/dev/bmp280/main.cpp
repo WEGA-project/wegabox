@@ -18,7 +18,11 @@
 //#define I2C_ADDRESS 0x76
 
 //create a BMx280I2C object using the I2C interface with I2C Address 0x76
-BMx280I2C bmx280(0x76);
+
+uint8_t BMP280addr=0x76;
+
+
+BMx280I2C bmx280(BMP280addr);
 
 unsigned long BMP280_old = millis();
 unsigned long BMP280_Repeat = 10000;

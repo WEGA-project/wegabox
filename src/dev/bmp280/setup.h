@@ -1,4 +1,14 @@
 #if c_BMP280 == 1
+
+
+
+  Wire.requestFrom(BMP280addr, (uint8_t)1);
+  if (Wire.available())
+   syslog_ng("I2C Addr found:"+String(BMP280addr, HEX));
+  else
+   syslog_ng("I2C Addr not found:"+String(BMP280addr, HEX)); 
+
+
 while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
     if (!bmx280.begin())
