@@ -1,5 +1,5 @@
 #if c_BMP280 == 1
-while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
     if (!bmx280.begin())
       {
