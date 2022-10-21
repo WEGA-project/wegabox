@@ -1,6 +1,6 @@
 #if c_CCS811 == 1
   // Enable CCS811
-  while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+  while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
 ccs811.set_i2cdelay(50); 
 bool ok= ccs811.begin();

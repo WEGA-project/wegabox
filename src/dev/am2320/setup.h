@@ -1,5 +1,5 @@
 #if c_AM2320 == 1
-while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
   if (! AM2320.begin() )
   {

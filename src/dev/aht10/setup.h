@@ -1,5 +1,5 @@
 #if c_AHT10 == 1
-while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
   myAHT10.softReset();
   delay(50);
