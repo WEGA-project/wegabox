@@ -15,6 +15,6 @@ if (Wire.available())
   syslog_ng("AHT10: add Task");
 }
 else
-  syslog_err("AHT10: not detected");
+  syslog_err("AHT10: The sensor is not detected");
 xSemaphoreGive(xSemaphoreX);
 #endif // c_TaskAHT10

@@ -16,6 +16,6 @@ if (Wire.available())
   syslog_ng("SDC30: add Task");
 }
 else
-  syslog_err("SDC30: not detected");
+  syslog_err("SDC30: The sensor is not detected");
 xSemaphoreGive(xSemaphoreX);
 #endif // c_SDC30
