@@ -79,7 +79,7 @@ void setup()
   syslog_ng("WEGABOX FW: "+ String(Firmware));
   syslog_ng("WEGABOX IP: "+ WiFi.localIP().toString());
   syslog_ng("WEGABOX Mac: "+ WiFi.macAddress());
-  syslog_ng("WEGABOX WIFI RSSI: "+ String( WiFi.RSSI() ));
+  syslog_ng("WEGABOX WIFI RSSI: "+ String( WiFi.RSSI() )+ "dBm "+fFTS(206.4+2.128*WiFi.RSSI(),0)+"%");
   
 
 #if c_LCD == 1

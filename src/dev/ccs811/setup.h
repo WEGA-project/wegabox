@@ -1,26 +1,38 @@
 #if c_CCS811 == 1
-  // Enable CCS811
-  while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
+// Enable CCS811
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+  ;
 
-ccs811.set_i2cdelay(50); 
-bool ok= ccs811.begin();
-  
+Wire.requestFrom(CCS811addr, (uint8_t)1);
+if (Wire.available())
+{
+
+
+ccs811.set_i2cdelay(50);
+bool ok = ccs811.begin();
 
 // Check if flashing should be executed
-if( ccs811.application_version()==0x2000 ) { Serial.println("init: already has 2.0.0");} else
+if (ccs811.application_version() == 0x2000)
 {
-// Flash
-//Serial.print("setup: starting flash of '");
-//Serial.print(image_name);
-//Serial.println("' in 5 seconds");
-delay(5000);
-//Serial.println("");
-ok= ccs811.flash(image_data, sizeof(image_data));
-if( !ok ) Serial.println("setup: CCS811 flash FAILED");
-//Serial.println("");
+  syslog_ng("CCS811: init... already has 2.0.0");
+}
+else
+{
+
+  delay(5000);
+  ok = ccs811.flash(image_data, sizeof(image_data));
+  if (!ok)
+    syslog_ng("CCS811: flash FAILED");
+
 }
 ccs811.start(CCS811_MODE_1SEC);
-xSemaphoreGive(xSemaphoreX);
 
-xTaskCreate(TaskCCS811,"TaskCCS811",10000,NULL,0,&appTasks[appTaskCount++]);
+
+xTaskCreate(TaskCCS811, "TaskCCS811", 10000, NULL, 0, &appTasks[appTaskCount++]);
+  syslog_ng("CCS811: add Task");
+}
+else
+  syslog_err("CCS811: The sensor is not detected");
+
+xSemaphoreGive(xSemaphoreX);
 #endif // c_CCS811

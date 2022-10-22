@@ -6,7 +6,7 @@ void TaskWegaApi(void *parameters)
   {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    syslog_ng("WegaApi loop. WIFI RSSI="+ String( WiFi.RSSI() ) );
+    syslog_ng("WegaApi loop. WIFI RSSI="+ String( WiFi.RSSI() )+ "dBm "+fFTS(206.4+2.128*WiFi.RSSI(),0)+"%" );
     
         // Отправка данных на WEGA-API
 
