@@ -5,7 +5,6 @@ void setup()
 
 #include <etc/syslog/setup.h>
 
-
 #if c_EC == 1
   pinMode(EC_DigitalPort1, INPUT);
   pinMode(EC_DigitalPort2, INPUT);
@@ -38,7 +37,7 @@ void setup()
                  //   //vTaskDelay(appTasks[i]);
                  // }
 
-                 syslog_ng("OTA Start");
+                 syslog_ng("OTA: Start");
 
 #if c_EC == 1
                  pinMode(EC_DigitalPort1, INPUT);
@@ -53,39 +52,38 @@ void setup()
                    type = "filesystem";
 
                  // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-                 Serial.println("Start updating " + type);
-               })
+                 syslog_ng("OTA:Start updating " + type); })
       .onEnd([]()
-             { Serial.println("\nEnd"); })
+             { syslog_ng("OTA:End"); })
       .onProgress([](unsigned int progress, unsigned int total)
                   { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
       .onError([](ota_error_t error)
                {
-                 Serial.printf("Error[%u]: ", error);
+                 syslog_err("OTA:Error: "+ String(error));
                  if (error == OTA_AUTH_ERROR)
-                   Serial.println("Auth Failed");
+                   syslog_err("OTA:Auth Failed");
                  else if (error == OTA_BEGIN_ERROR)
-                   Serial.println("Begin Failed");
+                   syslog_err("OTA:Begin Failed");
                  else if (error == OTA_CONNECT_ERROR)
-                   Serial.println("Connect Failed");
+                   syslog_err("OTA:Connect Failed");
                  else if (error == OTA_RECEIVE_ERROR)
-                   Serial.println("Receive Failed");
+                   syslog_err("OTA:Receive Failed");
                  else if (error == OTA_END_ERROR)
-                   Serial.println("End Failed");
-               });
+                   syslog_err("OTA:End Failed"); 
+                   ESP.restart();
+                   });
 
   syslog_ng("WEGABOX: Start system");
-  syslog_ng("WEGABOX NAME: "+ String(HOSTNAME));
-  syslog_ng("WEGABOX FW: "+ String(Firmware));
-  syslog_ng("WEGABOX IP: "+ WiFi.localIP().toString());
-  syslog_ng("WEGABOX Mac: "+ WiFi.macAddress());
-  syslog_ng("WEGABOX WIFI RSSI: "+ String( WiFi.RSSI() )+ "dBm "+fFTS(206.4+2.128*WiFi.RSSI(),0)+"%");
-  
+  syslog_ng("WEGABOX NAME: " + String(HOSTNAME));
+  syslog_ng("WEGABOX FW: " + String(Firmware));
+  syslog_ng("WEGABOX IP: " + WiFi.localIP().toString());
+  syslog_ng("WEGABOX Mac: " + WiFi.macAddress());
+  syslog_ng("WEGABOX WIFI RSSI: " + String(WiFi.RSSI()) + "dBm " + fFTS(206.4 + 2.128 * WiFi.RSSI(), 0) + "%");
 
 #if c_LCD == 1
 
-  oled.init();              // инициализация
- 
+  oled.init(); // инициализация
+
   oled.clear();
   oled.home();
   oled.autoPrintln(true);
@@ -101,56 +99,37 @@ void setup()
 
 #endif // c_LCD
 
-
-
-
   ArduinoOTA.begin();
 
-syslog_ng("WEGABOX: Wait OTA 30 sec");
+  syslog_ng("WEGABOX: Wait OTA 30 sec");
   while (millis() < 30000)
     ArduinoOTA.handle(); // Ожидание возможности прошивки сразу после включения до запуска всего остального
-Reset_reason0=reset_reason(rtc_get_reset_reason(0));
-Reset_reason1=reset_reason(rtc_get_reset_reason(1));
+  Reset_reason0 = reset_reason(rtc_get_reset_reason(0));
+  Reset_reason1 = reset_reason(rtc_get_reset_reason(1));
 
-syslog_ng("Reset_reason CPU0: "+ Reset_reason0 );
-syslog_ng("Reset_reason CPU1: "+ Reset_reason1 );
-
+  syslog_ng("Reset_reason CPU0: " + Reset_reason0);
+  syslog_ng("Reset_reason CPU1: " + Reset_reason1);
 
   // Сканирование устройств на шине i2c
-//   Wire.begin(I2C_SDA, I2C_SCL);
-  
-//   //Wire.begin();
-//   syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
-  
-// syslog_ng("I2C: Scan I2C bus");
-//   I2CScanner scanner;
-//   scanner.Init();
-//   scanner.Scan();
-//   syslog_ng("I2C found devices:"+ String(scanner.Devices_Count));
+  //   Wire.begin(I2C_SDA, I2C_SCL);
 
+  //   //Wire.begin();
+  //   syslog_ng("I2C Wire Clock:"+String(Wire.getClock()));
 
+  // syslog_ng("I2C: Scan I2C bus");
+  //   I2CScanner scanner;
+  //   scanner.Init();
+  //   scanner.Scan();
+  //   syslog_ng("I2C found devices:"+ String(scanner.Devices_Count));
 
-	scanner.Init();
-	scanner.Execute(debug);
+  scanner.Init();
+  scanner.Execute(debug);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  preferences.begin("settings", false); 
+  preferences.begin("settings", false);
 
   MDNS.begin(HOSTNAME);
   MDNS.addService("http", "tcp", 80);
-  //server.enableDelay(true);
+  // server.enableDelay(true);
   server.on("/", handleRoot);
   server.on("/menu", handleMenu);
   server.on("/main", handleMain);
@@ -199,7 +178,7 @@ syslog_ng("Reset_reason CPU1: "+ Reset_reason1 );
   //  oled.setScale(1);
   oled.update();
 
-  //xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
+  // xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
 
 #endif // c_LCD
 }

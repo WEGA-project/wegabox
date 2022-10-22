@@ -17,7 +17,7 @@ void TaskMCP3421(void *parameters)
         syslog_ng("MCP3421 Start " + fFTS(MCP3421_LastTime - MCP3421_Repeat, 0) + "ms");
         MCP342x::Config status;
         long phvalue;
-        uint8_t err = adc.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
+        uint8_t err = adc2.convertAndRead(MCP342x::channel1, MCP342x::oneShot, MCP342x::resolution18, MCP342x::gain4, 100000, phvalue, status);
         if (!err)
         {
 
