@@ -1,4 +1,7 @@
 #if c_MCP23017 == 1
+uint8_t MCP23017addr=0x20;
+
+
 #include <Adafruit_MCP23X17.h>
 Adafruit_MCP23X17 mcp;
 

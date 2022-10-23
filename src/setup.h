@@ -70,8 +70,7 @@ void setup()
                    syslog_err("OTA:Receive Failed");
                  else if (error == OTA_END_ERROR)
                    syslog_err("OTA:End Failed"); 
-                   ESP.restart();
-                   });
+                   ESP.restart(); });
 
   syslog_ng("WEGABOX: Start system");
   syslog_ng("WEGABOX NAME: " + String(HOSTNAME));
@@ -140,8 +139,8 @@ void setup()
   server.on("/SettingsPomps", handleSettingsPomps);
   server.begin();
 
-  http.setConnectTimeout(2000);
-  http.setTimeout(1000);
+  // http.setConnectTimeout(2000);
+  // http.setTimeout(1000);
 
   xTaskCreate(TaskOTA, "TaskOTA", 5000, NULL, 3, NULL);
   xTaskCreate(TaskWegaApi, "TaskWegaApi", 10000, NULL, 1, &appTasks[appTaskCount++]);
@@ -173,12 +172,11 @@ void setup()
 #include <dev/vl53l0x_us/setup.h>
 
 #if c_LCD == 1
+  while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+    ;
   oled.clear();
-  //  oled.autoPrintln(true);
-  //  oled.setScale(1);
   oled.update();
-
-  // xTaskCreate(TaskLCD,"TaskLCD",20000,NULL,0,NULL);
+  xSemaphoreGive(xSemaphoreX);
 
 #endif // c_LCD
 }

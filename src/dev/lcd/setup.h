@@ -1,24 +1,14 @@
 #if c_LCD == 1
+while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
+    ;
 
-//   oled.init();              // инициализация
-  
-//   oled.clear();
-//   oled.home();
-//   oled.autoPrintln(true);
-//   oled.setScale(3);
-//   oled.println("WEGABOX");
-//   oled.setScale(1.3);
-//   oled.println();
-//   oled.println(Firmware);
-//   oled.println(WiFi.localIP());
-//   oled.print(HOSTNAME);
-//   oled.println(".local");
-//   oled.update();
-
-// //xTaskCreate(TaskLCD,"TaskLCD",5000,NULL,0,NULL);
-
-xTaskCreatePinnedToCore(TaskLCD,"TaskLCD",8000,NULL,0,NULL,0);
-syslog_ng("LCD add Task");
+Wire.requestFrom(LCDaddr, (uint8_t)1);
+if (Wire.available())
+{
+    xTaskCreatePinnedToCore(TaskLCD, "TaskLCD", 8000, NULL, 0, NULL, 0);
+    syslog_ng("LCD: add Task");
+}
+else
+    syslog_err("LCD: not detected");
+xSemaphoreGive(xSemaphoreX);
 #endif // c_LCD
-
-

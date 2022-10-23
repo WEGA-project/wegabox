@@ -1,6 +1,7 @@
 #if c_VL6180X == 1
+uint8_t VL6180Xaddr = 0x29;
 
-#include <Wire.h>
+
 #include <VL6180X.h>
 
 VL6180X s_vl6180X;
