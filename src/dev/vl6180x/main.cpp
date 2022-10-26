@@ -10,8 +10,8 @@ VL6180X s_vl6180X;
     unsigned long VL6180X_old = millis();
     unsigned long VL6180X_Repeat = 5000;
 
-    RunningMedian VL6180X_RangeRM = RunningMedian(200);
-
+    RunningMedian VL6180X_RangeRM = RunningMedian(254);
+    RunningMedian VL6180X_RangeAVG = RunningMedian(100);
 
 
 #endif //c_VL6180X
