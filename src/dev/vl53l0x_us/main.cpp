@@ -12,7 +12,12 @@ VL53L0X s_VL53L0X;
 unsigned long VL53L0X_old = millis();
 unsigned long VL53L0X_Repeat = 5000;
 
-RunningMedian VL53L0X_RangeRM = RunningMedian(240);
+//RunningMedian VL53L0X_RangeRM = RunningMedian(240);
+
+
+    RunningMedian VL53L0X_RangeRM = RunningMedian(25);
+    RunningMedian VL53L0X_RangeAVG = RunningMedian(100);
+
 long VL53L0X_err = 0;
 
 #endif // c_VL53L0X_us
