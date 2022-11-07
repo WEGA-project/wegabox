@@ -159,6 +159,7 @@ void setup()
 #include <dev/mcp3421/setup.h>
 #include <dev/bmp280/setup.h>
 #include <dev/mcp23017/setup.h>
+#include <dev/doser/setup.h>
 #include <dev/hx710b/setup.h>
 #include <dev/ads1115/setup.h>
 #include <dev/pr/setup.h>

@@ -97,6 +97,7 @@ SemaphoreHandle_t xSemaphoreX = NULL;
 #include <dev/vl6180x/main.cpp>
 #include <dev/vl6180x_us/main.cpp>
 #include <dev/vl53l0x_us/main.cpp>
+#include <dev/doser/main.cpp>
 
 #include <tasks.h>
 #include <httpserv.h>

@@ -21,6 +21,7 @@ void TaskOTA(void *parameters)
 #include <dev/mcp3421/tasks.h>
 #include <dev/bmp280/tasks.h>
 #include <dev/mcp23017/tasks.h>
+#include <dev/doser/tasks.h>
 #include <dev/hx710b/tasks.h>
 #include <dev/ec/tasks.h>
 #include <dev/ntc/tasks.h>
