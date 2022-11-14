@@ -6,7 +6,7 @@
     int C = 6;
     int D = 7;
     
-    long del = 300;
+    long del = 700;
     int stap = 1;
 
 unsigned long DOSER_old = millis();
