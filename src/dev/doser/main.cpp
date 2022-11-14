@@ -1,10 +1,11 @@
 #if c_MCP23017 == 1 and c_DOSER == 1
   long lastOffDoser;
 
-    int A = preferences.getInt("DRV2_A", -1);;
-    int B = preferences.getInt("DRV2_B", -1);;
-    int C = preferences.getInt("DRV2_C", -1);;
-    int D = preferences.getInt("DRV2_D", -1);;
+    int A = 4;
+    int B = 5;
+    int C = 6;
+    int D = 7;
+    
     long del = 300;
     int stap = 1;
 

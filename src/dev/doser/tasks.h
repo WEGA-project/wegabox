@@ -16,35 +16,45 @@ void TaskDOSER(void *parameters)
         unsigned long DOSER_time = millis();
         syslog_ng("DOSER Start " + fFTS(DOSER_LastTime - DOSER_Repeat, 0) + "ms");
 
+      mcp.pinMode(A, OUTPUT);     
+      mcp.pinMode(B, OUTPUT);     
+      mcp.pinMode(C, OUTPUT);     
+      mcp.pinMode(D, OUTPUT);  
+
         for (int i = 0; i <= 500; i++)
         {
-          // enn
-          mcp.digitalWrite(A, LOW);
-          mcp.digitalWrite(B, HIGH);
-          mcp.digitalWrite(C, HIGH);
-          mcp.digitalWrite(D, LOW);
-          delayMicroseconds(del);
 
-          // twee
-          mcp.digitalWrite(A, LOW);
-          mcp.digitalWrite(B, HIGH);
-          mcp.digitalWrite(C, LOW);
-          mcp.digitalWrite(D, HIGH);
-          delayMicroseconds(del);
+        // enn
+        bitWrite(bitw, A, 0);
+        bitWrite(bitw, B, 1);
+        bitWrite(bitw, C, 1);
+        bitWrite(bitw, D, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(del);
 
-          // drie
-          mcp.digitalWrite(A, HIGH);
-          mcp.digitalWrite(B, LOW);
-          mcp.digitalWrite(C, LOW);
-          mcp.digitalWrite(D, HIGH);
-          delayMicroseconds(del);
+        // twee
+        bitWrite(bitw, A, 0);
+        bitWrite(bitw, B, 1);
+        bitWrite(bitw, C, 0);
+        bitWrite(bitw, D, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(del);
 
-          // vier
-          mcp.digitalWrite(A, HIGH);
-          mcp.digitalWrite(B, LOW);
-          mcp.digitalWrite(C, HIGH);
-          mcp.digitalWrite(D, LOW);
-          delayMicroseconds(del);
+        // drie
+        bitWrite(bitw, A, 1);
+        bitWrite(bitw, B, 0);
+        bitWrite(bitw, C, 0);
+        bitWrite(bitw, D, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(del);
+
+        // vier
+        bitWrite(bitw, A, 1);
+        bitWrite(bitw, B, 0);
+        bitWrite(bitw, C, 1);
+        bitWrite(bitw, D, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(del);
 
           lastOffDoser = millis();
         }
