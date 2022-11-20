@@ -5,6 +5,11 @@
     int B = 5;
     int C = 6;
     int D = 7;
+
+    int BA = 8;
+    int BB = 9;
+    int BC = 10;
+    int BD = 11;
     
     long del = 700;
     int stap = 1;
