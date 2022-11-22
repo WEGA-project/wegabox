@@ -137,6 +137,7 @@ void setup()
   server.on("/pwd", handlePWD);
   server.on("/settings", handleSettings);
   server.on("/SettingsPomps", handleSettingsPomps);
+  server.on("/doser", handleDoser);
   server.begin();
 
   // http.setConnectTimeout(2000);

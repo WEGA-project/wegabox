@@ -16,10 +16,21 @@ void TaskDOSER(void *parameters)
         unsigned long DOSER_time = millis();
         syslog_ng("DOSER Start " + fFTS(DOSER_LastTime - DOSER_Repeat, 0) + "ms");
 
-        mcp.pinMode(A, OUTPUT);
-        mcp.pinMode(B, OUTPUT);
-        mcp.pinMode(C, OUTPUT);
-        mcp.pinMode(D, OUTPUT);
+
+        AA=preferences.getInt("StPumpA_A", 4);
+        AB=preferences.getInt("StPumpA_B", 5);
+        AC=preferences.getInt("StPumpA_C", 6);
+        AD=preferences.getInt("StPumpA_D", 7);
+
+        BA=preferences.getInt("StPumpB_A", 8);
+        BB=preferences.getInt("StPumpB_B", 9);
+        BC=preferences.getInt("StPumpB_C", 10);
+        BD=preferences.getInt("StPumpB_D", 11);
+
+        mcp.pinMode(AA, OUTPUT);
+        mcp.pinMode(AB, OUTPUT);
+        mcp.pinMode(AC, OUTPUT);
+        mcp.pinMode(AD, OUTPUT);
 
         mcp.pinMode(BA, OUTPUT);
         mcp.pinMode(BB, OUTPUT);
@@ -30,10 +41,10 @@ void TaskDOSER(void *parameters)
         {
 
           // enn
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 1);
-          bitWrite(bitw, C, 1);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 1);
+          bitWrite(bitw, AC, 1);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 1);
@@ -45,10 +56,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // twee
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 1);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 1);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 1);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 1);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 1);
@@ -59,10 +70,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // drie
-          bitWrite(bitw, A, 1);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 1);
+          bitWrite(bitw, AA, 1);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 1);
 
           bitWrite(bitw, BA, 1);
           bitWrite(bitw, BB, 0);
@@ -72,10 +83,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // vier
-          bitWrite(bitw, A, 1);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 1);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 1);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 1);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 1);
           bitWrite(bitw, BB, 0);
@@ -84,10 +95,10 @@ void TaskDOSER(void *parameters)
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
 
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 0);
@@ -107,10 +118,10 @@ void TaskDOSER(void *parameters)
         {
 
           // enn
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 1);
-          bitWrite(bitw, C, 1);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 1);
+          bitWrite(bitw, AC, 1);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 1);
@@ -120,10 +131,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // twee
-          bitWrite(bitw, A, 1);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 1);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 1);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 1);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 1);
           bitWrite(bitw, BB, 0);
@@ -133,10 +144,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // drie
-          bitWrite(bitw, A, 1);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 1);
+          bitWrite(bitw, AA, 1);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 1);
 
           bitWrite(bitw, BA, 1);
           bitWrite(bitw, BB, 0);
@@ -146,10 +157,10 @@ void TaskDOSER(void *parameters)
           delayMicroseconds(del);
 
           // vier
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 1);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 1);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 1);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 1);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 1);
@@ -158,10 +169,10 @@ void TaskDOSER(void *parameters)
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
 
-          bitWrite(bitw, A, 0);
-          bitWrite(bitw, B, 0);
-          bitWrite(bitw, C, 0);
-          bitWrite(bitw, D, 0);
+          bitWrite(bitw, AA, 0);
+          bitWrite(bitw, AB, 0);
+          bitWrite(bitw, AC, 0);
+          bitWrite(bitw, AD, 0);
 
           bitWrite(bitw, BA, 0);
           bitWrite(bitw, BB, 0);
@@ -174,10 +185,10 @@ void TaskDOSER(void *parameters)
             vTaskDelete(NULL);
         }
 
-        mcp.pinMode(A, LOW);
-        mcp.pinMode(B, LOW);
-        mcp.pinMode(C, LOW);
-        mcp.pinMode(D, LOW);
+        mcp.pinMode(AA, LOW);
+        mcp.pinMode(AB, LOW);
+        mcp.pinMode(AC, LOW);
+        mcp.pinMode(AD, LOW);
 
         mcp.pinMode(BA, LOW);
         mcp.pinMode(BB, LOW);

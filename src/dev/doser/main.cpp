@@ -1,10 +1,10 @@
 #if c_MCP23017 == 1 and c_DOSER == 1
   long lastOffDoser;
 
-    int A = 4;
-    int B = 5;
-    int C = 6;
-    int D = 7;
+    int AA = 4;
+    int AB = 5;
+    int AC = 6;
+    int AD = 7;
 
     int BA = 8;
     int BB = 9;

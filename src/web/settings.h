@@ -34,3 +34,10 @@ void handleSettingsPomps()
 #include <web/SettingsPoms.h>
   server.send(200, "text/html", h);
 }
+
+void handleDoser()
+{
+  String h = "<!DOCTYPE html> <html>\n";
+#include <web/doser.h>
+  server.send(200, "text/html", h);
+}

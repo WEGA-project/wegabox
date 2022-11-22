@@ -31,6 +31,7 @@ void handleMenu()
   s += "<li><a href='status' target='CONTENT'>wega-server api</a></li>";
   s += "<li><a href='settings' target='CONTENT'>Settings</a></li>";
   s += "<li><a href='SettingsPomps' target='CONTENT'>SettingsPomps</a></li>";
+  s += "<li><a href='Doser' target='CONTENT'>doser</a></li>";
   s += "</ul>";
   s += "<u1>";
   s += "<li><a href='reset' target='CONTENT'>REBOOT</a></li>";
