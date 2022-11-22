@@ -55,6 +55,7 @@ void TaskDOSER(void *parameters)
 
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
+        del=preferences.getInt("StPumpA_Del", 700);
 
           // twee
           bitWrite(bitw, AA, 0);
@@ -69,6 +70,7 @@ void TaskDOSER(void *parameters)
 
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
+        del=preferences.getInt("StPumpA_Del", 700);
 
           // drie
           bitWrite(bitw, AA, 1);
@@ -82,6 +84,7 @@ void TaskDOSER(void *parameters)
           bitWrite(bitw, BD, 1);
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
+        del=preferences.getInt("StPumpA_Del", 700);
 
           // vier
           bitWrite(bitw, AA, 1);
@@ -95,6 +98,7 @@ void TaskDOSER(void *parameters)
           bitWrite(bitw, BD, 0);
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
+        del=preferences.getInt("StPumpA_Del", 700);
 
           bitWrite(bitw, AA, 0);
           bitWrite(bitw, AB, 0);
@@ -108,6 +112,7 @@ void TaskDOSER(void *parameters)
 
           mcp.writeGPIOAB(bitw);
           delayMicroseconds(del);
+        del=preferences.getInt("StPumpA_Del", 700);
 
           if (OtaStart == true)
             vTaskDelete(NULL);

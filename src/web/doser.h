@@ -1,6 +1,6 @@
 #if c_MCP23017 == 1 and c_DOSER == 1
 
-if (server.arg("StPumpA_del") != "")  preferences.putInt("StPumpA_del", server.arg("StPumpA_del").toInt());
+if (server.arg("StPumpA_Del") != "")  preferences.putInt("StPumpA_Del", server.arg("StPumpA_Del").toInt());
 if (server.arg("StPumpA_On") != "")  preferences.putInt("StPumpA_On", server.arg("StPumpA_On").toInt());
 
 if (server.arg("StPumpA_A") != "")  preferences.putInt("StPumpA_A", server.arg("StPumpA_A").toInt());
@@ -8,7 +8,7 @@ if (server.arg("StPumpA_B") != "")  preferences.putInt("StPumpA_B", server.arg("
 if (server.arg("StPumpA_C") != "")  preferences.putInt("StPumpA_C", server.arg("StPumpA_C").toInt());
 if (server.arg("StPumpA_D") != "")  preferences.putInt("StPumpA_D", server.arg("StPumpA_D").toInt());
 
-if (server.arg("StPumpB_del") != "")  preferences.putInt("StPumpB_del", server.arg("StPumpB_del").toInt());
+if (server.arg("StPumpB_Del") != "")  preferences.putInt("StPumpB_Del", server.arg("StPumpB_Del").toInt());
 if (server.arg("StPumpB_On") != "")  preferences.putInt("StPumpB_On", server.arg("StPumpB_On").toInt());
 
 if (server.arg("StPumpB_A") != "")  preferences.putInt("StPumpB_A", server.arg("StPumpB_A").toInt());
