@@ -39,6 +39,7 @@ void TaskDOSER(void *parameters)
 
         for (long i = 0; i <= 40000; i++)
         {
+        del=preferences.getInt("StPumpA_Del", 700);
 
           // enn
           bitWrite(bitw, AA, 0);
@@ -116,7 +117,7 @@ void TaskDOSER(void *parameters)
 
         for (long i = 0; i <= 40000; i++) // reverse
         {
-
+          del=preferences.getInt("StPumpA_Del", 700);
           // enn
           bitWrite(bitw, AA, 0);
           bitWrite(bitw, AB, 1);

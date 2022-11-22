@@ -175,7 +175,7 @@ void TaskMCP23017(void *parameters)
           int DRV = preferences.getInt(ECStabPomp.c_str(), -1);
           int ECStabInterval = preferences.getInt("ECStabInterval", 180);
           float ECStabMinDist = preferences.getFloat("ECStabMinDist", 5);
-          float ECStabMaxDist = preferences.getFloat("ECStabMaxDist", 50);
+          //float ECStabMaxDist = preferences.getFloat("ECStabMaxDist", 50);
 
           if (wEC > setEC and millis() - ECStabTimeStart > ECStabInterval * 1000 and Dist >= ECStabMinDist)
           {
