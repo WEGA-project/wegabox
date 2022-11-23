@@ -40,79 +40,7 @@ void TaskDOSER(void *parameters)
         for (long i = 0; i <= 40000; i++)
         {
         del=preferences.getInt("StPumpA_Del", 700);
-
-          // enn
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 1);
-          bitWrite(bitw, AC, 1);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 1);
-          bitWrite(bitw, BC, 1);
-          bitWrite(bitw, BD, 0);
-
-
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-        del=preferences.getInt("StPumpA_Del", 700);
-
-          // twee
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 1);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 1);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 1);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 1);
-
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-        del=preferences.getInt("StPumpA_Del", 700);
-
-          // drie
-          bitWrite(bitw, AA, 1);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 1);
-
-          bitWrite(bitw, BA, 1);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 1);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-        del=preferences.getInt("StPumpA_Del", 700);
-
-          // vier
-          bitWrite(bitw, AA, 1);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 1);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 1);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 1);
-          bitWrite(bitw, BD, 0);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-        del=preferences.getInt("StPumpA_Del", 700);
-
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 0);
-
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-        del=preferences.getInt("StPumpA_Del", 700);
+        StepTwoDrvForward(AA,AB,AC,AD,BA,BB,BC,BD,del);
 
           if (OtaStart == true)
             vTaskDelete(NULL);
@@ -123,70 +51,7 @@ void TaskDOSER(void *parameters)
         for (long i = 0; i <= 40000; i++) // reverse
         {
           del=preferences.getInt("StPumpA_Del", 700);
-          // enn
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 1);
-          bitWrite(bitw, AC, 1);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 1);
-          bitWrite(bitw, BC, 1);
-          bitWrite(bitw, BD, 0);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-
-          // twee
-          bitWrite(bitw, AA, 1);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 1);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 1);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 1);
-          bitWrite(bitw, BD, 0);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-
-          // drie
-          bitWrite(bitw, AA, 1);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 1);
-
-          bitWrite(bitw, BA, 1);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 1);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-
-          // vier
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 1);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 1);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 1);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 1);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-
-          bitWrite(bitw, AA, 0);
-          bitWrite(bitw, AB, 0);
-          bitWrite(bitw, AC, 0);
-          bitWrite(bitw, AD, 0);
-
-          bitWrite(bitw, BA, 0);
-          bitWrite(bitw, BB, 0);
-          bitWrite(bitw, BC, 0);
-          bitWrite(bitw, BD, 0);
-          mcp.writeGPIOAB(bitw);
-          delayMicroseconds(del);
-
+          StepTwoDrvBackward(AA,AB,AC,AD,BA,BB,BC,BD,del);
           if (OtaStart == true)
             vTaskDelete(NULL);
         }

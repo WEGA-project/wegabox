@@ -20,6 +20,8 @@
     long del = 700;
     int stap = 1;
 
+#include <dev/doser/func.h> 
+
 unsigned long DOSER_old = millis();
 unsigned long DOSER_Repeat = 20000;
 #endif // c_DOSER
