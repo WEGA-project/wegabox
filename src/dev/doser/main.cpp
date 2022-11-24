@@ -20,6 +20,11 @@
     long del = 700;
     int stap = 1;
 
+float StPumpA_cStepMl=1000;
+float StPumpA_cMl=1;
+float StPumpB_cStepMl=1000;
+float StPumpB_cMl=1;
+
 #include <dev/doser/func.h> 
 
 unsigned long DOSER_old = millis();
