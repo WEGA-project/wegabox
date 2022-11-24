@@ -42,6 +42,14 @@ void TaskDOSER(void *parameters)
         StPumpA_cMl = preferences.getFloat("StPumpA_cMl", 1);
         del = preferences.getInt("StPumpA_Del", 700);
         float CurrentMl = 0;
+
+        for(long i=0;i<100;i++){
+        StepTwoDrvBackward(AA, AB, AC, AD, BA, BB, BC, BD, del);  
+        }
+        for(long i=0;i<100;i++){
+        StepTwoDrvForward(AA, AB, AC, AD, BA, BB, BC, BD, del);  
+        }
+
         while (CurrentMl <= Tgt)
         {
           if (OtaStart == true)

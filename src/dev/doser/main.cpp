@@ -3,6 +3,7 @@
 
     int AOn = 1;
     int ADel=700;
+    int ARet=700;
 
     int AA = 4;
     int AB = 5;
@@ -11,6 +12,7 @@
 
     int BOn = 1;
     int BDel=700;
+    int BRet=700;
 
     int BA = 8;
     int BB = 9;
@@ -18,6 +20,7 @@
     int BD = 11;
     
     long del = 700;
+    long ret = 1500;
     int stap = 1;
 
 float StPumpA_cStepMl=1000;

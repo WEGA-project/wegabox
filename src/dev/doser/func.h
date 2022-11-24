@@ -67,6 +67,8 @@ void StepOneDrvBackward(int A, int B, int C, int D, int del)
 //Шаг двумя насосами вперед
 void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, int BD, int del)
 {
+    del = preferences.getInt("StPumpA_Del", 700);
+    ret = preferences.getInt("StPumpA_Ret", 700);
     // enn
     bitWrite(bitw, AA, 0);
     bitWrite(bitw, AB, 1);
@@ -77,7 +79,7 @@ void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, i
     bitWrite(bitw, BC, 1);
     bitWrite(bitw, BD, 0);
     mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+    delayMicroseconds(ret);
     bitWrite(bitw, AA, 0);
     bitWrite(bitw, AB, 0);
     bitWrite(bitw, AC, 0);
@@ -98,7 +100,7 @@ void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, i
     bitWrite(bitw, BC, 0);
     bitWrite(bitw, BD, 1);
     mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+    delayMicroseconds(ret);
     bitWrite(bitw, AA, 0);
     bitWrite(bitw, AB, 0);
     bitWrite(bitw, AC, 0);
@@ -119,7 +121,7 @@ void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, i
     bitWrite(bitw, BC, 0);
     bitWrite(bitw, BD, 1);
     mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+    delayMicroseconds(ret);
     bitWrite(bitw, AA, 0);
     bitWrite(bitw, AB, 0);
     bitWrite(bitw, AC, 0);
@@ -140,7 +142,7 @@ void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, i
     bitWrite(bitw, BC, 1);
     bitWrite(bitw, BD, 0);
     mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+    delayMicroseconds(ret);
     bitWrite(bitw, AA, 0);
     bitWrite(bitw, AB, 0);
     bitWrite(bitw, AC, 0);
