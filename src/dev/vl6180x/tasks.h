@@ -45,7 +45,6 @@ void TaskVL6180X(void *parameters)
 
         delay(100);
         long err = 0;
-        float range = 0;
         float range0 = 0;
         unsigned cont = 0;
         unsigned long t = millis();

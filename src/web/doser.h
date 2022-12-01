@@ -1,4 +1,11 @@
 #if c_MCP23017 == 1 and c_DOSER == 1
+if (server.arg("SetPumpA_Ml") != "")  preferences.putFloat ("SetPumpA_Ml", server.arg("SetPumpA_Ml").toFloat());
+if (server.arg("SetPumpB_Ml") != "")  preferences.putFloat ("SetPumpB_Ml", server.arg("SetPumpB_Ml").toFloat());
+SetPumpA_Ml=preferences.getFloat("SetPumpA_Ml", 0);
+SetPumpB_Ml=preferences.getFloat("SetPumpB_Ml", 0);
+
+
+
 
 if (server.arg("StPumpA_Del") != "")  preferences.putInt("StPumpA_Del", server.arg("StPumpA_Del").toInt());
 if (server.arg("StPumpA_Ret") != "")  preferences.putInt("StPumpA_Ret", server.arg("StPumpA_Ret").toInt());
@@ -54,6 +61,8 @@ h += "<form action='' method='POST' id='set'></form>\n";
 /////////   A  //////////////
 h += "<table><caption>Doser Steping Pump A</caption>\n";
 
+h += "<tr><td>SetPumpA_Ml<td><input type='text' name='SetPumpA_Ml' value='" + fFTS(SetPumpA_Ml,3) + "' form='set'></tr>\n";
+
 h += "<tr><td>StPumpA_cStepMl<td><input type='text' name='StPumpA_cStepMl' value='" + fFTS(StPumpA_cStepMl,3) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpA_cMl<td><input type='text' name='StPumpA_cMl' value='" + fFTS(StPumpA_cMl,3) + "' form='set'></tr>\n";
 
@@ -73,6 +82,9 @@ h += "</table>\n";
 /////////// B  //////////////
 h += "<table><caption>Doser Steping Pump B</caption>\n";
 
+h += "<tr><td>SetPumpB_Ml<td><input type='text' name='SetPumpB_Ml' value='" + fFTS(SetPumpB_Ml,3) + "' form='set'></tr>\n";
+
+
 h += "<tr><td>StPumpB_cStepMl<td><input type='text' name='StPumpB_cStepMl' value='" + fFTS(StPumpB_cStepMl,3) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpB_cMl<td><input type='text' name='StPumpB_cMl' value='" + fFTS(StPumpB_cMl,3) + "' form='set'></tr>\n";
 
@@ -90,24 +102,5 @@ h += "</table>\n";
 
 h += "<input type='submit' value='save' form='set'/></form>\n";
 
-
-
-
-
-
-
-
-
-// h += "<form action='' method='POST' id='set'></form>\n";
-// h += " <table>\n";
-// h += "     <caption>Pomp Night Stoping</caption>\n";
-
-// h += "     <tr>\n";
-// h += "         <td>Pomp Night Enable\n";
-// h += "         <td><input type='text' name='PompNightEnable' value='" + String(PompNightEnable) + "' form='set'>\n";
-// h += "     </tr>\n";
-
-// h += "</table>\n";
-// h += "<input type='submit' value='save' form='set'/></form>\n";
 
 #endif // c_DOSER

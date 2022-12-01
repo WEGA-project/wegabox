@@ -36,44 +36,40 @@ void TaskDOSER(void *parameters)
         mcp.pinMode(BC, OUTPUT);
         mcp.pinMode(BD, OUTPUT);
 
-        // Налить 10 мл
-        float Tgt = 10;
-        StPumpA_cStepMl = preferences.getFloat("StPumpA_cStepMl", 1000);
+        StPumpA_cStepMl = preferences.getFloat("StPumpA_cStepMl", 500);
         StPumpA_cMl = preferences.getFloat("StPumpA_cMl", 1);
-        del = preferences.getInt("StPumpA_Del", 700);
-        float CurrentMl = 0;
+        SetPumpA_Ml = preferences.getFloat("SetPumpA_Ml", 0);
+        AOn = preferences.getInt("StPumpA_On", 0);
 
-        for(long i=0;i<100;i++){
-        StepTwoDrvBackward(AA, AB, AC, AD, BA, BB, BC, BD, del);  
-        }
-        for(long i=0;i<100;i++){
-        StepTwoDrvForward(AA, AB, AC, AD, BA, BB, BC, BD, del);  
-        }
-
-        while (CurrentMl <= Tgt)
+        if (SetPumpA_Ml > 0 and AOn !=0)
         {
-          if (OtaStart == true)
-            vTaskDelete(NULL);
 
-          StepTwoDrvForward(AA, AB, AC, AD, BA, BB, BC, BD, del);
-          CurrentMl = CurrentMl + (StPumpA_cMl / StPumpA_cStepMl);
+          for (long i = 0; i < 500; i++)
+          {
+            StepAF();
+            if (OtaStart == true)
+              vTaskDelete(NULL);
+          }
+          preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * 500));
         }
 
-        // for (long i = 0; i <= 40000; i++)
-        // {
-        // del=preferences.getInt("StPumpA_Del", 700);
-        // StepTwoDrvForward(AA,AB,AC,AD,BA,BB,BC,BD,del);
+        StPumpB_cStepMl = preferences.getFloat("StPumpB_cStepMl", 500);
+        StPumpB_cMl = preferences.getFloat("StPumpB_cMl", 1);
+        SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
+        BOn = preferences.getInt("StPumpB_On", 0);
 
-        //   if (OtaStart == true) vTaskDelete(NULL);
-        // }
+        if (SetPumpB_Ml > 0 and BOn !=0)
+        {
 
-        // for (long i = 0; i <= 40000; i++) // reverse
-        // {
-        //   del=preferences.getInt("StPumpA_Del", 700);
-        //   StepTwoDrvBackward(AA,AB,AC,AD,BA,BB,BC,BD,del);
-        //   if (OtaStart == true)
-        //     vTaskDelete(NULL);
-        // }
+          for (long i = 0; i < 500; i++)
+          {
+            StepBF();
+
+            if (OtaStart == true)
+              vTaskDelete(NULL);
+          }
+          preferences.putFloat("SetPumpB_Ml", SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * 500));
+        }
 
         mcp.pinMode(AA, LOW);
         mcp.pinMode(AB, LOW);

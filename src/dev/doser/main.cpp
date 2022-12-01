@@ -28,6 +28,9 @@ float StPumpA_cMl=1;
 float StPumpB_cStepMl=1000;
 float StPumpB_cMl=1;
 
+float SetPumpA_Ml=0;
+float SetPumpB_Ml=0;
+
 #include <dev/doser/func.h> 
 
 unsigned long DOSER_old = millis();
