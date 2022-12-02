@@ -14,6 +14,9 @@ if (server.arg("StPumpA_On") != "")  preferences.putInt("StPumpA_On", server.arg
 
 if (server.arg("StPumpA_cStepMl") != "")  preferences.putFloat ("StPumpA_cStepMl", server.arg("StPumpA_cStepMl").toFloat());
 if (server.arg("StPumpA_cMl") != "")  preferences.putFloat ("StPumpA_cMl", server.arg("StPumpA_cMl").toFloat());
+if (server.arg("StPumpA_cStep") != "")  preferences.putFloat ("StPumpA_cStep", server.arg("StPumpA_cStep").toFloat());
+
+
 
 if (server.arg("StPumpA_A") != "")  preferences.putInt("StPumpA_A", server.arg("StPumpA_A").toInt());
 if (server.arg("StPumpA_B") != "")  preferences.putInt("StPumpA_B", server.arg("StPumpA_B").toInt());
@@ -27,6 +30,8 @@ if (server.arg("StPumpB_On") != "")  preferences.putInt("StPumpB_On", server.arg
 
 if (server.arg("StPumpB_cStepMl") != "")  preferences.putFloat ("StPumpB_cStepMl", server.arg("StPumpB_cStepMl").toFloat());
 if (server.arg("StPumpB_cMl") != "")  preferences.putFloat ("StPumpB_cMl", server.arg("StPumpB_cMl").toFloat());
+if (server.arg("StPumpB_cStep") != "")  preferences.putFloat ("StPumpB_cStep", server.arg("StPumpB_cStep").toFloat());
+
 
 if (server.arg("StPumpB_A") != "")  preferences.putInt("StPumpB_A", server.arg("StPumpB_A").toInt());
 if (server.arg("StPumpB_B") != "")  preferences.putInt("StPumpB_B", server.arg("StPumpB_B").toInt());
@@ -38,6 +43,8 @@ ARet=preferences.getInt("StPumpA_Ret", 700);
 AOn=preferences.getInt("StPumpA_On", 0);
 StPumpA_cStepMl=preferences.getFloat("StPumpA_cStepMl", 1000);
 StPumpA_cMl=preferences.getFloat("StPumpA_cMl", 1);
+StPumpA_cStep=preferences.getFloat("StPumpA_cStep", 1000);
+
 
 AA=preferences.getInt("StPumpA_A", 4);
 AB=preferences.getInt("StPumpA_B", 5);
@@ -47,8 +54,9 @@ AD=preferences.getInt("StPumpA_D", 7);
 BDel=preferences.getInt("StPumpB_Del", 700);
 BRet=preferences.getInt("StPumpB_Ret", 700);
 BOn=preferences.getInt("StPumpB_On", 0);
-StPumpB_cStepMl=preferences.getFloat("StPumpA_cStepMl", 1000);
-StPumpB_cMl=preferences.getFloat("StPumpA_cMl", 1);
+StPumpB_cStepMl=preferences.getFloat("StPumpB_cStepMl", 1000);
+StPumpB_cMl=preferences.getFloat("StPumpB_cMl", 1);
+StPumpB_cStep=preferences.getFloat("StPumpB_cStep", 1000);
 
 BA=preferences.getInt("StPumpB_A", 8);
 BB=preferences.getInt("StPumpB_B", 9);
@@ -65,6 +73,7 @@ h += "<tr><td>SetPumpA_Ml<td><input type='text' name='SetPumpA_Ml' value='" + fF
 
 h += "<tr><td>StPumpA_cStepMl<td><input type='text' name='StPumpA_cStepMl' value='" + fFTS(StPumpA_cStepMl,3) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpA_cMl<td><input type='text' name='StPumpA_cMl' value='" + fFTS(StPumpA_cMl,3) + "' form='set'></tr>\n";
+h += "<tr><td>StPumpA_cStep<td><input type='text' name='StPumpA_cStep' value='" + fFTS(StPumpA_cStep,3) + "' form='set'></tr>\n";
 
 h += "<tr><td>StPumpA_Del<td><input type='text' name='StPumpA_Del' value='" + String(ADel) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpA_Ret<td><input type='text' name='StPumpA_Ret' value='" + String(ARet) + "' form='set'></tr>\n";
@@ -87,6 +96,8 @@ h += "<tr><td>SetPumpB_Ml<td><input type='text' name='SetPumpB_Ml' value='" + fF
 
 h += "<tr><td>StPumpB_cStepMl<td><input type='text' name='StPumpB_cStepMl' value='" + fFTS(StPumpB_cStepMl,3) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpB_cMl<td><input type='text' name='StPumpB_cMl' value='" + fFTS(StPumpB_cMl,3) + "' form='set'></tr>\n";
+h += "<tr><td>StPumpB_cStep<td><input type='text' name='StPumpB_cStep' value='" + fFTS(StPumpB_cStep,3) + "' form='set'></tr>\n";
+
 
 h += "<tr><td>StPumpB_Del<td><input type='text' name='StPumpB_Del' value='" + String(BDel) + "' form='set'></tr>\n";
 h += "<tr><td>StPumpB_Ret<td><input type='text' name='StPumpB_Ret' value='" + String(BRet) + "' form='set'></tr>\n";

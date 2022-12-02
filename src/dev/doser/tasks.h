@@ -40,35 +40,39 @@ void TaskDOSER(void *parameters)
         StPumpA_cMl = preferences.getFloat("StPumpA_cMl", 1);
         SetPumpA_Ml = preferences.getFloat("SetPumpA_Ml", 0);
         AOn = preferences.getInt("StPumpA_On", 0);
+        StPumpA_cStepMl = preferences.getFloat("StPumpA_cStep", 500);
+
 
         if (SetPumpA_Ml > 0 and AOn !=0)
         {
 
-          for (long i = 0; i < 500; i++)
+          for (long i = 0; i < StPumpA_cStep; i++)
           {
             StepAF();
             if (OtaStart == true)
               vTaskDelete(NULL);
           }
-          preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * 500));
+          preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
         }
 
         StPumpB_cStepMl = preferences.getFloat("StPumpB_cStepMl", 500);
         StPumpB_cMl = preferences.getFloat("StPumpB_cMl", 1);
         SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
         BOn = preferences.getInt("StPumpB_On", 0);
+        StPumpB_cStepMl = preferences.getFloat("StPumpB_cStep", 500);
+
 
         if (SetPumpB_Ml > 0 and BOn !=0)
         {
 
-          for (long i = 0; i < 500; i++)
+          for (long i = 0; i < StPumpB_cStep; i++)
           {
             StepBF();
 
             if (OtaStart == true)
               vTaskDelete(NULL);
           }
-          preferences.putFloat("SetPumpB_Ml", SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * 500));
+          preferences.putFloat("SetPumpB_Ml", SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
         }
 
         mcp.pinMode(AA, LOW);
