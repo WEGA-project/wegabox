@@ -19,19 +19,19 @@
     int BC = 10;
     int BD = 11;
     
-    long del = 700;
+    long del = 700; 
     long ret = 1500;
     int stap = 1;
 
-float StPumpA_cStepMl=1000;
-float StPumpA_cMl=1;
-float StPumpA_cStep=1000;
+float StPumpA_cStepMl=1000; //Число шагов на объем для калибровки
+float StPumpA_cMl=1; // Объем в мл для калибровки
+float StPumpA_cStep=1000; // Число шагов за 1 цикл
 float StPumpB_cStepMl=1000;
 float StPumpB_cMl=1;
 float StPumpB_cStep=1000;
 
-float SetPumpA_Ml=0;
-float SetPumpB_Ml=0;
+float SetPumpA_Ml=0; // Сколько налить мл
+float SetPumpB_Ml=0; // Сколько налить мл
 
 #include <dev/doser/func.h> 
 

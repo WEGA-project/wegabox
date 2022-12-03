@@ -40,8 +40,9 @@ void TaskDOSER(void *parameters)
         StPumpA_cMl = preferences.getFloat("StPumpA_cMl", 1);
         SetPumpA_Ml = preferences.getFloat("SetPumpA_Ml", 0);
         AOn = preferences.getInt("StPumpA_On", 0);
-        StPumpA_cStepMl = preferences.getFloat("StPumpA_cStep", 500);
-
+        StPumpA_cStep = preferences.getFloat("StPumpA_cStep", 500);        
+        float ALeftStep=(SetPumpA_Ml/StPumpA_cMl)*StPumpA_cStepMl;
+        if (ALeftStep<StPumpA_cStep) StPumpA_cStep = ALeftStep; // Если до конца цикла осталось меньше 
 
         if (SetPumpA_Ml > 0 and AOn !=0)
         {
@@ -59,8 +60,10 @@ void TaskDOSER(void *parameters)
         StPumpB_cMl = preferences.getFloat("StPumpB_cMl", 1);
         SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
         BOn = preferences.getInt("StPumpB_On", 0);
-        StPumpB_cStepMl = preferences.getFloat("StPumpB_cStep", 500);
-
+        StPumpB_cStep = preferences.getFloat("StPumpB_cStep", 500);
+        float BLeftStep=(SetPumpA_Ml/StPumpA_cMl)*StPumpA_cStepMl;
+        if (BLeftStep<StPumpA_cStep) StPumpA_cStep = BLeftStep; // Если до конца цикла осталось меньше 
+        
 
         if (SetPumpB_Ml > 0 and BOn !=0)
         {
