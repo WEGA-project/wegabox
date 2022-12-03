@@ -61,8 +61,8 @@ void TaskDOSER(void *parameters)
         SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
         BOn = preferences.getInt("StPumpB_On", 0);
         StPumpB_cStep = preferences.getFloat("StPumpB_cStep", 500);
-        float BLeftStep=(SetPumpA_Ml/StPumpA_cMl)*StPumpA_cStepMl;
-        if (BLeftStep<StPumpA_cStep) StPumpA_cStep = BLeftStep; // Если до конца цикла осталось меньше 
+        float BLeftStep=(SetPumpB_Ml/StPumpB_cMl)*StPumpB_cStepMl;
+        if (BLeftStep<StPumpB_cStep) StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше 
         
 
         if (SetPumpB_Ml > 0 and BOn !=0)
