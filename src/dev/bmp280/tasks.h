@@ -47,7 +47,7 @@ void TaskBMP280(void *parameters)
           if (bmx280.isBME280())
           {
             BMP280_AirHumRM.add(BMP280_Hum);
-            AirPress = BMP280_AirHumRM.getAverage(10);
+            AirHum = BMP280_AirHumRM.getAverage(10);
           }
         }
         else
