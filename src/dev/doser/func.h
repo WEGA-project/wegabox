@@ -8,92 +8,180 @@ void bitW4(int p1, int p2, int p3, int p4, int b1, int b2, int b3, int b4)
 }
 
 // Шаг насоса А вперед
-void StepAF(){
-    del = preferences.getInt("StPumpA_Del", 700);
-    ret = preferences.getInt("StPumpA_Ret", 700);
-    AA=preferences.getInt("StPumpA_A", 4);
-    AB=preferences.getInt("StPumpA_B", 5);
-    AC=preferences.getInt("StPumpA_C", 6);
-    AD=preferences.getInt("StPumpA_D", 7);
+void StepAF(bool phase1, bool phase2, bool cool)
+{
     // enn
-        bitW4(AA, AB, AC, AD, 0, 1, 1, 0);
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 1);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
-
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
         bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);
-    // twee
+        delayMicroseconds(ADel);
+    }
+    if (phase2 == true)
+    {
         bitW4(AA, AB, AC, AD, 0, 1, 0, 1);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
+        delayMicroseconds(ARet);
+    }
 
+    // twee
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 1, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
         bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);    
+        delayMicroseconds(ADel);
+    }
+
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 1, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+
     // drie
-        bitW4(AA, AB, AC, AD, 1, 0, 0, 1);
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 1, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
-
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
         bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);  
-    // vier  
+        delayMicroseconds(ADel);
+    }
+
+    if (phase2 == true)
+    {
         bitW4(AA, AB, AC, AD, 1, 0, 1, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
+        delayMicroseconds(ARet);
+    }
 
+    // vier
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 1, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
         bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);             
+        delayMicroseconds(ADel);
+    }
+
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 1, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
 }
 
 // Шаг насоса B вперед
-void StepBF(){
-    del = preferences.getInt("StPumpB_Del", 700);
-    ret = preferences.getInt("StPumpB_Ret", 700);
-    BA=preferences.getInt("StPumpB_A", 4);
-    BB=preferences.getInt("StPumpB_B", 5);
-    BC=preferences.getInt("StPumpB_C", 6);
-    BD=preferences.getInt("StPumpB_D", 7);
+void StepBF(bool phase1, bool phase2, bool cool)
+{
     // enn
-        bitW4(BA, BB, BC, BD, 0, 1, 1, 0);
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 0, 1);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
-
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
         bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);
-    // twee
+        delayMicroseconds(BDel);
+    }
+    if (phase2 == true)
+    {
         bitW4(BA, BB, BC, BD, 0, 1, 0, 1);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
+        delayMicroseconds(BRet);
+    }
 
+    // twee
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 1, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
         bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);    
+        delayMicroseconds(BDel);
+    }
+
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 1, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+
     // drie
-        bitW4(BA, BB, BC, BD, 1, 0, 0, 1);
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 1, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BDel);
+    }
 
-        bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
-        mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);  
-    // vier  
+    if (phase2 == true)
+    {
         bitW4(BA, BB, BC, BD, 1, 0, 1, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(ret);
+        delayMicroseconds(BRet);
+    }
 
+    // vier
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 1, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
         bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
         mcp.writeGPIOAB(bitw);
-        delayMicroseconds(del);             
+        delayMicroseconds(BDel);
+    }
+
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 1, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
 }
 
-
-
-//Шаг одним насосом вперед
+// Шаг одним насосом вперед
 void StepOneDrvForward(int A, int B, int C, int D)
 {
     // enn
@@ -126,7 +214,7 @@ void StepOneDrvForward(int A, int B, int C, int D)
     delayMicroseconds(del);
 }
 
-//Шаг одним насосом назад
+// Шаг одним насосом назад
 void StepOneDrvBackward(int A, int B, int C, int D, int del)
 {
     // enn
@@ -159,7 +247,7 @@ void StepOneDrvBackward(int A, int B, int C, int D, int del)
     delayMicroseconds(del);
 }
 
-//Шаг двумя насосами вперед
+// Шаг двумя насосами вперед
 void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, int BD, int del)
 {
     del = preferences.getInt("StPumpA_Del", 700);
@@ -223,7 +311,7 @@ void StepTwoDrvForward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, i
     delayMicroseconds(del);
 }
 
-//Шаг двумя насосами назад
+// Шаг двумя насосами назад
 void StepTwoDrvBackward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, int BD, int del)
 {
     del = preferences.getInt("StPumpA_Del", 700);
@@ -285,4 +373,3 @@ void StepTwoDrvBackward(int AA, int AB, int AC, int AD, int BA, int BB, int BC, 
     mcp.writeGPIOAB(bitw);
     delayMicroseconds(del);
 }
-

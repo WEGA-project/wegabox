@@ -20,17 +20,22 @@ void TaskDOSER(void *parameters)
         AB = preferences.getInt("StPumpA_B", 5);
         AC = preferences.getInt("StPumpA_C", 6);
         AD = preferences.getInt("StPumpA_D", 7);
-
-        BA = preferences.getInt("StPumpB_A", 8);
-        BB = preferences.getInt("StPumpB_B", 9);
-        BC = preferences.getInt("StPumpB_C", 10);
-        BD = preferences.getInt("StPumpB_D", 11);
-
+        ADel = preferences.getInt("StPumpA_Del", 700);
+        ARet = preferences.getInt("StPumpA_Ret", 700);
         mcp.pinMode(AA, OUTPUT);
         mcp.pinMode(AB, OUTPUT);
         mcp.pinMode(AC, OUTPUT);
         mcp.pinMode(AD, OUTPUT);
 
+
+
+
+        BA = preferences.getInt("StPumpB_A", 8);
+        BB = preferences.getInt("StPumpB_B", 9);
+        BC = preferences.getInt("StPumpB_C", 10);
+        BD = preferences.getInt("StPumpB_D", 11);
+        BDel = preferences.getInt("StPumpB_Del", 700);
+        BRet = preferences.getInt("StPumpB_Ret", 700);
         mcp.pinMode(BA, OUTPUT);
         mcp.pinMode(BB, OUTPUT);
         mcp.pinMode(BC, OUTPUT);
@@ -49,7 +54,7 @@ void TaskDOSER(void *parameters)
 
           for (long i = 0; i < StPumpA_cStep; i++)
           {
-            StepAF();
+            StepAF(1,1,1);
             if (OtaStart == true)
               vTaskDelete(NULL);
           }
@@ -70,7 +75,7 @@ void TaskDOSER(void *parameters)
 
           for (long i = 0; i < StPumpB_cStep; i++)
           {
-            StepBF();
+            StepBF(1,1,1);
 
             if (OtaStart == true)
               vTaskDelete(NULL);
