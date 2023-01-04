@@ -46,7 +46,7 @@ void TaskMCP23017(void *parameters)
 
         // KickUp пнуть шим до предела перед снижением до нормы при включении
         int PompKickUP = 0;    // Пинок для насоса
-        int KickUpMax = 254;   // максимум мощности пинка
+        int KickUpMax = 255;   // максимум мощности пинка
         int KickUpStrart = 10; // начальная можность пинка
         int KickUpTime = 300;  // Время пинка в миллисекундах
 
@@ -105,9 +105,9 @@ void TaskMCP23017(void *parameters)
         if (preferences.getInt("RootPomp", -1) == 1)
         {
           String SelectedRootPomp = preferences.getString("SelectedRootPomp", "DRV1_A");
-          pwd_val_root = preferences.getInt("PWD", 254);
+          pwd_val_root = preferences.getInt("PWD", 255);
           RootPwdOn = preferences.getInt("RootPwdOn", 1);
-          RootPwdMax = preferences.getInt("RootPwdMax", 254);
+          RootPwdMax = preferences.getInt("RootPwdMax", 255);
           RootPwdMin = preferences.getInt("RootPwdMin", 0);
           RootDistMin = preferences.getInt("RootDistMin", 6);
           PwdStepUp = preferences.getInt("PwdStepUp", 1);
@@ -126,7 +126,7 @@ void TaskMCP23017(void *parameters)
             }
             else
             {
-              if (PwdStepUp == 255)
+              if (PwdStepUp == 256)
               {
                 aPWD = (AirTemp - RootTemp);         
                 pwd_val_root = round(aPWD*200);

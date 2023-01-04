@@ -181,70 +181,178 @@ void StepBF(bool phase1, bool phase2, bool cool)
     }
 }
 
-// Шаг одним насосом вперед
-void StepOneDrvForward(int A, int B, int C, int D)
+// Шаг насоса А назад
+void StepAB(bool phase1, bool phase2, bool cool)
 {
-    // enn
-    bitWrite(bitw, A, 0);
-    bitWrite(bitw, B, 1);
-    bitWrite(bitw, C, 1);
-    bitWrite(bitw, D, 0);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
-    // twee
-    bitWrite(bitw, A, 0);
-    bitWrite(bitw, B, 1);
-    bitWrite(bitw, C, 0);
-    bitWrite(bitw, D, 1);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
-    // drie
-    bitWrite(bitw, A, 1);
-    bitWrite(bitw, B, 0);
-    bitWrite(bitw, C, 0);
-    bitWrite(bitw, D, 1);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+
     // vier
-    bitWrite(bitw, A, 1);
-    bitWrite(bitw, B, 0);
-    bitWrite(bitw, C, 1);
-    bitWrite(bitw, D, 0);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 1, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ADel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 1, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+
+    // drie
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 1, 0, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ADel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+
+    // twee
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 1, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ADel);
+    }
+
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 1, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+
+    // enn
+    if (phase2 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 1, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ADel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(ARet);
+    }
 }
 
-// Шаг одним насосом назад
-void StepOneDrvBackward(int A, int B, int C, int D, int del)
+// Шаг насоса B назад
+void StepBB(bool phase1, bool phase2, bool cool)
 {
-    // enn
-    bitWrite(bitw, A, 0);
-    bitWrite(bitw, B, 1);
-    bitWrite(bitw, C, 1);
-    bitWrite(bitw, D, 0);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
-    // twee
-    bitWrite(bitw, A, 1);
-    bitWrite(bitw, B, 0);
-    bitWrite(bitw, C, 1);
-    bitWrite(bitw, D, 0);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
-    // drie
-    bitWrite(bitw, A, 1);
-    bitWrite(bitw, B, 0);
-    bitWrite(bitw, C, 0);
-    bitWrite(bitw, D, 1);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+
     // vier
-    bitWrite(bitw, A, 0);
-    bitWrite(bitw, B, 1);
-    bitWrite(bitw, C, 0);
-    bitWrite(bitw, D, 1);
-    mcp.writeGPIOAB(bitw);
-    delayMicroseconds(del);
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 1, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BDel);
+    }
+
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 1, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    // drie
+
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 1, 0, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
+        bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BDel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+
+    // twee
+
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 1, 1, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BDel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 1, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+
+    // enn
+    if (phase2 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 1, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
+    if (cool == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BDel);
+    }
+    if (phase1 == true)
+    {
+        bitW4(BA, BB, BC, BD, 0, 0, 0, 1);
+        mcp.writeGPIOAB(bitw);
+        delayMicroseconds(BRet);
+    }
 }
 
 // Шаг двумя насосами вперед

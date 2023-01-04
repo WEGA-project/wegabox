@@ -27,9 +27,6 @@ void TaskDOSER(void *parameters)
         mcp.pinMode(AC, OUTPUT);
         mcp.pinMode(AD, OUTPUT);
 
-
-
-
         BA = preferences.getInt("StPumpB_A", 8);
         BB = preferences.getInt("StPumpB_B", 9);
         BC = preferences.getInt("StPumpB_C", 10);
@@ -45,18 +42,27 @@ void TaskDOSER(void *parameters)
         StPumpA_cMl = preferences.getFloat("StPumpA_cMl", 1);
         SetPumpA_Ml = preferences.getFloat("SetPumpA_Ml", 0);
         AOn = preferences.getInt("StPumpA_On", 0);
-        StPumpA_cStep = preferences.getFloat("StPumpA_cStep", 500);        
-        float ALeftStep=(SetPumpA_Ml/StPumpA_cMl)*StPumpA_cStepMl;
-        if (ALeftStep<StPumpA_cStep) StPumpA_cStep = ALeftStep; // Если до конца цикла осталось меньше 
+        StPumpA_cStep = preferences.getFloat("StPumpA_cStep", 500);
+        float ALeftStep = (SetPumpA_Ml / StPumpA_cMl) * StPumpA_cStepMl;
+        if (ALeftStep < StPumpA_cStep)
+          StPumpA_cStep = ALeftStep; // Если до конца цикла осталось меньше
 
-        if (SetPumpA_Ml > 0 and AOn !=0)
+        if (SetPumpA_Ml > 0 and AOn != 0)
         {
+// Облегчить старт коротким реверсом
+          for (long i = 0; i < 5; i++)
+            StepAB(1, 1, 1);
+          for (long i = 0; i < 5; i++)
+            StepAF(1, 1, 1);
 
           for (long i = 0; i < StPumpA_cStep; i++)
           {
-            StepAF(1,1,1);
+            StepAF(true, true, true);
             if (OtaStart == true)
+            {
+              mcp.writeGPIOAB(0);
               vTaskDelete(NULL);
+            }
           }
           preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
         }
@@ -66,19 +72,22 @@ void TaskDOSER(void *parameters)
         SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
         BOn = preferences.getInt("StPumpB_On", 0);
         StPumpB_cStep = preferences.getFloat("StPumpB_cStep", 500);
-        float BLeftStep=(SetPumpB_Ml/StPumpB_cMl)*StPumpB_cStepMl;
-        if (BLeftStep<StPumpB_cStep) StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше 
-        
+        float BLeftStep = (SetPumpB_Ml / StPumpB_cMl) * StPumpB_cStepMl;
+        if (BLeftStep < StPumpB_cStep)
+          StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше
 
-        if (SetPumpB_Ml > 0 and BOn !=0)
+        if (SetPumpB_Ml > 0 and BOn != 0)
         {
 
           for (long i = 0; i < StPumpB_cStep; i++)
           {
-            StepBF(1,1,1);
+            StepBF(true, true, true);
 
             if (OtaStart == true)
+            {
+              mcp.writeGPIOAB(0);
               vTaskDelete(NULL);
+            }
           }
           preferences.putFloat("SetPumpB_Ml", SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
         }
