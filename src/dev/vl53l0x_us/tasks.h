@@ -18,14 +18,14 @@ void TaskVL53L0X(void *parameters)
 
         Wire.begin(US_SDA, US_SCL);
 
-        s_VL53L0X.init();
-        s_VL53L0X.setTimeout(500);
-        s_VL53L0X.setSignalRateLimit(0.01);
+        // s_VL53L0X.init();
+        // s_VL53L0X.setTimeout(500);
+        // s_VL53L0X.setSignalRateLimit(0.01);
 
-        s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-        s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+        // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+        // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
 
-        s_VL53L0X.setMeasurementTimingBudget(200000);
+        // s_VL53L0X.setMeasurementTimingBudget(200000);
 
         delay(100);
         long err = 0;
@@ -35,7 +35,11 @@ void TaskVL53L0X(void *parameters)
         unsigned long t = millis();
         while (millis() - t < 5000)
         {
-          range0 = s_VL53L0X.readRangeSingleMillimeters();
+          //range0 = s_VL53L0X.readRangeSingleMillimeters();
+          range0 = s_VL53L0X.readRangeContinuousMillimeters();
+          if (s_VL53L0X.timeoutOccurred()) { 
+            syslog_ng("VL53L0X: TIMEOUT"); 
+            }
           if (range != 65535)
           {
             VL53L0X_RangeRM.add(range0);
@@ -67,7 +71,7 @@ void TaskVL53L0X(void *parameters)
 
         // syslog_ng("VL53L0X range: " + String(range));
         // syslog_ng("VL53L0X dist: " + fFTS(Dist, 3));
-        // syslog_ng("VL53L0X " + fFTS(VL53L0X_time, 0) + "ms end.");
+        syslog_ng("VL53L0X " + fFTS(VL53L0X_time, 0) + "ms end.");
 
         Wire.begin(I2C_SDA, I2C_SCL);
         VL53L0X_old = millis();

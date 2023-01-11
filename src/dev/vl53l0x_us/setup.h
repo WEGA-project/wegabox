@@ -11,13 +11,14 @@ if (Wire.available())
   if (s_VL53L0X.init())
   {
     syslog_ng("VL53L0X: sensor detected");
+    s_VL53L0X.startContinuous();
     s_VL53L0X.setTimeout(500);
-    s_VL53L0X.setSignalRateLimit(0.01);
+//     s_VL53L0X.setSignalRateLimit(0.5);
 
-    s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-    s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+    // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+    // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
 
-    s_VL53L0X.setMeasurementTimingBudget(200000);
+     s_VL53L0X.setMeasurementTimingBudget(400000);
 
     xTaskCreate(TaskVL53L0X, "VL53L0X", 10000, NULL, 0, NULL);
     syslog_ng("VL53L0X: add Task");
