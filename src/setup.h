@@ -169,6 +169,7 @@ void setup()
 #include <dev/sdc30/setup.h>
 #include <dev/cput/setup.h>
 #include <dev/hall/setup.h>
+#include <dev/vcc/setup.h>
 #include <dev/vl6180x/setup.h>
 #include <dev/vl6180x_us/setup.h>
 #include <dev/vl53l0x_us/setup.h>

@@ -260,11 +260,11 @@ void TaskMCP23017(void *parameters)
             ESP.restart();}
 
           Wire.begin();
-          delay(100);
+          delay(300);
           mcp.begin_I2C();
-          delay(100);
+          delay(300);
           mcp.writeGPIOAB(bitw);
-          delay(100);
+          delay(300);
           readGPIO = mcp.readGPIOAB();
           
         }

@@ -76,6 +76,12 @@ void TaskWegaApi(void *parameters)
 
     httpstr += "&RSSI=" + String(WiFi.RSSI());
 
+    // float v = 0;
+    //   for (int i = 0; i < 100; i++) v += rom_phy_get_vdd33();
+    //   v /= 100;
+if (Vcc) 
+    httpstr += "&Vcc=" + fFTS(Vcc,3);
+
     http.begin(client, httpstr);
     //http.setTimeout(2000);
     http.GET();
