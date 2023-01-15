@@ -29,7 +29,7 @@ void Taskvcc(void *parameters)
         } while (i < 64);
 
 
-        Vcc = vccRM.getAverage() / 2000 * VccAdj;
+        Vcc = vccRM.getAverage() / 2048 * VccAdj;
         // 0.0005045f * v + 0.3368f,3
 
         vcc_time = millis() - vcc_time;

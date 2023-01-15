@@ -80,7 +80,7 @@ void TaskWegaApi(void *parameters)
     //   for (int i = 0; i < 100; i++) v += rom_phy_get_vdd33();
     //   v /= 100;
 if (Vcc) 
-    httpstr += "&Vcc=" + fFTS(Vcc,3);
+    httpstr += "&Vcc=" + fFTS(Vcc,4);
 
     http.begin(client, httpstr);
     //http.setTimeout(2000);
