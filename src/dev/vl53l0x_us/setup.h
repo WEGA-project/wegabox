@@ -12,11 +12,12 @@ if (Wire.available())
   {
     syslog_ng("VL53L0X: sensor detected");
     s_VL53L0X.startContinuous();
+    //s_VL53L0X.stopContinuous();
     s_VL53L0X.setTimeout(5000);
     s_VL53L0X.setSignalRateLimit(5);
 
-    // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-    // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+     s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 2);
+     s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 3);
 
      s_VL53L0X.setMeasurementTimingBudget(400000);
 

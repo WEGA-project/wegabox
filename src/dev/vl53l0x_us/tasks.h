@@ -33,6 +33,21 @@ void TaskVL53L0X(void *parameters)
         float range0 = 0;
         unsigned cont = 0;
         unsigned long t = millis();
+
+
+//s_VL53L0X.init();
+//delay(300);
+    // s_VL53L0X.stopContinuous();
+    //s_VL53L0X.setTimeout(5000);
+    // s_VL53L0X.setSignalRateLimit(5);
+
+    //  s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 2);
+    //  s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 3);
+
+    //  s_VL53L0X.setMeasurementTimingBudget(400000);
+
+//delay (5000);
+
         while (millis() - t < 5000)
         {
           //range0 = s_VL53L0X.readRangeSingleMillimeters();
@@ -40,7 +55,7 @@ void TaskVL53L0X(void *parameters)
           if (s_VL53L0X.timeoutOccurred()) { 
             syslog_ng("VL53L0X: TIMEOUT"); 
             }
-          if (range != 65535)
+          if (range0 < 8000)
           {
             VL53L0X_RangeRM.add(range0);
             cont++;
@@ -53,7 +68,7 @@ void TaskVL53L0X(void *parameters)
         VL53L0X_RangeAVG.add(range);
 
         Dist = VL53L0X_RangeAVG.getAverage();
-        if (abs(Dist - range) > 10)
+        if (abs(Dist - range) > 4)
         {
           VL53L0X_RangeAVG.clear();
           syslog_ng("VL53L0X: Reset average filter");
