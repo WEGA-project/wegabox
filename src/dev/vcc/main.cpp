@@ -6,5 +6,4 @@ float VccAdj = 1;
 unsigned long vcc_old = millis();
 unsigned long vcc_Repeat = 10000;
 RunningMedian vccRM = RunningMedian(250);
-float Vcc;
 #endif //c_vcc
