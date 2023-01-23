@@ -1,28 +1,24 @@
 #if c_MCP23017 == 1 and c_DOSER == 1
-void TaskDOSER(void *parameters)
-{
-  for (;;)
-  {
+void TaskDOSER(void *parameters) {
+  for (;;) {
     if (OtaStart == true)
       vTaskDelete(NULL);
     delay(100);
 
     unsigned long DOSER_LastTime = millis() - DOSER_old;
 
-    if (xSemaphoreX != NULL and DOSER_LastTime > DOSER_Repeat)
-    {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
-      {
+    if (xSemaphoreX != NULL and DOSER_LastTime > DOSER_Repeat) {
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)3) == pdTRUE) {
         unsigned long DOSER_time = millis();
-        syslog_ng("DOSER Start " + fFTS(DOSER_LastTime - DOSER_Repeat, 0) + "ms");
+        syslog_ng("DOSER Start " + fFTS(DOSER_LastTime - DOSER_Repeat, 0) +
+                  "ms");
 
         SetPumpA_Ml = preferences.getFloat("SetPumpA_Ml", 0);
         SetPumpB_Ml = preferences.getFloat("SetPumpB_Ml", 0);
 
-        if (SetPumpA_Ml > 0 or SetPumpB_Ml > 0)
-        {
-          syslog_ng("DOSER: PumpA remains ml=" + fFTS(SetPumpA_Ml,2));
-          syslog_ng("DOSER: PumpB remains ml=" + fFTS(SetPumpB_Ml,2));
+        if (SetPumpA_Ml > 0 or SetPumpB_Ml > 0) {
+          syslog_ng("DOSER: PumpA remains ml=" + fFTS(SetPumpA_Ml, 2));
+          syslog_ng("DOSER: PumpB remains ml=" + fFTS(SetPumpB_Ml, 2));
 
           AA = preferences.getInt("StPumpA_A", 4);
           AB = preferences.getInt("StPumpA_B", 5);
@@ -55,20 +51,21 @@ void TaskDOSER(void *parameters)
           if (ALeftStep < StPumpA_cStep)
             StPumpA_cStep = ALeftStep; // Если до конца цикла осталось меньше
 
-          if (SetPumpA_Ml > 0 and AOn != 0)
-          {
+          if (SetPumpA_Ml > 0 and AOn != 0) {
             // Облегчить старт коротким реверсом
             for (long i = 0; i < 5; i++)
               StepAB(1, 1, 1);
             for (long i = 0; i < 5; i++)
               StepAF(1, 1, 1);
 
-            for (long i = 0; i < StPumpA_cStep; i++)
-            {
+            for (long i = 0; i < StPumpA_cStep; i++) {
               StepAF(true, true, true);
-              if (OtaStart == true)
-              {
-                mcp.writeGPIOAB(0);
+              if (OtaStart == true) {
+                // mcp.writeGPIOAB(0);
+                bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+                bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+                mcp.writeGPIOAB(bitw);
+                preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * i));
                 vTaskDelete(NULL);
               }
             }
@@ -83,33 +80,36 @@ void TaskDOSER(void *parameters)
           if (BLeftStep < StPumpB_cStep)
             StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше
 
-          if (SetPumpB_Ml > 0 and BOn != 0)
-          {
+          if (SetPumpB_Ml > 0 and BOn != 0) {
 
-            for (long i = 0; i < StPumpB_cStep; i++)
-            {
+            for (long i = 0; i < StPumpB_cStep; i++) {
               StepBF(true, true, true);
 
-              if (OtaStart == true)
-              {
-                mcp.writeGPIOAB(0);
+              if (OtaStart == true) {
+                // mcp.writeGPIOAB(0);
+                bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+                bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+                mcp.writeGPIOAB(bitw);
+                preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * i));
                 vTaskDelete(NULL);
               }
             }
-            preferences.putFloat("SetPumpB_Ml", SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
+            preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
           }
 
-          mcp.pinMode(AA, LOW);
-          mcp.pinMode(AB, LOW);
-          mcp.pinMode(AC, LOW);
-          mcp.pinMode(AD, LOW);
+          // mcp.pinMode(AA, LOW);
+          // mcp.pinMode(AB, LOW);
+          // mcp.pinMode(AC, LOW);
+          // mcp.pinMode(AD, LOW);
+          // mcp.pinMode(BA, LOW);
+          // mcp.pinMode(BB, LOW);
+          // mcp.pinMode(BC, LOW);
+          // mcp.pinMode(BD, LOW);
 
-          mcp.pinMode(BA, LOW);
-          mcp.pinMode(BB, LOW);
-          mcp.pinMode(BC, LOW);
-          mcp.pinMode(BD, LOW);
-        }
-        else
+          bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
+          bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
+          mcp.writeGPIOAB(bitw);
+        } else
           syslog_ng("DOSER: Nothing to do");
 
         DOSER_time = millis() - DOSER_time;

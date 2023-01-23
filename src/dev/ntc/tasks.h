@@ -1,21 +1,14 @@
-// Измерение термистора
-#if c_NTC == 1
-void TaskNTC(void *parameters)
-{
-
-  for (;;)
-  {
+#if c_NTC == 1 
+void TaskNTC(void *parameters) {
+  for (;;) {
     if (OtaStart == true)
       vTaskDelete(NULL);
-    vTaskDelay(1000);
-    //syslog_ng("NTC loop");
+    vTaskDelay(100);
 
     unsigned long NTC_LastTime = millis() - NTC_old;
 
-    if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat)
-    {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
-      {
+    if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat) {
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE) {
         vTaskDelay(2000);
         unsigned long NTC_time = millis();
         syslog_ng("NTC Start " + fFTS(NTC_LastTime - NTC_Repeat, 0) + "ms");
@@ -25,10 +18,9 @@ void TaskNTC(void *parameters)
         // disableCore0WDT();
         // disableLoopWDT();
 
-        //unsigned long NTC0 = 0;
+        // unsigned long NTC0 = 0;
         float NTC0 = 0;
-        for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++)
-        {
+        for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++) {
           NTC0 = NTC0 + adc1_get_raw(NTC_port);
           vTaskDelay(1);
         }
