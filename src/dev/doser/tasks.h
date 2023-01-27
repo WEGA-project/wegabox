@@ -66,10 +66,13 @@ void TaskDOSER(void *parameters) {
                 bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
                 mcp.writeGPIOAB(bitw);
                 preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * i));
+                preferences.putFloat("SetPumpA_Ml_SUM", preferences.getFloat("SetPumpA_Ml_SUM", 0) + (StPumpA_cMl / StPumpA_cStepMl * i));
                 vTaskDelete(NULL);
               }
             }
             preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
+
+            preferences.putFloat("SetPumpA_Ml_SUM", preferences.getFloat("SetPumpA_Ml_SUM", 0) + (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
           }
 
           StPumpB_cStepMl = preferences.getFloat("StPumpB_cStepMl", 500);
@@ -81,6 +84,10 @@ void TaskDOSER(void *parameters) {
             StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше
 
           if (SetPumpB_Ml > 0 and BOn != 0) {
+                        for (long i = 0; i < 5; i++)
+              StepBB(1, 1, 1);
+            for (long i = 0; i < 5; i++)
+              StepBF(1, 1, 1);
 
             for (long i = 0; i < StPumpB_cStep; i++) {
               StepBF(true, true, true);
@@ -91,10 +98,14 @@ void TaskDOSER(void *parameters) {
                 bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
                 mcp.writeGPIOAB(bitw);
                 preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * i));
+
+                preferences.putFloat("SetPumpB_Ml_SUM", preferences.getFloat("SetPumpB_Ml_SUM", 0) + (StPumpB_cMl / StPumpB_cStepMl * i));
                 vTaskDelete(NULL);
               }
             }
             preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
+
+            preferences.putFloat("SetPumpB_Ml_SUM", preferences.getFloat("SetPumpB_Ml_SUM", 0) + (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
           }
 
           // mcp.pinMode(AA, LOW);
@@ -109,6 +120,9 @@ void TaskDOSER(void *parameters) {
           bitW4(AA, AB, AC, AD, 0, 0, 0, 0);
           bitW4(BA, BB, BC, BD, 0, 0, 0, 0);
           mcp.writeGPIOAB(bitw);
+
+          syslog_ng("DOSER: PumpA SUM ml=" + fFTS(preferences.getFloat("SetPumpA_Ml_SUM", 0), 2));
+          syslog_ng("DOSER: PumpB SUM ml=" + fFTS(preferences.getFloat("SetPumpB_Ml_SUM", 0), 2));
         } else
           syslog_ng("DOSER: Nothing to do");
 

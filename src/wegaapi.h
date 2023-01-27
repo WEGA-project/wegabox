@@ -82,6 +82,11 @@ void TaskWegaApi(void *parameters)
 if (Vcc) 
     httpstr += "&Vcc=" + fFTS(Vcc,4);
 
+#if c_DOSER == 1
+httpstr += "&PumpA_SUM=" + fFTS(preferences.getFloat("SetPumpA_Ml_SUM", 0), 2);
+httpstr += "&PumpB_SUM=" + fFTS(preferences.getFloat("SetPumpB_Ml_SUM", 0), 2);
+#endif // c_DOSER
+
     http.begin(client, httpstr);
     //http.setTimeout(2000);
     http.GET();

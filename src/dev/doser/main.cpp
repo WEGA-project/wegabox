@@ -36,5 +36,5 @@ float SetPumpB_Ml=0; // Сколько налить мл
 #include <dev/doser/func.h> 
 
 unsigned long DOSER_old = millis();
-unsigned long DOSER_Repeat = 20000;
+unsigned long DOSER_Repeat = 10000;
 #endif // c_DOSER
