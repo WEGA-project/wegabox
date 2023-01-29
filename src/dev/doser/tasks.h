@@ -67,12 +67,14 @@ void TaskDOSER(void *parameters) {
                 mcp.writeGPIOAB(bitw);
                 preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * i));
                 preferences.putFloat("SetPumpA_Ml_SUM", preferences.getFloat("SetPumpA_Ml_SUM", 0) + (StPumpA_cMl / StPumpA_cStepMl * i));
+                preferences.putLong("PumpA_Step_SUM", preferences.getLong("PumpA_Step_SUM",0) + i);
                 vTaskDelete(NULL);
               }
             }
             preferences.putFloat("SetPumpA_Ml", SetPumpA_Ml - (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
 
             preferences.putFloat("SetPumpA_Ml_SUM", preferences.getFloat("SetPumpA_Ml_SUM", 0) + (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
+            preferences.putLong("PumpA_Step_SUM", preferences.getLong("PumpA_Step_SUM",0) + StPumpA_cStep);
           }
 
           StPumpB_cStepMl = preferences.getFloat("StPumpB_cStepMl", 500);
@@ -100,12 +102,14 @@ void TaskDOSER(void *parameters) {
                 preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * i));
 
                 preferences.putFloat("SetPumpB_Ml_SUM", preferences.getFloat("SetPumpB_Ml_SUM", 0) + (StPumpB_cMl / StPumpB_cStepMl * i));
+                preferences.putLong("PumpB_Step_SUM", preferences.getLong("PumpB_Step_SUM",0) + i);
                 vTaskDelete(NULL);
               }
             }
             preferences.putFloat("SetPumpB_Ml",SetPumpB_Ml - (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
 
             preferences.putFloat("SetPumpB_Ml_SUM", preferences.getFloat("SetPumpB_Ml_SUM", 0) + (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
+            preferences.putLong("PumpB_Step_SUM", preferences.getLong("PumpB_Step_SUM",0) + StPumpB_cStep);
           }
 
           // mcp.pinMode(AA, LOW);

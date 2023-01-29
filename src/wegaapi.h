@@ -85,6 +85,10 @@ if (Vcc)
 #if c_DOSER == 1
 httpstr += "&PumpA_SUM=" + fFTS(preferences.getFloat("SetPumpA_Ml_SUM", 0), 2);
 httpstr += "&PumpB_SUM=" + fFTS(preferences.getFloat("SetPumpB_Ml_SUM", 0), 2);
+
+httpstr += "&StepA_SUM=" + fFTS(preferences.getLong("PumpA_Step_SUM", 0),0);
+httpstr += "&StepB_SUM=" + fFTS(preferences.getLong("PumpB_Step_SUM", 0),0);
+
 #endif // c_DOSER
 
     http.begin(client, httpstr);
