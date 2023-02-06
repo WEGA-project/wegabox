@@ -13,5 +13,7 @@ VL6180X s_vl6180X;
     RunningMedian VL6180X_RangeRM = RunningMedian(254);
     RunningMedian VL6180X_RangeAVG = RunningMedian(100);
 
+    int vl6180XScalling=1;
+
 
 #endif //c_VL6180X

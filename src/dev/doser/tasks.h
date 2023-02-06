@@ -52,6 +52,7 @@ void TaskDOSER(void *parameters) {
             StPumpA_cStep = ALeftStep; // Если до конца цикла осталось меньше
 
           if (SetPumpA_Ml > 0 and AOn != 0) {
+            syslog_ng("DOSER: PumpA Start");
             // Облегчить старт коротким реверсом
             for (long i = 0; i < 5; i++)
               StepAB(1, 1, 1);
@@ -75,6 +76,7 @@ void TaskDOSER(void *parameters) {
 
             preferences.putFloat("SetPumpA_Ml_SUM", preferences.getFloat("SetPumpA_Ml_SUM", 0) + (StPumpA_cMl / StPumpA_cStepMl * StPumpA_cStep));
             preferences.putLong("PumpA_Step_SUM", preferences.getLong("PumpA_Step_SUM",0) + StPumpA_cStep);
+            syslog_ng("DOSER: PumpA Stop");
           }
 
           StPumpB_cStepMl = preferences.getFloat("StPumpB_cStepMl", 500);
@@ -86,6 +88,7 @@ void TaskDOSER(void *parameters) {
             StPumpB_cStep = BLeftStep; // Если до конца цикла осталось меньше
 
           if (SetPumpB_Ml > 0 and BOn != 0) {
+            syslog_ng("DOSER: PumpB Start");
                         for (long i = 0; i < 5; i++)
               StepBB(1, 1, 1);
             for (long i = 0; i < 5; i++)
@@ -110,6 +113,7 @@ void TaskDOSER(void *parameters) {
 
             preferences.putFloat("SetPumpB_Ml_SUM", preferences.getFloat("SetPumpB_Ml_SUM", 0) + (StPumpB_cMl / StPumpB_cStepMl * StPumpB_cStep));
             preferences.putLong("PumpB_Step_SUM", preferences.getLong("PumpB_Step_SUM",0) + StPumpB_cStep);
+            syslog_ng("DOSER: PumpB Stop");
           }
 
           // mcp.pinMode(AA, LOW);
