@@ -38,25 +38,23 @@ void TaskVL6180X(void *parameters)
         unsigned long t = millis();
         while (millis() - t < 5000)
         {
-
-          s_vl6180X.timeoutOccurred();
-          //range0 = s_vl6180X.readRangeSingleMillimeters();
+          //s_vl6180X.timeoutOccurred();
           range0 = s_vl6180X.readRangeContinuousMillimeters();
-          if (range0 != 256 * vl6180XScalling)
+          if (range0 != 768)
           {
             VL6180X_RangeRM.add(range0);
-            //range = range0 + range;
             cont++;
           }
           else
           {
             syslog_err("VL6180X: Error range");
             err++;
+            Wire.begin();
           }
         }
-        //if (cont > 0) Dist = range/cont/10;
-        //Dist = VL6180X_RangeRM.getAverage(50) / 10;
-        // Dist = VL6180X_RangeRM.getMedian() / 10;
+
+
+
         VL6180X_RangeAVG.add(VL6180X_RangeRM.getMedian() / 10);
         Dist=VL6180X_RangeAVG.getAverage();
 
