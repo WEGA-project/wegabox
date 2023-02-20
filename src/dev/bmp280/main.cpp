@@ -20,12 +20,13 @@
 //create a BMx280I2C object using the I2C interface with I2C Address 0x76
 
 uint8_t BMP280addr=0x76;
+bool AHTx=false;
 
 
 BMx280I2C bmx280(BMP280addr);
 
 unsigned long BMP280_old = millis();
-unsigned long BMP280_Repeat = 10000;
+unsigned long BMP280_Repeat = 5000;
 
 RunningMedian BMP280_AirTempRM = RunningMedian(30);
 RunningMedian BMP280_AirHumRM = RunningMedian(30);

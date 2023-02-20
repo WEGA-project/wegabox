@@ -10,6 +10,9 @@ void debug(byte addscan)
   case 0x76:
     syslog_ng("I2C found: 0x" + String(addscan, HEX) + " BMP280/BME280 - Temp/Barometric sensor");
     break;
+  case 0x77:
+    syslog_ng("I2C found: 0x" + String(addscan, HEX) + " BMP280/BME280 - Temp/Barometric sensor");
+    break;
   case 0x38:
     syslog_ng("I2C found: 0x" + String(addscan, HEX) + " AHT10 Humidity and Temperature sensor");
     break;
