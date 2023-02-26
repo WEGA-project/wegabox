@@ -66,10 +66,15 @@ xSemaphoreGive(xSemaphoreX);
         }
 
         // wait for the measurement to finish
-        do
-        {
+
+        for (int i=0;!bmx280.hasValue() and i<10;i++){
           delay(100);
-        } while (!bmx280.hasValue());
+          if (i>9) syslog_err("BMx280: wait end for the measurement");
+        }
+        // do
+        // {
+        //   delay(100);
+        // } while (!bmx280.hasValue());
         
         BMP280_Press = bmx280.getPressure64() * 0.00750063755419211;
         syslog_ng("BMx280 AirPress:" + fFTS(BMP280_Press, 3));
