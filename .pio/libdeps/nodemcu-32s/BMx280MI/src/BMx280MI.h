@@ -22,6 +22,8 @@
 
 #include <Arduino.h>
 
+#include <math.h>
+
 class BMx280MI
 {
 public:
@@ -145,6 +147,11 @@ public:
 	//@return the last measured pressure, in Pa. uses the 64bit calculcation code taken from the datasheet.
 	double getPressure64();
 
+	//@return the last measured pressure, in Pa, as a <64,8> fixed point. uses the 64bit calculcation code taken from the datasheet. 
+	//returns -1 if pressure measurement is disabled. 
+	//returns -2 on calculation error. 
+	int64_t getPressureI64();
+
 	//@return the last measured temperature, in deg C. uses the 32bit calculation code taken from the datasheet. 
 	float getTemperature();
 	
@@ -223,6 +230,20 @@ public:
 	//@param standby time as standby_time_t. 
 	//@return true on success, false otherwise. 
 	bool writeStandbyTime(uint8_t standby_time);
+	
+	//calculates the dew point from temperature and relative humidity. 
+	//formula source: https://bmcnoldy.rsmas.miami.edu/Humidity.html
+	//@param temperature in °C. 
+	//@param humidity in %RH
+	//@return dew point in °C. 
+	static float tempHumToDewPoint(float temperature, float humidity);
+	
+	//calculates the humidity from temperature and dew point. 
+	//formula source: https://bmcnoldy.rsmas.miami.edu/Humidity.html
+	//@param temperature in °C. 
+	//@param dew point in °C. 
+	//@return humidity in %RH
+	static float tempDewToHumidity(float temperature, float dew_point);
 
 private:
 	enum bmx280_register_t : uint8_t

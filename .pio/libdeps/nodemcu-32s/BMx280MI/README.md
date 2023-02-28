@@ -12,6 +12,10 @@ sensors: https://www.bosch-sensortec.com/bst/products/all_products/bmp280 / http
 - Never blocks or delays (except for convenience functions)
 
 ## Changelog:
+- 1.2.3
+	- added examples for ESP8266 and Normal Mode. 
+- 1.2.2
+	- added function getPressureI64() that returns the pressure as in Pa a <64,8> fixed point number. 
 - 1.2.1
 	- added SoftWire Example. 
 - 1.2.0

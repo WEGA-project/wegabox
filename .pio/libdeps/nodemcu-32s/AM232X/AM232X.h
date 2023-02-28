@@ -2,27 +2,28 @@
 //
 //    FILE: AM232X.h
 //  AUTHOR: Rob Tillaart
-// PURPOSE: AM232X library for Arduino
-// VERSION: 0.3.4
-// HISTORY: See AM232X.cpp
+// PURPOSE: AM232X Temperature and Humidity sensor library for Arduino
+// VERSION: 0.4.5
 //     URL: https://github.com/RobTillaart/AM232X
 //
-
-//  Bottom view
+//  AM232X PIN layout             AM2315 COLOR
+//  ============================================
+//   bottom view  DESCRIPTION     COLOR
 //       +---+
-//  VDD  |o  |
-//  SDA  |o  |
-//  GND  |o  |
-//  SCL  |o  |
+//       |o  |       VDD          RED
+//       |o  |       SDA          YELLOW
+//       |o  |       GND          BLACK
+//       |o  |       SCL          GREY
 //       +---+
+//
+// do not forget pull up resistors between SDA, SCL and VDD.
 
 
 #include "Arduino.h"
 #include "Wire.h"
 
 
-#define AM232X_LIB_VERSION              (F("0.3.4"))
-
+#define AM232X_LIB_VERSION              (F("0.4.5"))
 
 
 #define AM232X_OK                        0
@@ -36,6 +37,7 @@
 #define AM232X_ERROR_WRITE_DISABLED     -17
 #define AM232X_ERROR_WRITE_COUNT        -18
 #define AM232X_MISSING_BYTES            -19
+#define AM232X_READ_TOO_FAST            -20
 
 
 /*
@@ -47,48 +49,117 @@
    0x84: Write disabled
 */
 
+
+//  optionally detect out of range values.
+//  occurs seldom so not enabled by default.
+//  #define AM232X_VALUE_OUT_OF_RANGE
+#define AM232X_HUMIDITY_OUT_OF_RANGE          -100
+#define AM232X_TEMPERATURE_OUT_OF_RANGE       -101
+
+
+//  allows to overrule AM232X_INVALID_VALUE e.g. to prevent spike in graphs.
+#ifndef AM232X_INVALID_VALUE
+#define AM232X_INVALID_VALUE                  -999
+#endif
+
+
 class AM232X
 {
 public:
-    explicit AM232X(TwoWire *wire = &Wire);
+  explicit AM232X(TwoWire *wire = &Wire);
 
-#if defined (ESP8266) || defined(ESP32)
-    bool     begin(uint8_t sda, uint8_t scl);
+#if defined(ESP8266) || defined(ESP32)
+  bool     begin(const uint8_t dataPin, const uint8_t clockPin);
 #endif
-    bool     begin();
-    // datasheet 8.2 - wake up is min 800 us max 3000 us
-    bool     isConnected(uint16_t timeout = 3000);  
+  bool     begin();
+  //  datasheet 8.2 - wake up is min 800 us max 3000 us
+  bool     isConnected(uint16_t timeout = 3000);
 
-    int      read();
-    int      getModel();
-    int      getVersion();
-    uint32_t getDeviceID();
+  int      read();
+  //  lastRead is in MilliSeconds since start sketch
+  uint32_t lastRead()     { return _lastRead; };
 
-    int      getStatus();
-    int      getUserRegisterA();
-    int      getUserRegisterB();
+  //  set readDelay to 0 will reset to datasheet values
+  uint16_t getReadDelay() { return _readDelay; };
+  void     setReadDelay(uint16_t rd = 0);
 
-    int      setStatus(uint8_t value);
-    int      setUserRegisterA(int value);
-    int      setUserRegisterB(int value);
+  //  negative return values are errors
+  int      getModel();
+  int      getVersion();
+  uint32_t getDeviceID();
 
-    inline float getHumidity()    { return humidity; };
-    inline float getTemperature() { return temperature; };
+  int      getStatus();
+  int      getUserRegisterA();
+  int      getUserRegisterB();
 
-    bool     wakeUp() { return isConnected(); };
+  int      setStatus(uint8_t value);
+  int      setUserRegisterA(int value);
+  int      setUserRegisterB(int value);
 
-private:
-    uint8_t  bits[8];
-    float    humidity;
-    float    temperature;
+  float    getHumidity();
+  float    getTemperature();
 
-    int      _readRegister(uint8_t reg, uint8_t cnt);
-    int      _writeRegister(uint8_t reg, uint8_t cnt, int16_t value);
-    int      _getData(uint8_t length);
+  // adding offsets works well in normal range
+  // might introduce under- or overflow at the ends of the sensor range
+  void     setHumOffset(float offset = 0)  { _humOffset = offset; };
+  void     setTempOffset(float offset = 0) { _tempOffset = offset; };
+  float    getHumOffset()             { return _humOffset; };
+  float    getTempOffset()            { return _tempOffset; };
 
-    uint16_t _crc16(uint8_t *ptr, uint8_t len);
+  // suppress error values of -999 => check return value of read() instead
+  bool     getSuppressError()         { return _suppressError; };
+  void     setSuppressError(bool b)   { _suppressError = b; };
 
-    TwoWire* _wire;
+  bool     wakeUp() { return isConnected(); };
+
+protected:
+  uint8_t  _bits[8];    // buffer to hold raw data
+  float    _humidity      = 0.0;
+  float    _temperature   = 0.0;
+  float    _humOffset     = 0.0;
+  float    _tempOffset    = 0.0;
+  uint32_t _lastRead      = 0;
+  uint16_t _readDelay     = 2000;
+
+  bool     _suppressError = false;
+
+  int      _readRegister(uint8_t reg, uint8_t cnt);
+  int      _writeRegister(uint8_t reg, uint8_t cnt, int16_t value);
+  int      _getData(uint8_t length);
+
+  uint16_t _crc16(uint8_t *ptr, uint8_t len);
+
+  TwoWire* _wire;
 };
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AM232X derived classes
+//
+class AM2320 : public AM232X
+{
+public:
+  AM2320(TwoWire *wire = &Wire);
+};
+
+
+class AM2321 : public AM232X
+{
+public:
+  AM2321(TwoWire *wire = &Wire);
+};
+
+
+class AM2322 : public AM232X
+{
+public:
+  AM2322(TwoWire *wire = &Wire);
+};
+
+
+
+
+
 // -- END OF FILE --
+

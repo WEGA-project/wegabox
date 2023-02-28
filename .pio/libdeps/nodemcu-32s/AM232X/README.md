@@ -19,78 +19,168 @@ the AM232X has a fixed address **0x5C** so one need to implement a
 multiplexing strategy to have multiple sensors in practice. 
 See multiplexing below.
 
+This library works also for the **AM2315** which has a library of its own - https://github.com/RobTillaart/AM2315
 
-Typical parameters
+
+#### Typical parameters
 
 |             |  range     | accuracy | repeatability |
 |:------------|:----------:|:--------:|:-------------:|
-| Temperature | -40 - 80   | 0.5°C    | ±0.1          |
-| Humidity    | 0.0 - 99.9 | 3%       | ±0.1          |
+| Temperature | -40 - 80   | 0.5°C    |  ±0.1         |
+| Humidity    | 0.0 - 99.9 | ±3%      |  ±0.1         |
 | Sample time | 2 seconds  |          |               |
 
 
+#### Hardware connection
+
 ```
-//  Bottom view 
+//  AM232X PIN layout             AM2315 COLOR
+//  ============================================
+//   bottom view  DESCRIPTION     COLOR
 //       +---+
-//  VDD  |o  |
-//  SDA  |o  |
-//  GND  |o  |
-//  SCL  |o  |
+//       |o  |       VDD          RED
+//       |o  |       SDA          YELLOW
+//       |o  |       GND          BLACK
+//       |o  |       SCL          GREY
 //       +---+
+//
+// do not forget pull up resistors between SDA, SCL and VDD.
 ```
+
+
+#### I2C clock speed
+
+The datasheet states the AM2320 should be used on 100 KHz I2C only.
+
+TODO measure and verify (see AM2315)
+
+
+## One Wire Protocol
+
+The AM2320, AM2321 and AM2322 can also be read by using a "OneWire" protocol.
+This protocol is identical to the DHT22 and will only provide temperature,
+humidity and a CRC. See issue #26.
+
+If one wants to use this protocol, one can use https://github.com/RobTillaart/DHTNew
+and optionally force the type to 22.
+
+If problems arise with the "OneWire" protocol, please let me know and 
+file the issues under DHTNew.
 
 
 ## Interface
 
+Since 0.4.2 the library provides specific classes for the AM2320, AM2321 and AM2322 which have the same interface.
 
-### Constructor
 
-- **AM232X(TwoWire \*wire = &Wire)** constructor, optionally set Wire0..WireN.
-- **bool begin(uint8_t sda, uint8_t scl)** for ESP32 alike devices, returns true if device is connected.
-- **bool begin()** for AVR alike devices, returns true if device is connected.
-- **bool isConnected(uint16_t timeout = 3000)** returns true if device-address is found on I2C bus. 
+#### Constructor
+
+- **AM232X(TwoWire \*wire = &Wire)** constructor, default using Wire (I2C bus), optionally set to Wire0 .. WireN.
+- **bool begin(uint8_t dataPin, uint8_t clockPin)** begin for ESP32 et al, to set I2C bus pins.
+Returns true if device address 0x5C is connected.
+- **bool begin()** initializer for non ESP32 e.g. AVR.
+Returns true if device address 0x5C is connected.
+- **bool isConnected(uint16_t timeout = 3000)** returns true if the device address 0x5C is found on I2C bus.
 As the device can be in sleep modus it will retry for the defined timeout (in micros) with a minimum of 1 try. 
 minimum = 800 us and maximum = 3000 us according to datasheet.
 
 
-### Base calls
+#### Core
 
-- **int read()** fetches the values from the sensor.
-- **float getHumidity()** returns the last read humidity.
-- **float getTemperature()** returns the last read temperature.
+- **int read()** read the sensor and store the values internally.
+Returns the status of the read which should be **AM232X_OK** == 0.
+- **float getHumidity()** returns the last read humidity + optional offset, 
+or **AM232X_INVALID_VALUE** == -999 in case of error. 
+This error can be suppressed, see below.
+- **float getTemperature()** returns the last read temperature + optional offset,
+or **AM232X_INVALID_VALUE** == -999 in case of error. 
+This error can be suppressed, see below.
+- **uint32_t lastRead()** returns the timestamp in milliseconds since startup of the last successful read.
 
 
-### Misc
+#### Offset
 
-check datasheet for details.
+- **void setHumOffset(float offset = 0)** set an offset for humidity to calibrate (1st order) the sensor.
+Default offset = 0, so no parameter will reset the offset.
+- **float getHumOffset()** return current humidity offset, default 0.
+- **void setTempOffset(float offset = 0)** set an offset for temperature to calibrate (1st order) the sensor.
+Default offset = 0, so no parameter will reset the offset.
+- **float getTempOffset()** return current temperature offset, default 0.
+
+
+#### Control
+
+Functions to adjust the communication with the sensor.
+
+- **void setReadDelay(uint16_t rd = 0)** Tunes the time it waits before actual read can be done.
+Set readDelay to 0 will reset it to 2000 ms effective the next **read()**.
+- **uint16_t getReadDelay()** returns the above setting. 
+Note that a value of zero (reset) will return 0 before the call and 2000 after the call to **read()**.
+- **bool wakeUp()** function that will try for 3 milliseconds to wake up the sensor.
+This can be done before an actual read to minimize the **read()** call.
+- **void setSuppressError(bool b)** suppress error values of **AM232X_INVALID_VALUE** == -999 => you need to check the return value of read() instead.  
+This can be used to keep spikes out of your graphs / logs. 
+- **bool getSuppressError()**  returns the above setting.
+
+
+#### Metadata
+
+Check datasheet for details.
 
 - **int getModel()** idem
 - **int getVersion()** idem
 - **uint32_t getDeviceID()** idem
-- **int getStatus()**
-- **int getUserRegisterA()**
-- **int getUserRegisterB()**
 - **int setStatus(uint8_t value)**
+- **int getStatus()**
+
+
+#### User registers
+
+Check datasheet for details.
+
 - **int setUserRegisterA(int value)**
 - **int setUserRegisterB(int value)**
-- **bool wakeUp()** function that will try for 3 milliseconds to wake up the sensor.
+- **int getUserRegisterA()**
+- **int getUserRegisterB()**
+
+
+#### Error codes
+
+| name                              | value | notes       |
+|:----------------------------------|------:|:------------|
+| AM232X_OK                         |  0    |
+| AM232X_ERROR_UNKNOWN              |  -10  |
+| AM232X_ERROR_CONNECT              |  -11  |
+| AM232X_ERROR_FUNCTION             |  -12  |
+| AM232X_ERROR_ADDRESS              |  -13  |
+| AM232X_ERROR_REGISTER             |  -14  |
+| AM232X_ERROR_CRC_1                |  -15  |
+| AM232X_ERROR_CRC_2                |  -16  |
+| AM232X_ERROR_WRITE_DISABLED       |  -17  |
+| AM232X_ERROR_WRITE_COUNT          |  -18  |
+| AM232X_MISSING_BYTES              |  -19  |
+| AM232X_READ_TOO_FAST              |  -20  |
+| AM232X_HUMIDITY_OUT_OF_RANGE      |  -100 | not used by default.
+| AM232X_TEMPERATURE_OUT_OF_RANGE   |  -101 | not used by default.
+| AM232X_INVALID_VALUE              |  -999 | can be suppressed. 
 
 
 ## Operation
 
 See examples
 
-In setup() you have to call the **begin()** to initialize 
+In **setup()** you have to call the **begin()** to initialize 
 the Wire library and do an initial **read()** to fill the variables temperature and humidity. 
 To access these values one must use **getTemperature()** and **getHumidity()**. 
+Multiple calls will give the same values until **read()** is called again.
 
-Note that the sensor can go into sleep mode and one might need to call **wakeUp()**
-before the **read()**.
+Note that the sensor can go into sleep mode after 3 seconds after last read, 
+so one might need to call **wakeUp()** before the **read()**.
 
 
 ## Multiplexing 
 
-Multiplexing the AM232X can be done in several ways.
+Multiplexing the **AM232X** can be done in several ways.
 This is not a complete list or tutorial but should get you started.
 
 1. Control the power line by means of an extra pin (+ transistor). 
@@ -100,19 +190,30 @@ the sensor takes to boot and to be ready for the first measurement.
 pin of the sensors. This way one can enable / disable communication 
 per sensor. This will still need an IO pin per sensor but does not 
 have the "boot time" constraint mentioned above.
-3. Use a TCA9548A I2C Multiplexer, or similar. 
+you may use a **PCF8574** to control the AND gates.
+https://github.com/RobTillaart/PCF8574
+3. Use a **TCA9548A** I2C Multiplexer, or similar. https://github.com/RobTillaart/TCA9548
 
 Which method fit your application depends on your requirements and constraints.
 
 
 ## Future
 
+#### Must
+
 - update documentation
-- test more
+- test more (other platforms)
+
+#### Should
+
+- keep in sync with AM2315 class
+  - merge in a far future.
+- update unit test
+- add examples
+
+#### Could
+
+- I2C performance measurements
+  - clock speed > 170 - see AM2315
 
 
-## Warning
-
-The library has not been tested extensively yet so use at own risk.
-
-See also LICENSE

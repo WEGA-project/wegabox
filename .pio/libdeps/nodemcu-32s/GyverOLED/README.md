@@ -1,4 +1,4 @@
-[![arduino-library-badge](https://www.ardu-badge.com/badge/GyverOLED.svg?)](https://www.ardu-badge.com/GyverOLED)
+[![latest](https://img.shields.io/github/v/release/GyverLibs/GyverOLED.svg?color=brightgreen)](https://github.com/GyverLibs/GyverOLED/releases/latest/download/GyverOLED.zip)
 [![Foo](https://img.shields.io/badge/Website-AlexGyver.ru-blue.svg?style=flat-square)](https://alexgyver.ru/)
 [![Foo](https://img.shields.io/badge/%E2%82%BD$%E2%82%AC%20%D0%9D%D0%B0%20%D0%BF%D0%B8%D0%B2%D0%BE-%D1%81%20%D1%80%D1%8B%D0%B1%D0%BA%D0%BE%D0%B9-orange.svg?style=flat-square)](https://alexgyver.ru/support_alex/)
 [![Foo](https://img.shields.io/badge/README-ENGLISH-blueviolet.svg?style=flat-square)](https://github-com.translate.goog/GyverLibs/GyverOLED?_x_tr_sl=ru&_x_tr_tl=en)  
@@ -92,6 +92,8 @@ GyverOLED<SSD1306_128x64, OLED_BUFFER, OLED_SPI, CS, DS, RST> oled;
 ```cpp
 // ===== СЕРВИС =====
 void init();                    // инициализация
+void init(sda, scl);            // инициализация (можно указать пины i2c для esp8266/32)
+
 void clear();                   // очистить дисплей
 void clear(int x0, int y0, int x1, int y1); // очистить область
 void setContrast(uint8_t value);    // яркость 0-255 (умолч. 127)
@@ -99,6 +101,11 @@ void setPower(bool mode);       // вкл/выкл
 void flipH(bool mode);          // отразить по горизонтали
 void invertDisplay(bool mode);  // инвертировать дисплей
 void flipV(bool mode);          // отразить по вертикали
+
+// ==== НАСТРОЙКИ ===
+// дефайны ПЕРЕД подключением библиотеки
+#define OLED_NO_PRINT   // отключить модуль вывода текста. Экономит ~2.5 кБ Flash
+#define OLED_SPI_SPEED  // скорость SPI
 
 // ===== ПЕЧАТЬ =====
 // наследует класс Print, то есть print/println любой тип данных
@@ -142,6 +149,12 @@ void drawBytes(uint8_t* data, byte size);       // вывести одномер
 void update();                                  // полностью обновить дисплей из буфера
 void update(int x0, int y0, int x1, int y1);    // выборочно обновить дисплей из буфера (x0, y0, x1, y1)
 ```
+
+### Дисплей по SPI + SD карта
+известная беда SD карт http://elm-chan.org/docs/mmc/mmc_e.html, 
+пункт Cosideration on Multi-slave Configuration. Как решить: после завершения общения 
+с картой памяти нужно отпустить CS карты (библа SD возможно сама это делает, либо отпустить вручную) 
+и закинуть по SPI пару байт (пару нулей условно). Почему - карта держит линию даты.
 
 <a id="example"></a>
 ## Пример
@@ -301,6 +314,8 @@ void loop() {
 - v1.3.2 - убран FastIO
 - v1.4 - пофикшены SPI дисплеи
 - v1.5 - пофикшен битый вывод после очистки без указания курсора
+- v1.6 - добавлен выбор пинов I2C для espX, исправлен clear(..) для BUFFER, добавлена возможность отключить модуль текста
+- v1.6.1 - повторный релиз для менеджера библиотек
 
 <a id="feedback"></a>
 ## Баги и обратная связь

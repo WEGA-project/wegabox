@@ -1,21 +1,21 @@
-me-no-dev/ESP Async WebServer@1.2.3
-andhiesetyabudi/HX710B@1.0.0
-milesburton/DallasTemperature@3.11.0
-gyverlibs/GyverFilters@3.2.0
-robtillaart/AM232X@0.3.4
-luisllamasbinaburo/I2CScanner@1.0.1
-maarten-pennings/CCS811@12.0.0
-bblanchon/ArduinoJson@6.19.4
-gyverlibs/GyverOLED@1.5.0
-sparkfun/SparkFun SCD30 Arduino Library@1.0.20
-enjoyneering/AHT10@1.1.0
-arcao/Syslog@2.0.0
-pololu/VL53L0X@1.3.1
-wollewald/ADS1115_WE@1.4.2
-adafruit/Adafruit MCP23017 Arduino Library@2.1.0
-martinsos/HCSR04@2.0.0
-adafruit/Adafruit BusIO@1.13.2
-robtillaart/RunningMedian@0.3.6
-stevemarple/MCP342x@1.0.4
-bitbucket-christandlg/BMx280MI@1.2.1
-pololu/VL6180X@1.3.1
+enjoyneering/AHT10
+gyverlibs/GyverOLED
+pololu/VL6180X
+robtillaart/RunningMedian
+pololu/VL53L0X
+arcao/Syslog
+wollewald/ADS1115_WE
+martinsos/HCSR04
+sparkfun/SparkFun SCD30 Arduino Library
+bblanchon/ArduinoJson
+stevemarple/MCP342x
+gyverlibs/GyverFilters
+luisllamasbinaburo/I2CScanner
+me-no-dev/ESP Async WebServer
+milesburton/DallasTemperature
+andhiesetyabudi/HX710B
+robtillaart/AM232X
+maarten-pennings/CCS811
+adafruit/Adafruit BusIO
+adafruit/Adafruit MCP23017 Arduino Library
+bitbucket-christandlg/BMx280MI

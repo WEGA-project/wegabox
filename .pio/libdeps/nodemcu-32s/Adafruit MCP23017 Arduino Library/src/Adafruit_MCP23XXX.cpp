@@ -207,12 +207,24 @@ void Adafruit_MCP23XXX::disableInterruptPin(uint8_t pin) {
 
 /**************************************************************************/
 /*!
-  @brief Gets the last interrupt pin.
-  @returns Pin that caused last interrupt.
+  @brief Clear interrupts. NOTE:If using DEFVAL, INT clears only if interrupt
+  condition does not exist. See Fig 1-7 in datasheet.
+*/
+/**************************************************************************/
+void Adafruit_MCP23XXX::clearInterrupts() {
+  // reading INTCAP register(s) clears interrupts
+  // just call this and ignore return
+  getCapturedInterrupt();
+}
+
+/**************************************************************************/
+/*!
+  @brief Gets the pin that caused the latest interrupt, from INTF, without
+  clearing any interrupt flags.
+  @returns Pin that caused lastest interrupt.
 */
 /**************************************************************************/
 uint8_t Adafruit_MCP23XXX::getLastInterruptPin() {
-  uint8_t intpin = 255;
   uint8_t intf;
 
   // Port A
@@ -221,33 +233,50 @@ uint8_t Adafruit_MCP23XXX::getLastInterruptPin() {
   INTFA.read(&intf);
   for (uint8_t pin = 0; pin < 8; pin++) {
     if (intf & (1 << pin)) {
-      intpin = pin;
-      break;
+      return pin;
     }
   }
 
-  // Port B and still not found?
-  if ((pinCount > 8) && (intpin == 255)) {
+  // Port B ?
+  if (pinCount > 8) {
     Adafruit_BusIO_Register INTFB(i2c_dev, spi_dev, MCP23XXX_SPIREG,
                                   getRegister(MCP23XXX_INTF, 1));
     INTFB.read(&intf);
     for (uint8_t pin = 0; pin < 8; pin++) {
       if (intf & (1 << pin)) {
-        intpin = pin + 8;
-        break;
+        return pin + 8;
       }
     }
   }
 
-  // clear if found
-  if (intpin != 255) {
-    Adafruit_BusIO_Register INTCAP(
-        i2c_dev, spi_dev, MCP23XXX_SPIREG,
-        getRegister(MCP23XXX_INTCAP, MCP_PORT(intpin)));
-    INTCAP.read();
+  return MCP23XXX_INT_ERR;
+}
+
+/**************************************************************************/
+/*!
+  @brief Get pin states captured at time of interrupt.
+  @returns Mutli-bit value representing pin states.
+*/
+/**************************************************************************/
+uint16_t Adafruit_MCP23XXX::getCapturedInterrupt() {
+  uint16_t intcap;
+  uint8_t intf;
+
+  // Port A
+  Adafruit_BusIO_Register INTCAPA(i2c_dev, spi_dev, MCP23XXX_SPIREG,
+                                  getRegister(MCP23XXX_INTCAP, 0));
+  INTCAPA.read(&intf);
+  intcap = intf;
+
+  // Port B ?
+  if (pinCount > 8) {
+    Adafruit_BusIO_Register INTCAPB(i2c_dev, spi_dev, MCP23XXX_SPIREG,
+                                    getRegister(MCP23XXX_INTCAP, 1));
+    INTCAPB.read(&intf);
+    intcap |= (uint16_t)intf << 8;
   }
 
-  return intpin;
+  return intcap;
 }
 
 /**************************************************************************/
@@ -263,10 +292,8 @@ uint16_t Adafruit_MCP23XXX::getRegister(uint8_t baseAddress, uint8_t port) {
   uint16_t reg = baseAddress;
   // MCP23x17 BANK=0
   if (pinCount > 8) {
-    reg *= 2;
-    // Port B
-    if (port)
-      reg++;
+    reg <<= 1;
+    reg |= port;
   }
   // for SPI, add opcode as high byte
   return (spi_dev) ? (0x4000 | (hw_addr << 9) | reg) : reg;
