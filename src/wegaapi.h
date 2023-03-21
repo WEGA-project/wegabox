@@ -138,7 +138,7 @@ void TaskWegaApi(void *parameters)
           wEC = ec / (1 + kt * (wNTC - 25)) + eckorr;
         }
       }
-    }
+    
 
     // Расчет pH
     if (pHmV)
@@ -162,7 +162,7 @@ void TaskWegaApi(void *parameters)
 
 
     }
-    
+    }  // else
     http.end();
 
     if (WiFi.status() != WL_CONNECTED)
