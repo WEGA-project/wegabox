@@ -70,8 +70,7 @@ Web Electronic Garden Automatic on ESP32.
 
 
 
-### Распиновка Jack для датчиков <a name="jack"></a>
-<a href="img/jack_connections.png"><img src="img/jack_connections.png" width="250"></a>
+
 
 ---
 ## Компоненты для заказа <a name="what_to_buy"></a>
