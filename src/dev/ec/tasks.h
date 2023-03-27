@@ -39,6 +39,11 @@ void TaskEC(void *parameters)
         // disableCore0WDT();
         // disableLoopWDT();
 
+        __wega_adcAttachPin(33);
+
+        adc_power_acquire();
+        SAR_ADC1_LOCK_ACQUIRE();
+
         for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
         {
           pinMode(EC_DigitalPort1, OUTPUT);
@@ -47,7 +52,9 @@ void TaskEC(void *parameters)
           digitalWrite(EC_DigitalPort2, LOW);
 
           digitalWrite(EC_DigitalPort1, HIGH);
-          Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
+          //Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
+          __wega_adcStart(33);
+          Ap0 = __wega_adcEnd(33) + Ap0;  
           digitalWrite(EC_DigitalPort1, LOW);
           delayMicroseconds(1);
 
@@ -60,7 +67,9 @@ void TaskEC(void *parameters)
           digitalWrite(EC_DigitalPort1, LOW);
 
           digitalWrite(EC_DigitalPort2, HIGH);
-          An0 = adc1_get_raw(EC_AnalogPort) + An0;
+          //An0 = adc1_get_raw(EC_AnalogPort) + An0;
+          __wega_adcStart(33);
+          An0 = __wega_adcEnd(33) + An0; 
           digitalWrite(EC_DigitalPort2, LOW);
 
           if (millis() - ect > 1000)
@@ -72,6 +81,8 @@ void TaskEC(void *parameters)
             ect = millis();
           }
         }
+        SAR_ADC1_LOCK_RELEASE();
+        adc_power_release();
 
         // rtc_wdt_protect_on();
         // rtc_wdt_enable();

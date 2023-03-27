@@ -22,12 +22,12 @@ void TaskVL6180X(void *parameters)
         //int32_t rangemm = s_vl6180X.readRangeSingleMillimeters();
         int32_t rangemm = s_vl6180X.readRangeContinuousMillimeters();
 
-        if (rangemm < 250)
+        // if (rangemm < 250)
           vl6180XScalling = 1;
-        if (rangemm >= 250 and rangemm < 500)
-          vl6180XScalling = 2;
-        if (rangemm >= 500)
-          vl6180XScalling = 3;
+        // if (rangemm >= 250 and rangemm < 500)
+        //   vl6180XScalling = 2;
+        // if (rangemm >= 500)
+        //   vl6180XScalling = 3;
 
         s_vl6180X.setScaling(vl6180XScalling);
 
@@ -38,7 +38,7 @@ void TaskVL6180X(void *parameters)
         unsigned long t = millis();
         while (millis() - t < 5000)
         {
-          //s_vl6180X.timeoutOccurred();
+          s_vl6180X.timeoutOccurred();
           range0 = s_vl6180X.readRangeContinuousMillimeters();
           if (range0 != 768)
           {

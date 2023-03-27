@@ -1,4 +1,8 @@
 #if c_EC == 1
+#include <dev/old_adc/wega-adc.h>
+static _lock_t sar_adc1_lock;
+#define SAR_ADC1_LOCK_ACQUIRE() _lock_acquire(&sar_adc1_lock)
+#define SAR_ADC1_LOCK_RELEASE() _lock_release(&sar_adc1_lock)
 
   #define EC_DigitalPort1 18
   #define EC_DigitalPort2 19
