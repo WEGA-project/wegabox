@@ -53,11 +53,14 @@ void TaskEC(void *parameters)
 
           digitalWrite(EC_DigitalPort1, HIGH);
           //Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
-          __wega_adcStart(33);
-          Ap0 = __wega_adcEnd(33) + Ap0;  
-          digitalWrite(EC_DigitalPort1, LOW);
-          delayMicroseconds(1);
+          delayMicroseconds(14);
 
+          __wega_adcStart(33);
+          Ap0 = __wega_adcEnd(33) + Ap0; 
+
+          digitalWrite(EC_DigitalPort1, LOW);
+
+          delayMicroseconds(1);
           digitalWrite(EC_DigitalPort2, HIGH);
           delayMicroseconds(1);
           digitalWrite(EC_DigitalPort2, LOW);
@@ -68,8 +71,11 @@ void TaskEC(void *parameters)
 
           digitalWrite(EC_DigitalPort2, HIGH);
           //An0 = adc1_get_raw(EC_AnalogPort) + An0;
+          delayMicroseconds(14);
+
           __wega_adcStart(33);
           An0 = __wega_adcEnd(33) + An0; 
+
           digitalWrite(EC_DigitalPort2, LOW);
 
           if (millis() - ect > 1000)
