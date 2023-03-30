@@ -26,77 +26,37 @@ void TaskEC(void *parameters)
         unsigned long An0 = 0;
         unsigned long Ap0 = 0;
 
+
+
+
+        __wega_adcAttachPin(33);
+        adc_power_acquire();
+        SAR_ADC1_LOCK_ACQUIRE();
+
         pinMode(EC_DigitalPort1, OUTPUT);
         pinMode(EC_DigitalPort2, OUTPUT);
 
         digitalWrite(EC_DigitalPort1, LOW);
         digitalWrite(EC_DigitalPort2, LOW);
-
         long ect = millis();
-
-        // rtc_wdt_protect_off();
-        // rtc_wdt_disable();
-        // disableCore0WDT();
-        // disableLoopWDT();
-
-        __wega_adcAttachPin(33);
-
-        adc_power_acquire();
-        SAR_ADC1_LOCK_ACQUIRE();
-
         for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
         {
-          pinMode(EC_DigitalPort1, OUTPUT);
-          pinMode(EC_DigitalPort2, OUTPUT);
-          digitalWrite(EC_DigitalPort1, LOW);
-          digitalWrite(EC_DigitalPort2, LOW);
 
           digitalWrite(EC_DigitalPort1, HIGH);
-          //Ap0 = adc1_get_raw(EC_AnalogPort) + Ap0;
-          delayMicroseconds(14);
-
           __wega_adcStart(33);
           Ap0 = __wega_adcEnd(33) + Ap0; 
-
-          digitalWrite(EC_DigitalPort1, LOW);
-
-          delayMicroseconds(1);
-          digitalWrite(EC_DigitalPort2, HIGH);
-          delayMicroseconds(1);
-          digitalWrite(EC_DigitalPort2, LOW);
-
-          digitalWrite(EC_DigitalPort1, HIGH);
-          delayMicroseconds(1);
           digitalWrite(EC_DigitalPort1, LOW);
 
           digitalWrite(EC_DigitalPort2, HIGH);
-          //An0 = adc1_get_raw(EC_AnalogPort) + An0;
-          delayMicroseconds(14);
-
           __wega_adcStart(33);
           An0 = __wega_adcEnd(33) + An0; 
-
           digitalWrite(EC_DigitalPort2, LOW);
-
-          if (millis() - ect > 1000)
-          {
-            pinMode(EC_DigitalPort1, INPUT);
-            pinMode(EC_DigitalPort2, INPUT);
-            //delay (300);
-            vTaskDelay(300 / portTICK_PERIOD_MS);
-            ect = millis();
-          }
         }
-        SAR_ADC1_LOCK_RELEASE();
-        adc_power_release();
-
-        // rtc_wdt_protect_on();
-        // rtc_wdt_enable();
-        // enableCore0WDT();
-        // enableLoopWDT();
-
         pinMode(EC_DigitalPort1, INPUT);
         pinMode(EC_DigitalPort2, INPUT);
+
+        SAR_ADC1_LOCK_RELEASE();
+        adc_power_release();
 
         float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
         float Mid_An0 = float(An0) / EC_MiddleCount;
