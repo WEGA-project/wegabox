@@ -2,7 +2,7 @@
 // Устройство для контроля и управления работой гидропонной установки и процессом выращивания растений.    //
 // Является частью проекта WEGA, https://github.com/wega_project
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define Firmware "beta-0.11.300323"
+#define Firmware "beta-0.11.141123"
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -32,7 +32,10 @@ RunningMedian PRRM = RunningMedian(30);
 #include <pre.h>
 #include <func>
 #include <driver/adc.h>
-
+#include <dev/old_adc/wega-adc.h>
+static _lock_t sar_adc1_lock;
+#define SAR_ADC1_LOCK_ACQUIRE() _lock_acquire(&sar_adc1_lock)
+#define SAR_ADC1_LOCK_RELEASE() _lock_release(&sar_adc1_lock)
 
 // #include "soc/rtc_wdt.h"
 // #include "esp_int_wdt.h"
