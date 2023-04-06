@@ -26,14 +26,18 @@ void TaskEC(void *parameters)
         unsigned long An0 = 0;
         unsigned long Ap0 = 0;
 
+        adc_power_acquire();
+        SAR_ADC1_LOCK_ACQUIRE();
+        vTaskDelay(300);
+
+
         pinMode(EC_DigitalPort1, OUTPUT);
         pinMode(EC_DigitalPort2, OUTPUT);
 
         digitalWrite(EC_DigitalPort1, LOW);
         digitalWrite(EC_DigitalPort2, LOW);
 
-        //adc_power_acquire();
-        SAR_ADC1_LOCK_ACQUIRE();
+
 
         unsigned long ec_probe_time = micros();
         for (long i = 0; i < EC_MiddleCount and OtaStart != true; i++)
@@ -55,7 +59,7 @@ void TaskEC(void *parameters)
         pinMode(EC_DigitalPort2, INPUT);
 
         SAR_ADC1_LOCK_RELEASE();
-        //adc_power_release();
+        adc_power_release();
 
         float Mid_Ap0 = float(Ap0) / EC_MiddleCount;
         float Mid_An0 = float(An0) / EC_MiddleCount;
