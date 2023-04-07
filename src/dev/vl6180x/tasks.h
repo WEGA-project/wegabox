@@ -1,6 +1,21 @@
 #if c_VL6180X == 1
 void TaskVL6180X(void *parameters)
 {
+
+  if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
+  {
+    s_vl6180X.init();
+    s_vl6180X.configureDefault();
+    s_vl6180X.setScaling(1);
+    s_vl6180X.setTimeout(100);
+    // s_vl6180X.stopContinuous();
+    s_vl6180X.startRangeContinuous();
+    s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 20);
+    s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
+
+    xSemaphoreGive(xSemaphoreX);
+  }
+
   for (;;)
   {
     if (OtaStart == true)
@@ -76,9 +91,9 @@ void TaskVL6180X(void *parameters)
         //   }
         // }
 
-        //VL6180X_RangeAVG.add(VL6180X_RangeRM.getMedian() / 10);
-        if(VL6180X_RangeRM.getAverage(3) != 0)
-        Dist = VL6180X_RangeRM.getAverage(3)/10;
+        // VL6180X_RangeAVG.add(VL6180X_RangeRM.getMedian() / 10);
+        if (VL6180X_RangeRM.getAverage(3) != 0)
+          Dist = VL6180X_RangeRM.getAverage(3) / 10;
 
         VL6180X_time = millis() - VL6180X_time;
         syslog_ng("VL6180X: dist=" + fFTS(Dist, 3));

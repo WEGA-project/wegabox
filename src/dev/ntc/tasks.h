@@ -13,22 +13,23 @@ void TaskNTC(void *parameters) {
         unsigned long NTC_time = millis();
         syslog_ng("NTC Start " + fFTS(NTC_LastTime - NTC_Repeat, 0) + "ms");
 
-        // rtc_wdt_protect_off();
-        // rtc_wdt_disable();
-        // disableCore0WDT();
-        // disableLoopWDT();
+        adc_power_acquire();
+        SAR_ADC1_LOCK_ACQUIRE();
+        vTaskDelay(300);
 
         // unsigned long NTC0 = 0;
         float NTC0 = 0;
         for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++) {
-          NTC0 = NTC0 + adc1_get_raw(NTC_port);
-          vTaskDelay(1);
+
+                    __wega_adcStart(32);
+          NTC0 = NTC0 + __wega_adcEnd(32);
+
+          // NTC0 = NTC0 + adc1_get_raw(NTC_port);
+          // vTaskDelay(1);
         }
 
-        // rtc_wdt_protect_on();
-        // rtc_wdt_enable();
-        // enableCore0WDT();
-        // enableLoopWDT();
+        SAR_ADC1_LOCK_RELEASE();
+        adc_power_release();
 
         NTCRM.add(float(NTC0) / NTC_MiddleCount);
         NTC = NTCRM.getAverage();
