@@ -4,7 +4,7 @@ while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
 
 Wire.begin(US_SDA, US_SCL);
 
-Wire.requestFrom(0x29, (uint8_t)1);
+Wire.requestFrom((uint8_t)0x29, (uint8_t)1);
 if (Wire.available())
 {
   syslog_ng("I2C-US found: 0x29 laser distance sensor");

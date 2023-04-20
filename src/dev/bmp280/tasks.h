@@ -6,13 +6,13 @@ while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE);
 
 // Autodetect address for BMx280 0x76 or 0x77
 
-Wire.requestFrom(0x76, (uint8_t)1);
+Wire.requestFrom((uint8_t)0x76, (uint8_t)1);
 if (Wire.available()){
   BMP280addr = 0x76;
   syslog_ng("BMx280: found on 0x76 address");
   }
 
-Wire.requestFrom(0x77, (uint8_t)1);
+Wire.requestFrom((uint8_t)0x77, (uint8_t)1);
 if (Wire.available()){
   BMP280addr = 0x77;
   syslog_ng("BMx280: found on 0x77 address");

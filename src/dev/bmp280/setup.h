@@ -3,14 +3,15 @@
 while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
   ;
 
-Wire.requestFrom(0x38, (uint8_t)1);
+//Wire.requestFrom('0x38', (uint8_t)1);
+Wire.requestFrom((uint8_t)0x38, (uint8_t)1);
 if (Wire.available())
 {
   AHTx = true;
   syslog_ng("BMx280: found sensor AHTx! Hum and Temp disable");
 }
 
-Wire.requestFrom(0x76, (uint8_t)1);
+Wire.requestFrom((uint8_t)0x76, (uint8_t)1);
 if (Wire.available())
 {
   xTaskCreate(TaskBMP280, "TaskBMP280", 10000, NULL, 0, NULL);
@@ -18,7 +19,7 @@ if (Wire.available())
 }
 else
 {
-  Wire.requestFrom(0x77, (uint8_t)1);
+  Wire.requestFrom((uint8_t)0x77, (uint8_t)1);
   if (Wire.available())
   {
     xTaskCreate(TaskBMP280, "TaskBMP280", 10000, NULL, 0, NULL);
