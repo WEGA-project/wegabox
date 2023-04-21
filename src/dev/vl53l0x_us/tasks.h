@@ -18,14 +18,6 @@ void TaskVL53L0X(void *parameters)
 
         Wire.begin(US_SDA, US_SCL);
 
-        // s_VL53L0X.init();
-        // s_VL53L0X.setTimeout(500);
-        // s_VL53L0X.setSignalRateLimit(0.01);
-
-        // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-        // s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
-
-        // s_VL53L0X.setMeasurementTimingBudget(200000);
 
         delay(100);
         long err = 0;
@@ -35,18 +27,6 @@ void TaskVL53L0X(void *parameters)
         unsigned long t = millis();
 
 
-//s_VL53L0X.init();
-//delay(300);
-    // s_VL53L0X.stopContinuous();
-    //s_VL53L0X.setTimeout(5000);
-    // s_VL53L0X.setSignalRateLimit(5);
-
-    //  s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 2);
-    //  s_VL53L0X.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 3);
-
-    //  s_VL53L0X.setMeasurementTimingBudget(400000);
-
-//delay (5000);
 
         while (millis() - t < 5000)
         {
@@ -80,12 +60,7 @@ void TaskVL53L0X(void *parameters)
         syslog_ng("VL53L0X: Highest= " + fFTS(VL53L0X_RangeRM.getHighest(), 1));
         syslog_ng("VL53L0X: Lowest= " + fFTS(VL53L0X_RangeRM.getLowest(), 1));
 
-        // VL53L0X_time = millis() - VL53L0X_time;
-        // if (VL53L0X_err > 0)
-        //   syslog_err("VL53L0X error count: " + String(VL53L0X_err));
 
-        // syslog_ng("VL53L0X range: " + String(range));
-        // syslog_ng("VL53L0X dist: " + fFTS(Dist, 3));
         syslog_ng("VL53L0X " + fFTS(VL53L0X_time, 0) + "ms end.");
 
         Wire.begin(I2C_SDA, I2C_SCL);
