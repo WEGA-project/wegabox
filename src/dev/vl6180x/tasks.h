@@ -7,11 +7,11 @@ void TaskVL6180X(void *parameters)
     s_vl6180X.init();
     s_vl6180X.configureDefault();
     s_vl6180X.setScaling(1);
-    s_vl6180X.setTimeout(100);
-    // s_vl6180X.stopContinuous();
-    s_vl6180X.startRangeContinuous();
-    s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 20);
-    s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
+    s_vl6180X.setTimeout(500);
+    s_vl6180X.stopContinuous();
+    s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 254);
+    s_vl6180X.writeReg(VL6180X::SYSRANGE__RANGE_IGNORE_VALID_HEIGHT, 150);
+    s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 500);
 
     xSemaphoreGive(xSemaphoreX);
   }
@@ -30,18 +30,13 @@ void TaskVL6180X(void *parameters)
         unsigned long VL6180X_time = millis();
         syslog_ng("VL6180X Start " + fFTS(VL6180X_LastTime - VL6180X_Repeat, 0) + "ms");
 
-        syslog_ng("VL6180X Range:" + fFTS(s_vl6180X.readRangeContinuousMillimeters(), 0));
+        syslog_ng("VL6180X Range:" + fFTS(s_vl6180X.readRangeSingleMillimeters(), 0));
 
         s_vl6180X.setScaling(vl6180XScalling);
         // int32_t rangemm = s_vl6180X.readRangeSingleMillimeters();
-        int32_t rangemm = s_vl6180X.readRangeContinuousMillimeters();
+        int32_t rangemm = s_vl6180X.readRangeSingleMillimeters();
 
-        // if (rangemm < 250)
         vl6180XScalling = 1;
-        // if (rangemm >= 250 and rangemm < 500)
-        //   vl6180XScalling = 2;
-        // if (rangemm >= 500)
-        //   vl6180XScalling = 3;
 
         s_vl6180X.setScaling(vl6180XScalling);
 
@@ -51,8 +46,8 @@ void TaskVL6180X(void *parameters)
         unsigned cont = 0;
         unsigned long t = millis();
 
-        range0 = s_vl6180X.readRangeContinuousMillimeters();
-        if (range0 != 255)
+        range0 = s_vl6180X.readRangeSingleMillimeters();
+        if (range0 != 255 and range0 != 0)
           VL6180X_RangeRM.add(range0);
         else
         {
@@ -62,38 +57,19 @@ void TaskVL6180X(void *parameters)
           Wire.end();
           delay(100);
           Wire.begin();
-
-          s_vl6180X.init();
-          s_vl6180X.configureDefault();
-          s_vl6180X.setScaling(1);
-          s_vl6180X.setTimeout(100);
-          // s_vl6180X.stopContinuous();
-          s_vl6180X.startRangeContinuous();
-          s_vl6180X.writeReg(VL6180X::SYSRANGE__MAX_CONVERGENCE_TIME, 20);
-          s_vl6180X.writeReg16Bit(VL6180X::SYSALS__INTEGRATION_PERIOD, 50);
         }
 
-        // while (millis() - t < 5000)
-        // {
-        //   s_vl6180X.timeoutOccurred();
-        //   range0 = s_vl6180X.readRangeContinuousMillimeters();
-        //   if (range0 != 768)
-        //   {
-        //     VL6180X_RangeRM.add(range0);
-        //     cont++;
-        //   }
-        //   else
-        //   {
-        //     syslog_err("VL6180X: Error range");
-        //     err++;
-        //     Wire.endTransmission(1);
-        //     Wire.end();
-        //   }
-        // }
 
-        // VL6180X_RangeAVG.add(VL6180X_RangeRM.getMedian() / 10);
-        if (VL6180X_RangeRM.getAverage(3) != 0)
-          Dist = VL6180X_RangeRM.getAverage(3) / 10;
+        if (VL6180X_RangeRM.getAverage(25) != 0)
+          Dist = VL6180X_RangeRM.getAverage(25) / 10;
+
+        if (abs(Dist - range0/10) > 4)
+        {
+          VL6180X_RangeRM.clear();
+          syslog_ng("VL6180X: Reset average filter Dist=" + String(Dist)+ " range="+String(range0));
+          VL6180X_RangeRM.add(range0);
+        }
+
 
         VL6180X_time = millis() - VL6180X_time;
         syslog_ng("VL6180X: dist=" + fFTS(Dist, 3));
