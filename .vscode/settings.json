@@ -25,5 +25,6 @@
         "cwchar": "cpp",
         "limits": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cmake.sourceDirectory": "/home/user/WEGA/wegabox/wegabox/.pio/libdeps/nodemcu-32s/Adafruit BusIO"
 }
