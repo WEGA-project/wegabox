@@ -1,7 +1,8 @@
 #if c_VL53L0X_us == 1
 while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
   ;
-
+Wire.end();
+delay (100);
 Wire.begin(US_SDA, US_SCL);
 
 Wire.requestFrom((uint8_t)0x29, (uint8_t)1);
@@ -28,6 +29,7 @@ if (Wire.available())
     syslog_err("VL53L0X: The sensor is not detected");
 }
 Wire.end();
+delay (100);
 Wire.begin(I2C_SDA, I2C_SCL);
 xSemaphoreGive(xSemaphoreX);
 #endif // c_VL53L0X_us
