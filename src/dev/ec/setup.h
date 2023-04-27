@@ -1,7 +1,7 @@
 
 #if c_EC == 1
 
-if (adc1_get_raw(NTC_port) > 0)
+if (analogRead(NTC_port) > 0)
 {
 
    __wega_adcAttachPin(EC_AnalogPort);

@@ -63,6 +63,7 @@ void TaskVL53L0X(void *parameters)
 
         syslog_ng("VL53L0X " + fFTS(VL53L0X_time, 0) + "ms end.");
 
+        Wire.end();
         Wire.begin(I2C_SDA, I2C_SCL);
         VL53L0X_old = millis();
         xSemaphoreGive(xSemaphoreX);

@@ -27,7 +27,7 @@ if (Wire.available())
   else
     syslog_err("VL53L0X: The sensor is not detected");
 }
-
+Wire.end();
 Wire.begin(I2C_SDA, I2C_SCL);
 xSemaphoreGive(xSemaphoreX);
 #endif // c_VL53L0X_us

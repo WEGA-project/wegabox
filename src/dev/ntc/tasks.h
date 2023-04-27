@@ -9,7 +9,7 @@ void TaskNTC(void *parameters) {
 
     if (xSemaphoreX != NULL and NTC_LastTime > NTC_Repeat) {
       if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE) {
-        vTaskDelay(2000);
+        vTaskDelay(1000); // Нужно выждать, чтобы убрать электромагнитные наводки от ЕС
         unsigned long NTC_time = millis();
         syslog_ng("NTC Start " + fFTS(NTC_LastTime - NTC_Repeat, 0) + "ms");
 
@@ -21,8 +21,8 @@ void TaskNTC(void *parameters) {
         float NTC0 = 0;
         for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++) {
 
-                    __wega_adcStart(32);
-          NTC0 = NTC0 + __wega_adcEnd(32);
+                    __wega_adcStart(NTC_port);
+          NTC0 = NTC0 + __wega_adcEnd(NTC_port);
 
           // NTC0 = NTC0 + adc1_get_raw(NTC_port);
           // vTaskDelay(1);
