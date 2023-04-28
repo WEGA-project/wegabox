@@ -22,6 +22,7 @@ void TaskNTC(void *parameters) {
         for (long i = 0; i < NTC_MiddleCount and OtaStart != true; i++) {
 
                     __wega_adcStart(NTC_port);
+                    vTaskDelay(1);
           NTC0 = NTC0 + __wega_adcEnd(NTC_port);
 
           // NTC0 = NTC0 + adc1_get_raw(NTC_port);
@@ -32,7 +33,7 @@ void TaskNTC(void *parameters) {
         adc_power_release();
 
         NTCRM.add(float(NTC0) / NTC_MiddleCount);
-        NTC = NTCRM.getAverage();
+        NTC = NTCRM.getAverage(10);
 
         NTC_time = millis() - NTC_time;
         syslog_ng("NTC:" + fFTS(NTC, 3));
