@@ -50,6 +50,7 @@ bool ECwork = false;
 bool USwork = false;
 int readGPIO, PWD1, PWD2;
 long ECStabOn;
+bool AHTx=false;
 
 
 String wegareply;

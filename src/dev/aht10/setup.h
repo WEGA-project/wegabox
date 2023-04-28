@@ -5,7 +5,7 @@ while (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdFALSE)
 Wire.requestFrom(AHT10addr, (uint8_t)1);
 if (Wire.available())
 {
-
+  AHTx = true;
   myAHT10.softReset();
   delay(50);
   myAHT10.begin();
