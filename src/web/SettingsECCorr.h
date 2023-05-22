@@ -30,7 +30,7 @@ if (server.arg("ECStabMaxDist") != "")
 
 h +="<form action='' method='POST' id='set'></form>\n";
 h +=" <table>\n";
-h +="     <caption>EC correction</caption>\n";
+h +="     <caption>EC Water Correction</caption>\n";
 
 
 h +="     <tr>\n";

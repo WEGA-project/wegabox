@@ -5,8 +5,6 @@ SetPumpA_Ml=preferences.getFloat("SetPumpA_Ml", 0);
 SetPumpB_Ml=preferences.getFloat("SetPumpB_Ml", 0);
 
 
-
-
 if (server.arg("StPumpA_Del") != "")  preferences.putInt("StPumpA_Del", server.arg("StPumpA_Del").toInt());
 if (server.arg("StPumpA_Ret") != "")  preferences.putInt("StPumpA_Ret", server.arg("StPumpA_Ret").toInt());
 
