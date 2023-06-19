@@ -11,7 +11,7 @@ void TaskUS(void *parameters)
 
     if (xSemaphoreX != NULL and US025_LastTime > US025_Repeat)
     {
-      if (xSemaphoreTake(xSemaphoreX, (TickType_t)1) == pdTRUE)
+      if (xSemaphoreTake(xSemaphoreX, (TickType_t)5) == pdTRUE)
       {
         unsigned long US025_time = millis();
         syslog_ng("US025 Start " + fFTS(US025_LastTime - US025_Repeat, 0) + "ms");
